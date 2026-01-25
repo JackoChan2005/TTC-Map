@@ -12,7 +12,7 @@ class loader:
         self.params = { "id": "merged-gtfs-ttc-routes-and-schedules"}
 
         # Data directory
-        self.data_dir = globals.home_dir / "data"
+        self.data_dir = globals.data_dir
 
     def download_Data(self) -> None:
         package = requests.get(self.url, params = self.params).json()
@@ -54,9 +54,11 @@ class loader:
             print("No zip files found!")
 
     def load_data(self) -> None:
-        return
+        if self.data_dir:
+            self.data_dir.mkdir(parents=True)
+        self.download_Data()
+        self.extract_data()
 
 if __name__ == "__main__":
     l = loader()
-    l.download_Data()
-    l.extract_data()
+    l.load_data()
