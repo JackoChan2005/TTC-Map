@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 from zipfile import ZipFile
 
 import globals
@@ -54,7 +53,7 @@ class loader:
             print("No zip files found!")
 
     def load_data(self) -> None:
-        if self.data_dir:
+        if not self.data_dir:
             self.data_dir.mkdir(parents=True)
         self.download_Data()
         self.extract_data()
