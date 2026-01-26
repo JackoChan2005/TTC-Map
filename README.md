@@ -1,23 +1,22 @@
 # The beginning of the TTC display
-before you start working on this project please download the requirements as following:
-
+PCB to display the TTC subway routes and realtime positions
 ## Setup
 
 1. Clone the repository
 2. Create a virtual environment:
 ```bash
-   python -m venv venv
+python -m venv venv
 ```
 3. Activate the virtual environment:
-   - On Windows:
+- On Windows:
 ```bash
-     venv\Scripts\activate
+venv\Scripts\activate
 ```
-   - On macOS/Linux:
+- On macOS/Linux:
 ```bash
-     source venv/bin/activate
+source venv/bin/activate
 ```
 4. Install dependencies:
 ```bash
-   pip install -r requirements.txt
+pip install -r requirements.txt
 ```
