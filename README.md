@@ -20,3 +20,11 @@ source venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+5. move to src
+```bash
+cd .\API\src\
+```
+6. run update_db.py
+```bash
+python .\update_db.py
+```
