@@ -20,11 +20,15 @@ source venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
-5. move to src
+5. Move to src:
 ```bash
 cd .\API\src\
 ```
-6. run update_db.py
+6. Run update_db.py:
 ```bash
 python .\update_db.py
+```
+7. To view the api run
+```bash
+Fastapi dev .\main.py
 ```
