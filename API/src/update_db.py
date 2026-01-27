@@ -17,3 +17,8 @@ class update_db:
     def update_tables(self) -> None:
         self.load.load_data()
         self.transform.transform()
+
+
+if __name__ == "__main__":
+    u = update_db()
+    u.update_tables()
