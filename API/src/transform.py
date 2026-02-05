@@ -45,6 +45,8 @@ class transformer:
         subway_stop_times = subway_stop_times.merge(stops[['stop_id','stop_code','stop_name']], on='stop_id')
         subway_stop_times = subway_stop_times.sort_values(['trip_id', 'stop_sequence'])
 
+        subway_stop_times['departing_time_sec'] = subway_stop_times['departure_time'].apply(globals.gtfs_time_to_seconds)
+
         id_cols = [col for col in subway_stop_times.columns if '_id' in col]
         other_cols = [col for col in subway_stop_times.columns if '_id' not in col]
         subway_stop_times = subway_stop_times[id_cols + other_cols]

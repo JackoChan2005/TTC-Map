@@ -1,0 +1,7 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "ESP32-DEVKIT-V1")(type "KiCad")(uri "${KIPRJMOD}/My-Custom-Footprints.pretty/ESP32-DEVKIT-V1/ESP32-DEVKIT-V1.kicad_sym")(options "")(descr ""))
+  (lib (name "JMK105BJ105KV-F")(type "KiCad")(uri "${KIPRJMOD}/My-Custom-Footprints.pretty/JMK105BJ105KV_F/JMK105BJ105KV-F.kicad_sym")(options "")(descr ""))
+  (lib (name "C0603C104K5RACTU")(type "KiCad")(uri "${KIPRJMOD}/My-Custom-Footprints.pretty/C0603C104K5RACTU/C0603C104K5RACTU.kicad_sym")(options "")(descr ""))
+  (lib (name "CL05A104KA5NNNC")(type "KiCad")(uri "${KIPRJMOD}/My-Custom-Footprints.pretty/CL05A104KA5NNNC/CL05A104KA5NNNC.kicad_sym")(options "")(descr ""))
+)

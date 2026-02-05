@@ -22,6 +22,7 @@ class SubwayStopTime(Base):
     stop_name = Column(String)
     arrival_time = Column(String)
     departure_time = Column(String)
+    departing_time_sec = Column(Integer)
     direction_id = Column(Integer)
 
 class ServiceDay(Base):
