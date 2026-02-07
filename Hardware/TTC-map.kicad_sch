@@ -3692,10 +3692,6 @@
 		(uuid "ca043382-cbed-4c24-8ea9-5fcc1839151d")
 	)
 	(no_connect
-		(at 243.84 100.33)
-		(uuid "ccf91032-8c5a-44f8-9239-044dd690e616")
-	)
-	(no_connect
 		(at 161.29 33.02)
 		(uuid "cd8282ef-cc26-4829-a2ac-9d868b5b5805")
 	)
@@ -4276,6 +4272,16 @@
 			(type default)
 		)
 		(uuid "7c10a56a-0fa5-4e0f-b815-5ea9ce04fd1e")
+	)
+	(wire
+		(pts
+			(xy 243.84 100.33) (xy 251.46 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7c27a09a-7185-424b-8910-622249e440eb")
 	)
 	(wire
 		(pts
@@ -4966,6 +4972,16 @@
 			(justify right bottom)
 		)
 		(uuid "5f6ba9b5-d52a-41fa-9050-917defee41c5")
+	)
+	(label "QB-2"
+		(at 251.46 100.33 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "64e26b4b-8b12-4343-a386-de1d4d8f72a4")
 	)
 	(label "QB-1"
 		(at 251.46 36.83 180)
