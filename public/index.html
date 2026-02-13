@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTC Route Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="layout">
+    <section class="panel">
+      <p class="eyebrow">TTC Live Search</p>
+      <h1>Find where a route is right now</h1>
+      <p class="subtitle">Search by route number and compare records against the current time.</p>
+
+      <form id="search-form" class="search-form">
+        <label for="route">Route number</label>
+        <input id="route" name="route" type="text" placeholder="e.g. 1 or 2" required>
+
+        <label for="at-time">Time</label>
+        <input id="at-time" name="at-time" type="datetime-local">
+
+        <div class="form-actions">
+          <button type="button" id="now-btn" class="secondary">Use Current Time</button>
+          <button type="submit">Search</button>
+        </div>
+      </form>
+
+      <div id="status" class="status"></div>
+    </section>
+
+    <section id="results" class="results hidden">
+      <h2>Best Match</h2>
+      <article id="best-match" class="card"></article>
+
+      <h2>Top Route Records</h2>
+      <div id="matches" class="matches"></div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

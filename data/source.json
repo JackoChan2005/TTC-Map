@@ -1,0 +1,18 @@
+{
+  "records": [
+    {
+      "id": "line1-northbound",
+      "line": 1,
+      "direction": "northbound",
+      "status": "on-time",
+      "updated_at": "2026-02-13T00:00:00.000Z"
+    },
+    {
+      "id": "line2-eastbound",
+      "line": 2,
+      "direction": "eastbound",
+      "status": "delayed",
+      "updated_at": "2026-02-13T00:00:00.000Z"
+    }
+  ]
+}
