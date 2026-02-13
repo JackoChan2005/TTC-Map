@@ -14,3 +14,9 @@ env/
 data/
 
 Hardware/TTC-map-backups
+
+# node-api local/runtime artifacts
+node-api/node_modules/
+node-api/.env
+node-api/data.db
+node-api/data/
