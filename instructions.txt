@@ -1,0 +1,81 @@
+TTC Node API - Run Instructions
+
+1) Open terminal at node-api
+*\ttc\node-api
+
+2) Install dependencies (first time only)
+npm.cmd install
+
+3) Check/update env config in node-api/.env
+PORT=3000
+DATABASE_PATH=./data.db
+JSON_SOURCE=ckan-package:b811ead4-6eaf-4adb-8408-d389fb5a069c
+CKAN_BASE_URL=https://ckan0.cf.opendata.inter.prod-toronto.ca
+CKAN_FETCH_RESOURCE=false
+SYNC_INTERVAL_MS=60000
+
+4) Start server
+npm.cmd start
+
+5) Open frontend
+http://localhost:3000
+
+
+What happens on startup
+
+1) SQLite DB initializes (node-api/data.db)
+2) Initial sync runs once
+3) Cron sync runs every 60 seconds (SYNC_INTERVAL_MS=60000)
+4) Synced data is stored in:
+   - synced_records
+   - sync_runs
+
+
+API endpoints
+
+1) Health
+GET /api/health
+
+2) Manual sync
+POST /api/sync/run
+
+3) Sync status (latest run)
+GET /api/sync/status
+
+4) List records
+GET /api/records?limit=100
+
+5) Get record by source key
+GET /api/records/:sourceKey
+
+6) Route search (used by frontend)
+GET /api/route-search?route=1
+GET /api/route-search?route=1&at=2026-02-13T05:00:00.000Z
+
+
+Important notes for API calls
+
+1) Route search requires the route query parameter
+2) at is optional; defaults to current time if omitted
+3) Route matching checks keys like route, route_id, line, route_number
+4) Time matching checks keys like timestamp, updated_at, arrival_time, departure_time
+5) If no matching route records exist, route-search returns 404
+
+
+CKAN source note
+
+1) Current package source syncs via package_show metadata
+2) CKAN_FETCH_RESOURCE=false is intentional because this package's main resource is ZIP, not JSON
+3) If CKAN_FETCH_RESOURCE=true, ensure selected resource is JSON/datastore data
+
+
+Common troubleshooting
+
+1) PowerShell blocks npm scripts
+Use npm.cmd instead of npm
+
+2) Port already in use (EADDRINUSE)
+$env:PORT='3001'; npm.cmd start
+
+3) Test sync quickly
+npm.cmd run sync
