@@ -1,7 +1,7 @@
 TTC Node API - Run Instructions
 
 1) Open terminal at node-api
-*\ttc\node-api
+*\TTC-MAP\node-api
 
 2) Install dependencies (first time only)
 npm.cmd install
@@ -19,6 +19,9 @@ npm.cmd start
 
 5) Open frontend
 http://localhost:3000
+
+6) Stop Process
+Control C
 
 
 What happens on startup

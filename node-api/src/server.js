@@ -1,7 +1,7 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '..', 'env.config') });
 
 const express = require('express');
-const path = require('path');
 const db = require('./db');
 const routes = require('./routes');
 const { runSync, startSyncCron } = require('./sync/syncJob');
@@ -53,3 +53,4 @@ startServer().catch((error) => {
   console.error('Server startup failed:', error.message);
   process.exit(1);
 });
+
