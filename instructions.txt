@@ -8,7 +8,7 @@ npm.cmd install
 
 3) Check/update env config in node-api/.env
 PORT=3000
-DATABASE_PATH=./data.db
+DATABASE_PATH=../API/db/SubwaySystem.db
 JSON_SOURCE=ckan-package:b811ead4-6eaf-4adb-8408-d389fb5a069c
 CKAN_BASE_URL=https://ckan0.cf.opendata.inter.prod-toronto.ca
 CKAN_FETCH_RESOURCE=false
@@ -26,7 +26,7 @@ Control C
 
 What happens on startup
 
-1) SQLite DB initializes (node-api/data.db)
+1) SQLite DB initializes (API/db/SubwaySystem.db)
 2) Initial sync runs once
 3) Cron sync runs every 60 seconds (SYNC_INTERVAL_MS=60000)
 4) Synced data is stored in:
@@ -82,3 +82,16 @@ $env:PORT='3001'; npm.cmd start
 
 3) Test sync quickly
 npm.cmd run sync
+
+Python sync integration (uses existing API/src/update_db.py)
+
+1) Install Python deps once from repo root:
+pip install -r requirements.txt
+
+2) In node-api/env.config set:
+PYTHON_SYNC_ENABLED=true
+PYTHON_BIN=python
+PYTHON_SYNC_SCRIPT=API/src/update_db.py
+PYTHON_SYNC_DB_PATH=API/db/SubwaySystem.db
+
+3) If you use a venv, point PYTHON_BIN to that interpreter path.
