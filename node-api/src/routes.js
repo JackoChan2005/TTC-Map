@@ -3,19 +3,17 @@ const db = require('./db');
 const { runSync, getJsonSource } = require('./sync/syncJob');
 
 const router = express.Router();
-const ROUTE_KEYS = new Set(['route', 'route_id', 'routeid', 'line', 'line_id', 'routenum', 'route_number']);
-const TIME_KEYS = new Set([
-  'timestamp',
-  'time',
-  'updated_at',
-  'updatedat',
-  'vehicle_timestamp',
-  'trip_start_time',
-  'departure_time',
-  'arrival_time'
+const TORONTO_TIMEZONE = 'America/Toronto';
+const DEPARTURE_WINDOW_SECONDS = 120;
+const WEEKDAY_COLUMNS = new Set([
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday'
 ]);
-
-const MAX_SEARCH_ROWS = 10000;
 
 const parsePayload = (row) => {
   try {
@@ -85,51 +83,76 @@ const parseTimestampCandidate = (value) => {
   return null;
 };
 
-const findValuesByKey = (input, allowedKeys, depth = 0, out = []) => {
-  if (depth > 4 || input === null || input === undefined) {
-    return out;
+const parseGtfsTimeToSeconds = (value) => {
+  if (typeof value !== 'string') {
+    return null;
   }
 
-  if (Array.isArray(input)) {
-    for (const item of input) {
-      findValuesByKey(item, allowedKeys, depth + 1, out);
-    }
-    return out;
+  const trimmed = value.trim();
+  const match = trimmed.match(/^(\d+):([0-5]\d):([0-5]\d)$/);
+  if (!match) {
+    return null;
   }
 
-  if (typeof input !== 'object') {
-    return out;
-  }
+  const hours = Number.parseInt(match[1], 10);
+  const minutes = Number.parseInt(match[2], 10);
+  const seconds = Number.parseInt(match[3], 10);
 
-  for (const [key, value] of Object.entries(input)) {
-    const normalizedKey = key.replace(/[\s-]/g, '').toLowerCase();
-    if (allowedKeys.has(normalizedKey)) {
-      out.push(value);
-    }
-
-    if (value && typeof value === 'object') {
-      findValuesByKey(value, allowedKeys, depth + 1, out);
-    }
-  }
-
-  return out;
+  return (hours * 3600) + (minutes * 60) + seconds;
 };
 
-const doesRouteMatch = (payload, requestedRoute) => {
-  const routeCandidates = findValuesByKey(payload, ROUTE_KEYS);
-  return routeCandidates.some((candidate) => normalizeRouteValue(candidate) === requestedRoute);
-};
+const getTorontoTimeParts = (date) => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: TORONTO_TIMEZONE,
+    weekday: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
 
-const getRecordTime = (record) => {
-  const timeCandidates = findValuesByKey(record.payload, TIME_KEYS);
-  for (const candidate of timeCandidates) {
-    const parsed = parseTimestampCandidate(candidate);
-    if (parsed) {
-      return parsed;
-    }
+  const parts = formatter.formatToParts(date);
+  const valueByType = {};
+  for (const part of parts) {
+    valueByType[part.type] = part.value;
   }
 
-  return parseTimestampCandidate(record.updated_at);
+  return {
+    weekday: String(valueByType.weekday || '').toLowerCase(),
+    hour: Number.parseInt(valueByType.hour || '0', 10),
+    minute: Number.parseInt(valueByType.minute || '0', 10),
+    second: Number.parseInt(valueByType.second || '0', 10)
+  };
+};
+
+const torontoServiceWeekdayForSec = (baseDate, sec) => {
+  const serviceDate = sec >= 24 * 3600
+    ? new Date(baseDate.getTime() - (24 * 3600 * 1000))
+    : baseDate;
+  const { weekday } = getTorontoTimeParts(serviceDate);
+  return weekday;
+};
+
+const getRequestedWindow = (atValue) => {
+  const baseDate = atValue ? parseTimestampCandidate(atValue) : new Date();
+  if (!baseDate) {
+    return null;
+  }
+
+  const explicitGtfsSeconds = parseGtfsTimeToSeconds(atValue);
+  const { hour, minute, second } = getTorontoTimeParts(baseDate);
+  const sec = explicitGtfsSeconds ?? ((hour * 3600) + (minute * 60) + second);
+  const day = torontoServiceWeekdayForSec(baseDate, sec);
+
+  if (!WEEKDAY_COLUMNS.has(day)) {
+    return null;
+  }
+
+  return {
+    sec,
+    day,
+    requestedAt: baseDate.toISOString()
+  };
 };
 
 router.get('/route-search', async (req, res, next) => {
@@ -140,50 +163,59 @@ router.get('/route-search', async (req, res, next) => {
       return;
     }
 
-    const at = req.query.at;
-    const requestedTime = at ? parseTimestampCandidate(at) : new Date();
-    if (!requestedTime) {
+    const requestedWindow = getRequestedWindow(req.query.at);
+    if (!requestedWindow) {
       res.status(400).json({ message: 'Query parameter "at" must be a valid date/time' });
       return;
     }
 
-    const rows = await db.all(
-      'SELECT id, source_key, payload, updated_at FROM synced_records ORDER BY id DESC LIMIT ?',
-      [MAX_SEARCH_ROWS]
-    );
-    const records = rows.map(parsePayload);
-    const routeRecords = records.filter((record) => doesRouteMatch(record.payload, requestedRoute));
+    const rows = await db.all(`
+      SELECT
+        sst.trip_id,
+        sst.stop_sequence,
+        sst.route_id,
+        sst.service_id,
+        sst.direction_id,
+        sst.stop_id,
+        sst.stop_name,
+        sst.arrival_time,
+        sst.departure_time,
+        sst.departing_time_sec
+      FROM SUBWAY_STOP_TIMES sst
+      JOIN SERVICE_DAYS sd
+        ON sd.service_id = sst.service_id
+      WHERE sd.${requestedWindow.day} = 1
+        AND CAST(sst.route_id AS TEXT) = ?
+        AND sst.departing_time_sec BETWEEN ? AND ?
+      ORDER BY sst.departure_time
+      LIMIT 200
+    `, [requestedRoute, requestedWindow.sec, requestedWindow.sec + DEPARTURE_WINDOW_SECONDS]);
 
-    if (routeRecords.length === 0) {
+    if (rows.length === 0) {
       res.status(404).json({
-        message: `No records found for route ${requestedRoute}`,
+        message: `No trains for route ${requestedRoute} in the next 2 minutes`,
         route: requestedRoute,
-        requestedAt: requestedTime.toISOString()
+        requestedAt: requestedWindow.requestedAt,
+        serviceDay: requestedWindow.day
       });
       return;
     }
 
-    const ranked = routeRecords
-      .map((record) => {
-        const recordTime = getRecordTime(record);
-        const diffMs = recordTime ? Math.abs(recordTime.getTime() - requestedTime.getTime()) : Number.MAX_SAFE_INTEGER;
-        return {
-          id: record.id,
-          sourceKey: record.source_key,
-          updatedAt: record.updated_at,
-          recordTime: recordTime ? recordTime.toISOString() : null,
-          deltaSeconds: Number.isFinite(diffMs) ? Math.round(diffMs / 1000) : null,
-          payload: record.payload
-        };
-      })
-      .sort((a, b) => (a.deltaSeconds ?? Number.MAX_SAFE_INTEGER) - (b.deltaSeconds ?? Number.MAX_SAFE_INTEGER));
+    const matches = rows.map((row) => ({
+      sourceKey: `${row.trip_id}-${row.stop_sequence}`,
+      recordTime: row.departure_time,
+      updatedAt: null,
+      deltaSeconds: row.departing_time_sec - requestedWindow.sec,
+      payload: row
+    }));
 
     res.json({
       route: requestedRoute,
-      requestedAt: requestedTime.toISOString(),
-      totalMatches: ranked.length,
-      bestMatch: ranked[0],
-      matches: ranked.slice(0, 25)
+      requestedAt: requestedWindow.requestedAt,
+      serviceDay: requestedWindow.day,
+      totalMatches: matches.length,
+      bestMatch: matches[0],
+      matches
     });
   } catch (error) {
     next(error);
