@@ -72,18 +72,18 @@ cd "$PROJECT_ROOT/node-api"
 npm ci
 echo "   ✅ Node packages installed"
 
-# ── 4. Point node-api/env.config PYTHON_BIN at the venv interpreter ──
+# ── 4. Point PYTHON_BIN at the venv interpreter via node-api/.env.local ──
+#      (gitignored local override; the committed env.config stays untouched)
 echo ""
-echo "🔧 Configuring node-api/env.config..."
+echo "🔧 Configuring node-api/.env.local..."
 
-ENV_CONFIG="$PROJECT_ROOT/node-api/env.config"
-if [ -f "$ENV_CONFIG" ]; then
-  sed -i.bak "s|^PYTHON_BIN=.*|PYTHON_BIN=$VENV_PY|" "$ENV_CONFIG"
-  rm -f "$ENV_CONFIG.bak"
-  echo "   ✅ PYTHON_BIN set to $VENV_PY"
-else
-  echo "   ⚠ env.config not found at $ENV_CONFIG — set PYTHON_BIN manually."
+ENV_LOCAL="$PROJECT_ROOT/node-api/.env.local"
+if [ -f "$ENV_LOCAL" ]; then
+  grep -v '^PYTHON_BIN=' "$ENV_LOCAL" > "$ENV_LOCAL.tmp" || true
+  mv "$ENV_LOCAL.tmp" "$ENV_LOCAL"
 fi
+echo "PYTHON_BIN=$VENV_PY" >> "$ENV_LOCAL"
+echo "   ✅ PYTHON_BIN set to $VENV_PY"
 
 # ── 5. Summary ──
 echo ""

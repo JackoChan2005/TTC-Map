@@ -10,6 +10,9 @@ cd /d "%~dp0node-api"
 
 set PORT=3000
 for /f "tokens=2 delims==" %%a in ('findstr /b "PORT=" env.config') do set PORT=%%a
+if exist .env.local (
+    for /f "tokens=2 delims==" %%a in ('findstr /b "PORT=" .env.local') do set PORT=%%a
+)
 
 echo Starting TTC-Map server on http://localhost:%PORT% ...
 echo (the browser opens automatically once the server is ready -

@@ -9,6 +9,10 @@
 cd "$(dirname "$0")/node-api"
 
 PORT=$(grep -E '^PORT=' env.config | head -1 | cut -d= -f2)
+if [ -f .env.local ]; then
+  LOCAL_PORT=$(grep -E '^PORT=' .env.local | head -1 | cut -d= -f2)
+  [ -n "$LOCAL_PORT" ] && PORT=$LOCAL_PORT
+fi
 PORT=${PORT:-3000}
 
 echo "Starting TTC-Map server on http://localhost:$PORT ..."

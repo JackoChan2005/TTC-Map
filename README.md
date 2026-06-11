@@ -18,7 +18,7 @@ Full dependency list: [DEPENDENCIES.md](DEPENDENCIES.md)
 
 ## Quick Start (recommended)
 
-Two scripts in the repo root do everything. **Setup** (one-time) creates the Python venv, installs all Python and Node dependencies, points `PYTHON_BIN` in `node-api/env.config` at the venv automatically, and runs the first data sync. **Start** launches the server and opens [http://localhost:3000](http://localhost:3000) in your browser as soon as it's ready.
+Two scripts in the repo root do everything. **Setup** (one-time) creates the Python venv, installs all Python and Node dependencies, writes `PYTHON_BIN` to a gitignored `node-api/.env.local` so the server uses the venv automatically, and runs the first data sync. **Start** launches the server and opens [http://localhost:3000](http://localhost:3000) in your browser as soon as it's ready.
 
 **Windows** — double-click the file, or run from a terminal in the repo root:
 ```bat
@@ -75,11 +75,13 @@ npm install
 
 ---
 
-## Configuring env.config and running
+## Configuration and running
 
-**5. Set your Python interpreter in `node-api/env.config`**
+The committed `node-api/env.config` holds shared defaults. Machine-specific values go in `node-api/.env.local` (gitignored) — anything set there overrides `env.config`, so you never need to edit the tracked file.
 
-Open `node-api/env.config` and set `PYTHON_BIN` to the venv interpreter:
+**5. Point `PYTHON_BIN` at your venv**
+
+Create `node-api/.env.local` containing one line (the setup scripts do this for you):
 
 ```
 # macOS / Linux
@@ -90,8 +92,8 @@ PYTHON_BIN=C:\path\to\TTC-Map\venv\Scripts\python.exe
 ```
 
 > The Node server spawns this interpreter on every sync to load the GTFS feed.
-> If left as the default `python`, it may resolve to a system install (e.g. Anaconda)
-> that lacks the required packages, and the sync will fail.
+> If left as the default `python` from `env.config`, it may resolve to a system
+> install (e.g. Anaconda) that lacks the required packages, and the sync will fail.
 
 **6. Run the first sync** (from the `node-api/` directory)
 
@@ -174,7 +176,10 @@ $env:PORT='3001'; npm.cmd start
 ```
 
 **Sync fails with import errors / missing packages**  
-Verify that `PYTHON_BIN` in `node-api/env.config` points to the venv interpreter, not a system Python.
+Verify that `PYTHON_BIN` in `node-api/.env.local` points to the venv interpreter, not a system Python. Re-running the setup script fixes this.
+
+**Port change**  
+Add `PORT=3001` (or any port) to `node-api/.env.local` — both the server and the start scripts pick it up.
 
 **`sqlite3` build fails on macOS**  
 Install Xcode Command Line Tools:

@@ -6,8 +6,8 @@ Quick start (recommended)
 Windows: setup.bat
 macOS:   ./setup.command
 (creates the Python venv, installs Python + Node dependencies,
- points PYTHON_BIN in node-api/env.config at the venv, and runs
- the first data sync - takes a few minutes)
+ writes PYTHON_BIN to node-api/.env.local so the server uses the
+ venv, and runs the first data sync - takes a few minutes)
 
 2) Start the server, from the repo root
 Windows: start.bat
@@ -27,7 +27,9 @@ Manual run (if not using the scripts above)
 2) Install dependencies (first time only)
 npm.cmd install
 
-3) Check/update env config in node-api/env.config
+3) Config files
+node-api/env.config  = committed shared defaults (do not edit for
+                       machine-specific values):
 PORT=3000
 NODE_ENV=development
 DATABASE_PATH=../API/db/SubwaySystem.db
@@ -36,9 +38,16 @@ CKAN_BASE_URL=https://ckan0.cf.opendata.inter.prod-toronto.ca
 CKAN_FETCH_RESOURCE=false
 SYNC_INTERVAL_MS=60000
 PYTHON_SYNC_ENABLED=true
-PYTHON_BIN=python   (set to your venv interpreter - the setup scripts do this automatically)
+PYTHON_BIN=python
 PYTHON_SYNC_SCRIPT=API/src/update_db.py
 PYTHON_SYNC_DB_PATH=API/db/SubwaySystem.db
+
+node-api/.env.local  = your local overrides (gitignored). Any
+variable set here wins over env.config. At minimum it should
+contain PYTHON_BIN pointing at your venv interpreter - the setup
+scripts create this file automatically:
+PYTHON_BIN=C:\path\to\TTC-Map\venv\Scripts\python.exe   (Windows)
+PYTHON_BIN=/path/to/TTC-Map/venv/bin/python             (macOS)
 
 4) Start server
 npm.cmd start
@@ -117,12 +126,12 @@ automatically. The steps below are only needed for a manual setup.
 2) Install Python deps once from repo root (inside your venv):
 pip install -r requirements.txt
 
-3) In node-api/env.config set:
+3) The committed env.config already enables the Python sync:
 PYTHON_SYNC_ENABLED=true
-PYTHON_BIN=python
 PYTHON_SYNC_SCRIPT=API/src/update_db.py
 PYTHON_SYNC_DB_PATH=API/db/SubwaySystem.db
 
-4) If you use a venv, point PYTHON_BIN to that interpreter path, e.g.
-Windows: C:\path\to\TTC-Map\venv\Scripts\python.exe
-macOS:   /path/to/TTC-Map/venv/bin/python
+4) Point PYTHON_BIN at your venv interpreter in node-api/.env.local
+(gitignored - overrides env.config):
+Windows: PYTHON_BIN=C:\path\to\TTC-Map\venv\Scripts\python.exe
+macOS:   PYTHON_BIN=/path/to/TTC-Map/venv/bin/python

@@ -121,23 +121,21 @@ finally {
 }
 
 # ─────────────────────────────────────────────
-# 4. Point node-api/env.config PYTHON_BIN at the venv interpreter
+# 4. Point PYTHON_BIN at the venv interpreter via node-api/.env.local
+#    (gitignored local override; the committed env.config stays untouched)
 # ─────────────────────────────────────────────
 Write-Host ""
-Write-Host "Configuring node-api/env.config..."
+Write-Host "Configuring node-api/.env.local..."
 
-$envConfigPath = Join-Path $nodeApiDir "env.config"
-if (Test-Path $envConfigPath) {
-    $cfgLines = Get-Content $envConfigPath | ForEach-Object {
-        if ($_ -match "^PYTHON_BIN=") { "PYTHON_BIN=$venvPython" } else { $_ }
-    }
-    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllLines($envConfigPath, $cfgLines, $utf8NoBom)
-    Write-Host "PYTHON_BIN set to $venvPython"
+$envLocalPath = Join-Path $nodeApiDir ".env.local"
+$localLines = @()
+if (Test-Path $envLocalPath) {
+    $localLines = @(Get-Content $envLocalPath | Where-Object { $_ -notmatch "^PYTHON_BIN=" })
 }
-else {
-    Write-Host "WARNING: env.config not found at $envConfigPath - set PYTHON_BIN manually."
-}
+$localLines += "PYTHON_BIN=$venvPython"
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllLines($envLocalPath, $localLines, $utf8NoBom)
+Write-Host "PYTHON_BIN set to $venvPython"
 
 # ─────────────────────────────────────────────
 # 5. Summary

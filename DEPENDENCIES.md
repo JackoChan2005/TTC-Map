@@ -52,18 +52,26 @@ cd node-api
 npm install
 ```
 
-## 4. Configuration (`node-api/env.config`)
+## 4. Configuration (`env.config` + `.env.local`)
+
+Config is split across two files in `node-api/`:
+
+| File | Tracked? | Purpose |
+|------|----------|---------|
+| `env.config` | yes | shared defaults — works as committed |
+| `.env.local` | no (gitignored) | machine-specific overrides — any variable set here wins |
 
 The Node server spawns the Python GTFS loader during sync, so `PYTHON_BIN`
 must point at an interpreter that has the requirements installed.
 **The setup scripts (`setup.bat` / `setup.command` / `Setup/Setup.ps1` / `Setup/Setup.sh`)
-set this automatically.** For a manual setup with a venv, set it to the venv's interpreter:
+write this to `.env.local` automatically.** For a manual setup with a venv, create
+`node-api/.env.local` containing:
 
 ```
 PYTHON_BIN=/absolute/path/to/TTC-Map/venv/bin/python   # Windows: ...\venv\Scripts\python.exe
 ```
 
-The other defaults (`DATABASE_PATH`, `PYTHON_SYNC_*`) work as committed.
+The committed defaults (`DATABASE_PATH`, `PYTHON_SYNC_*`) need no changes.
 
 ## 5. Run it
 
