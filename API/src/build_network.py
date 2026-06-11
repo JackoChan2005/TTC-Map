@@ -9,6 +9,8 @@ NETWORK_PATH = globals.home_dir.parent / "shared" / "network.json"
 
 PLATFORM_SUFFIXES = [" - Northbound Platform", " - Southbound Platform",
                      " - Eastbound Platform", " - Westbound Platform"]
+LAYOUT_PATH = globals.home_dir.parent / "shared" / "layouts" / "geographic.json"
+LAYOUT_MARGIN = 30.0
 
 
 class network_builder:
@@ -58,7 +60,35 @@ class network_builder:
 
         lines = []
         stations: dict[str, dict] = {}
+        platforms: dict[str, dict] = {}
         station_id_by_name: dict[str, str] = {}
+
+        def register_station(stop_id) -> str:
+            platform = stops.loc[stop_id]
+            parent_id = platform["parent_station"]
+
+            if pd.notna(parent_id):
+                station_id = str(int(parent_id))
+                parent = stops.loc[int(parent_id)]
+                name = self.station_name(str(parent["stop_name"]))
+                lat, lon = parent["stop_lat"], parent["stop_lon"]
+            else:
+                name = self.station_name(str(platform["stop_name"]))
+                station_id = name.lower().replace(" ", "-")
+                lat, lon = platform["stop_lat"], platform["stop_lon"]
+
+            # some platforms lack a parent_station (e.g. Spadina on Line 1);
+            # merge by name so interchanges stay one station
+            station_id = station_id_by_name.setdefault(name, station_id)
+
+            if station_id not in stations:
+                stations[station_id] = {
+                    "name": name,
+                    "lat": round(float(lat), 6),
+                    "lon": round(float(lon), 6),
+                    "lines": [],
+                }
+            return station_id
 
         for _, route in subway_routes.iterrows():
             trip_stops = self.longest_trip(dfs["trips"], dfs["stop_times"],
@@ -71,33 +101,22 @@ class network_builder:
             station_ids = []
 
             for stop_id in trip_stops["stop_id"]:
-                platform = stops.loc[stop_id]
-                parent_id = platform["parent_station"]
-
-                if pd.notna(parent_id):
-                    station_id = str(int(parent_id))
-                    parent = stops.loc[int(parent_id)]
-                    name = self.station_name(str(parent["stop_name"]))
-                    lat, lon = parent["stop_lat"], parent["stop_lon"]
-                else:
-                    name = self.station_name(str(platform["stop_name"]))
-                    station_id = name.lower().replace(" ", "-")
-                    lat, lon = platform["stop_lat"], platform["stop_lon"]
-
-                # some platforms lack a parent_station (e.g. Spadina on Line 1);
-                # merge by name so interchanges stay one station
-                station_id = station_id_by_name.setdefault(name, station_id)
-
-                if station_id not in stations:
-                    stations[station_id] = {
-                        "name": name,
-                        "lat": round(float(lat), 6),
-                        "lon": round(float(lon), 6),
-                        "lines": [],
-                    }
+                station_id = register_station(stop_id)
                 if line_id not in stations[station_id]["lines"]:
                     stations[station_id]["lines"].append(line_id)
                 station_ids.append(station_id)
+
+            # platform stop_ids for both directions, so realtime sources and
+            # the schedule source can map stop_times/NTAS rows to stations
+            for direction_id in (0, 1):
+                direction_stops = self.longest_trip(dfs["trips"], dfs["stop_times"],
+                                                    route["route_id"], direction_id)
+                for stop_id in direction_stops["stop_id"]:
+                    platforms[str(stop_id)] = {
+                        "station": register_station(stop_id),
+                        "line": line_id,
+                        "direction": direction_id,
+                    }
 
             lines.append({
                 "id": line_id,
@@ -116,6 +135,35 @@ class network_builder:
             "stationOrder": "direction_id 0 travel order",
             "lines": lines,
             "stations": stations,
+            "platforms": platforms,
+        }
+
+    def build_geographic_layout(self, network: dict) -> dict:
+        # equirectangular projection of station coordinates onto a
+        # 1000-wide canvas, latitude scaled so distances keep their aspect
+        import math
+
+        lats = [s["lat"] for s in network["stations"].values()]
+        lons = [s["lon"] for s in network["stations"].values()]
+        lat_mid = math.radians((min(lats) + max(lats)) / 2)
+        lon_span = (max(lons) - min(lons)) * math.cos(lat_mid)
+        lat_span = max(lats) - min(lats)
+
+        width = 1000.0
+        scale = (width - 2 * LAYOUT_MARGIN) / lon_span
+        height = lat_span * scale + 2 * LAYOUT_MARGIN
+
+        layout = {}
+        for station_id, s in network["stations"].items():
+            x = (s["lon"] - min(lons)) * math.cos(lat_mid) * scale + LAYOUT_MARGIN
+            y = (max(lats) - s["lat"]) * scale + LAYOUT_MARGIN
+            layout[station_id] = {"x": round(x, 1), "y": round(y, 1)}
+
+        return {
+            "name": "geographic",
+            "width": round(width),
+            "height": round(height),
+            "stations": layout,
         }
 
     def write(self) -> None:
@@ -124,9 +172,15 @@ class network_builder:
         with open(NETWORK_PATH, "w") as f:
             json.dump(network, f, indent=2)
 
+        layout = self.build_geographic_layout(network)
+        LAYOUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(LAYOUT_PATH, "w") as f:
+            json.dump(layout, f, indent=2)
+        print(f"Wrote {LAYOUT_PATH}")
+
         total = sum(len(line["stations"]) for line in network["lines"])
         interchanges = [s["name"] for s in network["stations"].values() if s["interchange"]]
-        print(f"Wrote {NETWORK_PATH}")
+        print(f"Wrote {NETWORK_PATH} ({len(network['platforms'])} platforms)")
         for line in network["lines"]:
             print(f"  {line['name']}: {len(line['stations'])} stations ({line['color']})")
         print(f"  {len(network['stations'])} unique stations "

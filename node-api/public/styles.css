@@ -137,14 +137,66 @@ button.secondary:hover {
   margin-bottom: 20px;
 }
 
-.card .route-pill {
+.card.highlight {
+  border-color: var(--accent);
+  box-shadow: 0 4px 14px rgba(222, 91, 46, 0.12);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.line-pill {
   display: inline-block;
-  background: #fee7de;
-  color: #8f3315;
+  background: #e5ebf4;
+  color: #233244;
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 12px;
-  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.direction {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.departure-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stop-name {
+  font-size: 18px;
+}
+
+.departure-time {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent-dark);
+}
+
+.departure-meta {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.raw-record {
+  margin-top: 10px;
+}
+
+.raw-record summary {
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
 }
 
 .card pre {

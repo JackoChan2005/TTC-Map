@@ -739,5 +739,747 @@
       ],
       "interchange": false
     }
+  },
+  "platforms": {
+    "14111": {
+      "station": "99992",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13789": {
+      "station": "99984",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13860": {
+      "station": "99977",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13792": {
+      "station": "99965",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13793": {
+      "station": "99987",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13795": {
+      "station": "99993",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13798": {
+      "station": "99997",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13799": {
+      "station": "99974",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13802": {
+      "station": "99970",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13803": {
+      "station": "99979",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13864": {
+      "station": "99999",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13806": {
+      "station": "99967",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13807": {
+      "station": "99998",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13810": {
+      "station": "99995",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13811": {
+      "station": "99981",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13814": {
+      "station": "99988",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13815": {
+      "station": "99969",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13817": {
+      "station": "99975",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13820": {
+      "station": "99983",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13821": {
+      "station": "99971",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13824": {
+      "station": "99980",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13825": {
+      "station": "99985",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13858": {
+      "station": "99972",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13853": {
+      "station": "spadina",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13828": {
+      "station": "99994",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13829": {
+      "station": "99973",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13832": {
+      "station": "99920",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13833": {
+      "station": "99990",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13836": {
+      "station": "99986",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13837": {
+      "station": "99963",
+      "line": "line-1",
+      "direction": 0
+    },
+    "13840": {
+      "station": "99966",
+      "line": "line-1",
+      "direction": 0
+    },
+    "14945": {
+      "station": "99978",
+      "line": "line-1",
+      "direction": 0
+    },
+    "15664": {
+      "station": "99996",
+      "line": "line-1",
+      "direction": 0
+    },
+    "15659": {
+      "station": "99991",
+      "line": "line-1",
+      "direction": 0
+    },
+    "15666": {
+      "station": "99964",
+      "line": "line-1",
+      "direction": 0
+    },
+    "15656": {
+      "station": "99982",
+      "line": "line-1",
+      "direction": 0
+    },
+    "15661": {
+      "station": "99989",
+      "line": "line-1",
+      "direction": 0
+    },
+    "15662": {
+      "station": "99968",
+      "line": "line-1",
+      "direction": 0
+    },
+    "15663": {
+      "station": "99968",
+      "line": "line-1",
+      "direction": 1
+    },
+    "15660": {
+      "station": "99989",
+      "line": "line-1",
+      "direction": 1
+    },
+    "15657": {
+      "station": "99982",
+      "line": "line-1",
+      "direction": 1
+    },
+    "15667": {
+      "station": "99964",
+      "line": "line-1",
+      "direction": 1
+    },
+    "15658": {
+      "station": "99991",
+      "line": "line-1",
+      "direction": 1
+    },
+    "15665": {
+      "station": "99996",
+      "line": "line-1",
+      "direction": 1
+    },
+    "14110": {
+      "station": "99978",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13839": {
+      "station": "99966",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13838": {
+      "station": "99963",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13835": {
+      "station": "99986",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13834": {
+      "station": "99990",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13831": {
+      "station": "99920",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13830": {
+      "station": "99973",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13827": {
+      "station": "99994",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13854": {
+      "station": "spadina",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13857": {
+      "station": "99972",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13826": {
+      "station": "99985",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13823": {
+      "station": "99980",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13822": {
+      "station": "99971",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13819": {
+      "station": "99983",
+      "line": "line-1",
+      "direction": 1
+    },
+    "18373": {
+      "station": "99975",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13816": {
+      "station": "99969",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13813": {
+      "station": "99988",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13812": {
+      "station": "99981",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13809": {
+      "station": "99995",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13808": {
+      "station": "99998",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13805": {
+      "station": "99967",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13863": {
+      "station": "99999",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13804": {
+      "station": "99979",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13801": {
+      "station": "99970",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13800": {
+      "station": "99974",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13797": {
+      "station": "99997",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13796": {
+      "station": "99993",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13794": {
+      "station": "99987",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13791": {
+      "station": "99965",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13859": {
+      "station": "99977",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13790": {
+      "station": "99984",
+      "line": "line-1",
+      "direction": 1
+    },
+    "14944": {
+      "station": "99992",
+      "line": "line-1",
+      "direction": 1
+    },
+    "13785": {
+      "station": "99946",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13784": {
+      "station": "99950",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13781": {
+      "station": "99940",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13780": {
+      "station": "99943",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13777": {
+      "station": "99949",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13776": {
+      "station": "99939",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13773": {
+      "station": "99951",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13772": {
+      "station": "99948",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13769": {
+      "station": "99953",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13768": {
+      "station": "99945",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13765": {
+      "station": "99954",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13764": {
+      "station": "99942",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13761": {
+      "station": "99957",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13760": {
+      "station": "99962",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13852": {
+      "station": "spadina",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13856": {
+      "station": "99972",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13757": {
+      "station": "99961",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13756": {
+      "station": "99999",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13753": {
+      "station": "99938",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13752": {
+      "station": "99959",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13749": {
+      "station": "99960",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13748": {
+      "station": "99958",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13746": {
+      "station": "99941",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13743": {
+      "station": "99955",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13742": {
+      "station": "99952",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13739": {
+      "station": "99956",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13738": {
+      "station": "99935",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13735": {
+      "station": "99944",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13734": {
+      "station": "99937",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13732": {
+      "station": "99936",
+      "line": "line-2",
+      "direction": 0
+    },
+    "14947": {
+      "station": "99947",
+      "line": "line-2",
+      "direction": 0
+    },
+    "13865": {
+      "station": "99947",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13731": {
+      "station": "99936",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13733": {
+      "station": "99937",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13736": {
+      "station": "99944",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13737": {
+      "station": "99935",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13740": {
+      "station": "99956",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13741": {
+      "station": "99952",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13744": {
+      "station": "99955",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13745": {
+      "station": "99941",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13747": {
+      "station": "99958",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13750": {
+      "station": "99960",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13751": {
+      "station": "99959",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13754": {
+      "station": "99938",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13755": {
+      "station": "99999",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13758": {
+      "station": "99961",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13855": {
+      "station": "99972",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13851": {
+      "station": "spadina",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13759": {
+      "station": "99962",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13762": {
+      "station": "99957",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13763": {
+      "station": "99942",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13766": {
+      "station": "99954",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13767": {
+      "station": "99945",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13770": {
+      "station": "99953",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13771": {
+      "station": "99948",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13774": {
+      "station": "99951",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13775": {
+      "station": "99939",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13778": {
+      "station": "99949",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13779": {
+      "station": "99943",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13782": {
+      "station": "99940",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13783": {
+      "station": "99950",
+      "line": "line-2",
+      "direction": 1
+    },
+    "14948": {
+      "station": "99946",
+      "line": "line-2",
+      "direction": 1
+    },
+    "13862": {
+      "station": "99977",
+      "line": "line-4",
+      "direction": 0
+    },
+    "13844": {
+      "station": "99928",
+      "line": "line-4",
+      "direction": 0
+    },
+    "18375": {
+      "station": "99927",
+      "line": "line-4",
+      "direction": 0
+    },
+    "13848": {
+      "station": "99925",
+      "line": "line-4",
+      "direction": 0
+    },
+    "14949": {
+      "station": "99926",
+      "line": "line-4",
+      "direction": 0
+    },
+    "14109": {
+      "station": "99926",
+      "line": "line-4",
+      "direction": 1
+    },
+    "13847": {
+      "station": "99925",
+      "line": "line-4",
+      "direction": 1
+    },
+    "13846": {
+      "station": "99927",
+      "line": "line-4",
+      "direction": 1
+    },
+    "13843": {
+      "station": "99928",
+      "line": "line-4",
+      "direction": 1
+    },
+    "13861": {
+      "station": "99977",
+      "line": "line-4",
+      "direction": 1
+    }
   }
 }
