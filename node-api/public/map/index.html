@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTC Live Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .map-panel svg { width: 100%; height: auto; display: block; }
+    .station { fill: #fff; stroke-width: 2; }
+    .station.interchange { stroke: #1f2937; }
+    .train { stroke: #1f2937; stroke-width: 1; }
+    .map-meta { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+    .legend-line { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+    .legend-swatch { width: 18px; height: 5px; border-radius: 3px; display: inline-block; }
+    .source-pill { background: #e5ebf4; color: #233244; border-radius: 999px; padding: 4px 10px; font-size: 12px; }
+    .source-pill.live { background: #dcf3e3; color: #14532d; }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <section class="panel">
+      <p class="eyebrow">TTC Map</p>
+      <h1>Subway map</h1>
+      <p class="subtitle">A virtual preview of the LED board: stations light up where trains are.</p>
+      <div class="map-meta">
+        <span id="source-pill" class="source-pill">loading…</span>
+        <span id="train-count" class="status" style="margin-top:0"></span>
+        <span id="legend"></span>
+      </div>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="panel map-panel">
+      <svg id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TTC subway map with live train positions"></svg>
+    </section>
+
+    <section class="panel">
+      <p class="subtitle" style="margin:0">
+        <a href="../index.html">Route search</a> ·
+        Data: schedule simulation or TTC NTAS realtime when available · refreshes every 10s
+      </p>
+    </section>
+  </main>
+  <script src="./map.js"></script>
+</body>
+</html>

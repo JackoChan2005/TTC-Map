@@ -21,8 +21,13 @@ class transformer:
             path = self.data_dir / filename
             print(f"reading {path}...")
             
-            # Handle the specific dtype requirement for stop_times
-            kwargs: dict[str, Any] = {'dtype': {'stop_headsign': str}} if var_name == "stop_times" else {}
+            # trip_id mixes numeric and text values in the merged GTFS feed,
+            # so it must be read as str on both sides of the merge
+            kwargs: dict[str, Any] = {}
+            if var_name == "stop_times":
+                kwargs = {'dtype': {'trip_id': str, 'stop_headsign': str}}
+            elif var_name == "trips":
+                kwargs = {'dtype': {'trip_id': str}}
             
             dfs[var_name] = pd.read_csv(path, **kwargs)
         return dfs
@@ -52,9 +57,16 @@ class transformer:
         subway_stop_times = subway_stop_times[id_cols + other_cols]
 
         print("Sending data to db...")
+        globals.db_dir.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(globals.conn)
         calendar.to_sql("SERVICE_DAYS", conn, if_exists="replace", index=False)
         subway_stop_times.to_sql("SUBWAY_STOP_TIMES", conn, if_exists="replace", index=False)
+
+        cur = conn.cursor()
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_sst_route_time ON SUBWAY_STOP_TIMES(route_id, departing_time_sec)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_sst_trip ON SUBWAY_STOP_TIMES(trip_id, stop_sequence)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_sst_service ON SUBWAY_STOP_TIMES(service_id)")
+        conn.commit()
 
         print("Service Days:")
         df_check = pd.read_sql("SELECT * FROM SERVICE_DAYS", conn)

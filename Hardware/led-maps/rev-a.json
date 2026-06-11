@@ -1,0 +1,15 @@
+{
+  "name": "rev-a",
+  "description": "First PCB revision: 8 LEDs (D1-D8) mapped to terminals and interchanges. Update station assignments to match the silkscreen before flashing.",
+  "ledCount": 8,
+  "leds": [
+    { "index": 0, "designator": "D1", "station": "99992", "stationName": "Finch" },
+    { "index": 1, "designator": "D2", "station": "99999", "stationName": "Bloor-Yonge" },
+    { "index": 2, "designator": "D3", "station": "99969", "stationName": "Union" },
+    { "index": 3, "designator": "D4", "station": "99972", "stationName": "St George" },
+    { "index": 4, "designator": "D5", "station": "99968", "stationName": "Vaughan Metropolitan Centre" },
+    { "index": 5, "designator": "D6", "station": "99946", "stationName": "Kipling" },
+    { "index": 6, "designator": "D7", "station": "99947", "stationName": "Kennedy" },
+    { "index": 7, "designator": "D8", "station": "99926", "stationName": "Don Mills" }
+  ]
+}
