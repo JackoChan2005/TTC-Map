@@ -5,18 +5,59 @@ Full dependency list: see [DEPENDENCIES.md](DEPENDENCIES.md)
 
 ## Setup
 
-1. Clone the repository
-2. Create a virtual environment:
+A PCB display showing TTC subway routes and real-time train positions.
+
+Full dependency list: [DEPENDENCIES.md](DEPENDENCIES.md)
+
+---
+
+## Prerequisites
+
+| Tool | Version |
+|------|---------|
+| Python | 3.12+ |
+| Node.js + npm | 18+ (tested on v20.7.0 / npm 10) |
+| Git | any recent |
+
+---
+
+## Quick Setup (recommended)
+
+Run the automated setup script from the repo root — it creates the Python venv, installs all Python and Node dependencies, and regenerates `requirements.txt` from source:
+
+**Windows (PowerShell / CMD)**
+```powershell
+python setup.py
+```
+
+**macOS / Linux / Git Bash**
 ```bash
+bash Setup/Setup.sh
+```
+
+Once the script finishes, skip to [Configure env.config and run](#configure-envconfigconfiguring-envconfig-and-running).
+
+---
+
+## Manual Setup
+
+**1. Clone the repository**
+```bash
+git clone https://github.com/JackoChan2005/TTC-Map.git
+cd TTC-Map
+```
+
+**2. Create a Python virtual environment**
+
+Windows (PowerShell):
+```powershell
 python -m venv venv
+venv\Scripts\Activate.ps1
 ```
-3. Activate the virtual environment:
-- On Windows:
+
+macOS / Linux:
 ```bash
-venv\Scripts\activate
-```
-- On macOS/Linux:
-```bash
+python3 -m venv venv
 source venv/bin/activate
 ```
 4. Install Python dependencies:
@@ -66,3 +107,45 @@ python ./update_db.py
 ```bash
 fastapi dev ./main.py
 ```
+
+**3. Start the API**
+```bash
+fastapi dev main.py
+```
+
+---
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/health` | Health check |
+| POST | `/api/sync/run` | Trigger a manual sync |
+| GET | `/api/sync/status` | Latest sync run status |
+| GET | `/api/records?limit=100` | List synced records |
+| GET | `/api/records/:sourceKey` | Get record by source key |
+| GET | `/api/route-search?route=1` | Search by route number |
+| GET | `/api/route-search?route=1&at=<ISO8601>` | Search by route at a specific time (`at` defaults to now) |
+
+---
+
+## Troubleshooting
+
+**PowerShell blocks npm scripts**  
+Use `npm.cmd` instead of `npm`.
+
+**Port already in use (EADDRINUSE)**  
+```powershell
+$env:PORT='3001'; npm.cmd start
+```
+
+**Sync fails with import errors / missing packages**  
+Verify that `PYTHON_BIN` in `node-api/env.config` points to the venv interpreter, not a system Python.
+
+**`sqlite3` build fails on macOS**  
+Install Xcode Command Line Tools:
+```bash
+xcode-select --install
+```
+
+See [instructions.txt](instructions.txt) for additional API details and troubleshooting.
