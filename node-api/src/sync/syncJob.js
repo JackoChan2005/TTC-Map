@@ -1,5 +1,5 @@
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '..', '..', 'env.config') });
+require('../loadEnv');
 
 const fs = require('fs');
 const { spawn } = require('child_process');

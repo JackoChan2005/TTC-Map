@@ -1,9 +1,4 @@
-# The beginning of the TTC display
-PCB to display the TTC subway routes and realtime positions
-
-Full dependency list: see [DEPENDENCIES.md](DEPENDENCIES.md)
-
-## Setup
+# TTC Map Display
 
 A PCB display showing TTC subway routes and real-time train positions.
 
@@ -21,21 +16,25 @@ Full dependency list: [DEPENDENCIES.md](DEPENDENCIES.md)
 
 ---
 
-## Quick Setup (recommended)
+## Quick Start (recommended)
 
-Run the automated setup script from the repo root — it creates the Python venv, installs all Python and Node dependencies, and regenerates `requirements.txt` from source:
+Two scripts in the repo root do everything. **Setup** (one-time) creates the Python venv, installs all Python and Node dependencies, writes `PYTHON_BIN` to a gitignored `node-api/.env.local` so the server uses the venv automatically, and runs the first data sync. **Start** launches the server and opens [http://localhost:3000](http://localhost:3000) in your browser as soon as it's ready.
 
-**Windows (PowerShell / CMD)**
-```powershell
-python setup.py
+**Windows** — double-click the file, or run from a terminal in the repo root:
+```bat
+setup.bat
+start.bat
 ```
 
-**macOS / Linux / Git Bash**
+**macOS** — double-click in Finder, or run from a terminal in the repo root:
 ```bash
-bash Setup/Setup.sh
+./setup.command
+./start.command
 ```
 
-Once the script finishes, skip to [Configure env.config and run](#configure-envconfigconfiguring-envconfig-and-running).
+Press `Ctrl+C` in the terminal window to stop the server.
+
+> Prefer the underlying scripts? `python Setup.py` runs the platform-appropriate setup (without the data sync), and `bash Setup/Setup.sh` / `Setup\Setup.ps1` can be run directly.
 
 ---
 
@@ -60,52 +59,89 @@ macOS / Linux:
 python3 -m venv venv
 source venv/bin/activate
 ```
-4. Install Python dependencies:
+
+**3. Install Python dependencies**
 ```bash
 pip install -r requirements.txt
 ```
-5. Install Node dependencies:
+
+**4. Install Node dependencies**
 ```bash
 cd node-api
 npm install
 ```
-6. **Point the server at your venv's Python.** The Node server runs the
-Python GTFS loader during every sync, so in `node-api/env.config` set
-`PYTHON_BIN` to your venv's interpreter:
+
+> **Windows PowerShell note:** if npm scripts are blocked, use `npm.cmd` in place of `npm` throughout.
+
+---
+
+## Configuration and running
+
+The committed `node-api/env.config` holds shared defaults. Machine-specific values go in `node-api/.env.local` (gitignored) — anything set there overrides `env.config`, so you never need to edit the tracked file.
+
+**5. Point `PYTHON_BIN` at your venv**
+
+Create `node-api/.env.local` containing one line (the setup scripts do this for you):
+
 ```
-# macOS/Linux
+# macOS / Linux
 PYTHON_BIN=/absolute/path/to/TTC-Map/venv/bin/python
+
 # Windows
 PYTHON_BIN=C:\path\to\TTC-Map\venv\Scripts\python.exe
 ```
-If you skip this, `python` may resolve to a system install (e.g. Anaconda)
-that doesn't have the required packages, and the sync will fail.
 
-7. Run the first sync (downloads the ~66 MB TTC GTFS feed and builds the
-database — takes a few minutes, a successful run reports ~120k records):
+> The Node server spawns this interpreter on every sync to load the GTFS feed.
+> If left as the default `python` from `env.config`, it may resolve to a system
+> install (e.g. Anaconda) that lacks the required packages, and the sync will fail.
+
+**6. Run the first sync** (from the `node-api/` directory)
+
+Downloads the ~66 MB TTC GTFS feed and builds the SQLite database. Takes a few minutes; a successful run reports ~120 k records.
+
 ```bash
 npm run sync
 ```
-8. Start the server and open http://localhost:3000:
+
+Windows PowerShell:
+```powershell
+npm.cmd run sync
+```
+
+**7. Start the server** (from the `node-api/` directory)
+
 ```bash
 npm start
 ```
 
-See [instructions.txt](instructions.txt) for API endpoints and troubleshooting.
-
-## Alternative: run the Python FastAPI directly
-
-1. Move to src:
-```bash
-cd ./API/src/
+Windows PowerShell:
+```powershell
+npm.cmd start
 ```
-2. Run update_db.py:
-```bash
-python ./update_db.py
+
+**8. Open the frontend:** [http://localhost:3000](http://localhost:3000)
+
+---
+
+## Alternative: Python FastAPI only
+
+To run just the FastAPI data pipeline without the Node server:
+
+**1. Activate the virtual environment**
+
+Windows:
+```powershell
+venv\Scripts\Activate.ps1
 ```
-3. To view the api run:
+macOS / Linux:
 ```bash
-fastapi dev ./main.py
+source venv/bin/activate
+```
+
+**2. Build the database**
+```bash
+cd API/src
+python update_db.py
 ```
 
 **3. Start the API**
@@ -140,7 +176,10 @@ $env:PORT='3001'; npm.cmd start
 ```
 
 **Sync fails with import errors / missing packages**  
-Verify that `PYTHON_BIN` in `node-api/env.config` points to the venv interpreter, not a system Python.
+Verify that `PYTHON_BIN` in `node-api/.env.local` points to the venv interpreter, not a system Python. Re-running the setup script fixes this.
+
+**Port change**  
+Add `PORT=3001` (or any port) to `node-api/.env.local` — both the server and the start scripts pick it up.
 
 **`sqlite3` build fails on macOS**  
 Install Xcode Command Line Tools:
