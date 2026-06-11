@@ -2,6 +2,11 @@
 
 Everything needed to run the TTC-Map data pipeline and API server.
 
+> **Shortcut:** `setup.bat` (Windows) or `./setup.command` (macOS) in the repo root
+> automates sections 2–4 and runs the first sync. Then `start.bat` / `./start.command`
+> launches the server and opens the browser. The sections below describe what those
+> scripts do, for manual setup or troubleshooting.
+
 ## 1. System requirements
 
 | Tool | Version | Notes |
@@ -51,7 +56,8 @@ npm install
 
 The Node server spawns the Python GTFS loader during sync, so `PYTHON_BIN`
 must point at an interpreter that has the requirements installed.
-**If you use a venv (recommended), set it to the venv's interpreter:**
+**The setup scripts (`setup.bat` / `setup.command` / `Setup/Setup.ps1` / `Setup/Setup.sh`)
+set this automatically.** For a manual setup with a venv, set it to the venv's interpreter:
 
 ```
 PYTHON_BIN=/absolute/path/to/TTC-Map/venv/bin/python   # Windows: ...\venv\Scripts\python.exe
@@ -60,6 +66,9 @@ PYTHON_BIN=/absolute/path/to/TTC-Map/venv/bin/python   # Windows: ...\venv\Scrip
 The other defaults (`DATABASE_PATH`, `PYTHON_SYNC_*`) work as committed.
 
 ## 5. Run it
+
+Easiest: `start.bat` (Windows) or `./start.command` (macOS) from the repo root —
+starts the server and opens the browser automatically. Manually:
 
 ```bash
 cd node-api
