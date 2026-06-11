@@ -31,8 +31,8 @@ On macOS, `sqlite3` (the npm package) ships prebuilt binaries; if the prebuild f
 Install into a virtual environment:
 
 ```bash
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -68,7 +68,7 @@ write this to `.env.local` automatically.** For a manual setup with a venv, crea
 `node-api/.env.local` containing:
 
 ```
-PYTHON_BIN=/absolute/path/to/TTC-Map/venv/bin/python   # Windows: ...\venv\Scripts\python.exe
+PYTHON_BIN=/absolute/path/to/TTC-Map/.venv/bin/python   # Windows: ...\.venv\Scripts\python.exe
 ```
 
 The committed defaults (`DATABASE_PATH`, `PYTHON_SYNC_*`) need no changes.

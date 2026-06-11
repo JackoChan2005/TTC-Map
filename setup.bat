@@ -22,7 +22,7 @@ cd /d "%~dp0node-api"
 call npm.cmd run sync
 if errorlevel 1 (
     echo.
-    echo Sync failed. Check PYTHON_BIN in node-api\env.config.
+    echo Sync failed. Check PYTHON_BIN in node-api\.env.local.
     pause
     exit /b 1
 )

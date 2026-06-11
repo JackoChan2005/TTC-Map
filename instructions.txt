@@ -46,8 +46,8 @@ node-api/.env.local  = your local overrides (gitignored). Any
 variable set here wins over env.config. At minimum it should
 contain PYTHON_BIN pointing at your venv interpreter - the setup
 scripts create this file automatically:
-PYTHON_BIN=C:\path\to\TTC-Map\venv\Scripts\python.exe   (Windows)
-PYTHON_BIN=/path/to/TTC-Map/venv/bin/python             (macOS)
+PYTHON_BIN=C:\path\to\TTC-Map\.venv\Scripts\python.exe   (Windows)
+PYTHON_BIN=/path/to/TTC-Map/.venv/bin/python             (macOS)
 
 4) Start server
 npm.cmd start
@@ -133,5 +133,5 @@ PYTHON_SYNC_DB_PATH=API/db/SubwaySystem.db
 
 4) Point PYTHON_BIN at your venv interpreter in node-api/.env.local
 (gitignored - overrides env.config):
-Windows: PYTHON_BIN=C:\path\to\TTC-Map\venv\Scripts\python.exe
-macOS:   PYTHON_BIN=/path/to/TTC-Map/venv/bin/python
+Windows: PYTHON_BIN=C:\path\to\TTC-Map\.venv\Scripts\python.exe
+macOS:   PYTHON_BIN=/path/to/TTC-Map/.venv/bin/python

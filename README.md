@@ -34,6 +34,8 @@ start.bat
 
 Press `Ctrl+C` in the terminal window to stop the server.
 
+> **VS Code tip:** open the `TTC-Map` folder directly (not a parent folder). The editor then auto-detects the `.venv` created by setup and selects it as the Python interpreter.
+
 > Prefer the underlying scripts? `python Setup.py` runs the platform-appropriate setup (without the data sync), and `bash Setup/Setup.sh` / `Setup\Setup.ps1` can be run directly.
 
 ---
@@ -50,14 +52,14 @@ cd TTC-Map
 
 Windows (PowerShell):
 ```powershell
-python -m venv venv
-venv\Scripts\Activate.ps1
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 ```
 
 macOS / Linux:
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 **3. Install Python dependencies**
@@ -85,10 +87,10 @@ Create `node-api/.env.local` containing one line (the setup scripts do this for 
 
 ```
 # macOS / Linux
-PYTHON_BIN=/absolute/path/to/TTC-Map/venv/bin/python
+PYTHON_BIN=/absolute/path/to/TTC-Map/.venv/bin/python
 
 # Windows
-PYTHON_BIN=C:\path\to\TTC-Map\venv\Scripts\python.exe
+PYTHON_BIN=C:\path\to\TTC-Map\.venv\Scripts\python.exe
 ```
 
 > The Node server spawns this interpreter on every sync to load the GTFS feed.
@@ -131,11 +133,11 @@ To run just the FastAPI data pipeline without the Node server:
 
 Windows:
 ```powershell
-venv\Scripts\Activate.ps1
+.venv\Scripts\Activate.ps1
 ```
 macOS / Linux:
 ```bash
-source venv/bin/activate
+source .venv/bin/activate
 ```
 
 **2. Build the database**

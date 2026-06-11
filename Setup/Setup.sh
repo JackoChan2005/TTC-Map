@@ -12,7 +12,7 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 echo "📂 Project root: $PROJECT_ROOT"
 
 REQ_FILE="$PROJECT_ROOT/requirements.txt"
-VENV_DIR="$PROJECT_ROOT/venv"
+VENV_DIR="$PROJECT_ROOT/.venv"
 VENV_PY="$VENV_DIR/bin/python"
 API_DIR="$PROJECT_ROOT/API"
 
@@ -52,7 +52,7 @@ echo "📦 Upgrading pip and installing pipreqs..."
 "$VENV_PY" -m pip install pipreqs
 
 echo "🔍 Scanning Python files for imports with pipreqs..."
-"$VENV_PY" -m pipreqs "$API_DIR" --force --savepath "$REQ_FILE"
+"$VENV_PY" -m pipreqs.pipreqs "$API_DIR" --force --savepath "$REQ_FILE"
 if grep -q "^fastapi$" "$REQ_FILE"; then
   sed -i.bak 's/^fastapi$/fastapi[standard]/' "$REQ_FILE"
   rm -f "$REQ_FILE.bak"
@@ -92,7 +92,7 @@ echo "  ✅  Setup complete!"
 echo "═══════════════════════════════════════════"
 echo ""
 echo "  PYTHON API (FastAPI):"
-echo "    Activate venv:   source venv/bin/activate"
+echo "    Activate venv:   source .venv/bin/activate"
 echo "    Init DB:         cd API/src && python update_db.py"
 echo "    Run server:      fastapi dev API/src/main.py"
 echo ""
