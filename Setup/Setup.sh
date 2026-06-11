@@ -52,7 +52,7 @@ echo "📦 Upgrading pip and installing pipreqs..."
 "$VENV_PY" -m pip install pipreqs
 
 echo "🔍 Scanning Python files for imports with pipreqs..."
-"$VENV_PY" -m pipreqs "$API_DIR" --force --savepath "$REQ_FILE"
+"$VENV_PY" -m pipreqs.pipreqs "$API_DIR" --force --savepath "$REQ_FILE"
 if grep -q "^fastapi$" "$REQ_FILE"; then
   sed -i.bak 's/^fastapi$/fastapi[standard]/' "$REQ_FILE"
   rm -f "$REQ_FILE.bak"

@@ -87,7 +87,7 @@ Write-Host "Upgrading pip and installing pipreqs..."
 & $venvPython -m pip install pipreqs
 
 Write-Host "Scanning Python files for imports with pipreqs..."
-& $venvPython -m pipreqs $apiDir --force --savepath $reqPath
+& $venvPython -m pipreqs.pipreqs $apiDir --force --savepath $reqPath
 if (Select-String -Path $reqPath -Pattern "^fastapi$") {
     (Get-Content $reqPath) `
         -replace "^fastapi$", "fastapi[standard]" `

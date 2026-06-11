@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
@@ -87,6 +88,7 @@ const init = () => new Promise((resolve, reject) => {
   }
 
   const dbPath = resolveDbPath();
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   db = new sqlite3.Database(dbPath, async (err) => {
     if (err) {
       reject(err);
