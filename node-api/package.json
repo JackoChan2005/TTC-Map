@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "sync": "node src/sync/syncJob.js"
+    "sync": "node src/sync/syncJob.js",
+    "test": "node --test test/"
   },
   "keywords": [],
   "author": "",

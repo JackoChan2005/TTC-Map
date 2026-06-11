@@ -62,6 +62,12 @@ class transformer:
         calendar.to_sql("SERVICE_DAYS", conn, if_exists="replace", index=False)
         subway_stop_times.to_sql("SUBWAY_STOP_TIMES", conn, if_exists="replace", index=False)
 
+        cur = conn.cursor()
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_sst_route_time ON SUBWAY_STOP_TIMES(route_id, departing_time_sec)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_sst_trip ON SUBWAY_STOP_TIMES(trip_id, stop_sequence)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_sst_service ON SUBWAY_STOP_TIMES(service_id)")
+        conn.commit()
+
         print("Service Days:")
         df_check = pd.read_sql("SELECT * FROM SERVICE_DAYS", conn)
         print(df_check.head())
