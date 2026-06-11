@@ -1,4 +1,9 @@
-# TTC Map Display
+# The beginning of the TTC display
+PCB to display the TTC subway routes and realtime positions
+
+Full dependency list: see [DEPENDENCIES.md](DEPENDENCIES.md)
+
+## Setup
 
 A PCB display showing TTC subway routes and real-time train positions.
 
@@ -55,87 +60,52 @@ macOS / Linux:
 python3 -m venv venv
 source venv/bin/activate
 ```
-
-**3. Install Python dependencies**
+4. Install Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-
-**4. Install Node dependencies**
+5. Install Node dependencies:
 ```bash
 cd node-api
 npm install
 ```
-
-> **Windows PowerShell note:** if npm scripts are blocked, use `npm.cmd` in place of `npm` throughout.
-
----
-
-## Configuring env.config and running
-
-**5. Set your Python interpreter in `node-api/env.config`**
-
-Open `node-api/env.config` and set `PYTHON_BIN` to the venv interpreter:
-
+6. **Point the server at your venv's Python.** The Node server runs the
+Python GTFS loader during every sync, so in `node-api/env.config` set
+`PYTHON_BIN` to your venv's interpreter:
 ```
-# macOS / Linux
+# macOS/Linux
 PYTHON_BIN=/absolute/path/to/TTC-Map/venv/bin/python
-
 # Windows
 PYTHON_BIN=C:\path\to\TTC-Map\venv\Scripts\python.exe
 ```
+If you skip this, `python` may resolve to a system install (e.g. Anaconda)
+that doesn't have the required packages, and the sync will fail.
 
-> The Node server spawns this interpreter on every sync to load the GTFS feed.
-> If left as the default `python`, it may resolve to a system install (e.g. Anaconda)
-> that lacks the required packages, and the sync will fail.
-
-**6. Run the first sync** (from the `node-api/` directory)
-
-Downloads the ~66 MB TTC GTFS feed and builds the SQLite database. Takes a few minutes; a successful run reports ~120 k records.
-
+7. Run the first sync (downloads the ~66 MB TTC GTFS feed and builds the
+database — takes a few minutes, a successful run reports ~120k records):
 ```bash
 npm run sync
 ```
-
-Windows PowerShell:
-```powershell
-npm.cmd run sync
-```
-
-**7. Start the server** (from the `node-api/` directory)
-
+8. Start the server and open http://localhost:3000:
 ```bash
 npm start
 ```
 
-Windows PowerShell:
-```powershell
-npm.cmd start
-```
+See [instructions.txt](instructions.txt) for API endpoints and troubleshooting.
 
-**8. Open the frontend:** [http://localhost:3000](http://localhost:3000)
+## Alternative: run the Python FastAPI directly
 
----
-
-## Alternative: Python FastAPI only
-
-To run just the FastAPI data pipeline without the Node server:
-
-**1. Activate the virtual environment**
-
-Windows:
-```powershell
-venv\Scripts\Activate.ps1
-```
-macOS / Linux:
+1. Move to src:
 ```bash
-source venv/bin/activate
+cd ./API/src/
 ```
-
-**2. Build the database**
+2. Run update_db.py:
 ```bash
-cd API/src
-python update_db.py
+python ./update_db.py
+```
+3. To view the api run:
+```bash
+fastapi dev ./main.py
 ```
 
 **3. Start the API**

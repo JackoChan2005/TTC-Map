@@ -4,12 +4,14 @@ require('dotenv').config({ path: path.resolve(__dirname, '..', 'env.config') });
 const express = require('express');
 const db = require('./db');
 const routes = require('./routes');
+const mapRoutes = require('./mapRoutes');
 const { runSync, startSyncCron } = require('./sync/syncJob');
 
 const app = express();
 
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname, '..', 'public')));
+app.use('/api/v1', mapRoutes);
 app.use('/api', routes);
 
 const PORT = Number(process.env.PORT || 3000);

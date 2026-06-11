@@ -14,7 +14,7 @@
     <section class="panel">
       <p class="eyebrow">TTC Live Search</p>
       <h1>Find where a route is right now</h1>
-      <p class="subtitle">Search by route number and compare records against the current time.</p>
+      <p class="subtitle">Search by route number and compare records against the current time. Or open the <a href="./map/">live subway map</a>.</p>
 
       <form id="search-form" class="search-form">
         <label for="route">Route number</label>
@@ -25,18 +25,18 @@
 
         <div class="form-actions">
           <button type="button" id="now-btn" class="secondary">Use Current Time</button>
-          <button type="submit">Search</button>
+          <button type="submit" id="search-btn">Search</button>
         </div>
       </form>
 
-      <div id="status" class="status"></div>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
     </section>
 
     <section id="results" class="results hidden">
-      <h2>Best Match</h2>
-      <article id="best-match" class="card"></article>
+      <h2>Next departure</h2>
+      <div id="best-match"></div>
 
-      <h2>Top Route Records</h2>
+      <h2>Following departures</h2>
       <div id="matches" class="matches"></div>
     </section>
   </main>
