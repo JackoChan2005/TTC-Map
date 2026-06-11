@@ -3,44 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TTC Route Finder</title>
+  <title>TTC Map</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./css/site.css">
 </head>
 <body>
-  <main class="layout">
-    <section class="panel">
-      <p class="eyebrow">TTC Live Search</p>
-      <h1>Find where a route is right now</h1>
-      <p class="subtitle">Search by route number and compare records against the current time. Or open the <a href="./map/">live subway map</a>.</p>
+  <header class="banner">
+    <div class="banner-text">
+      <h1>TTC Map</h1>
+      <p class="banner-tagline">Toronto's subway, live</p>
+    </div>
+    <a class="banner-button" href="/search/">TTC LIVE SEARCH</a>
+  </header>
 
-      <form id="search-form" class="search-form">
-        <label for="route">Route number</label>
-        <input id="route" name="route" type="text" placeholder="e.g. 1 or 2" required>
+  <main class="map-stage">
+    <svg id="map" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Schematic TTC subway map with live train positions"></svg>
 
-        <label for="at-time">Time</label>
-        <input id="at-time" name="at-time" type="datetime-local">
-
-        <div class="form-actions">
-          <button type="button" id="now-btn" class="secondary">Use Current Time</button>
-          <button type="submit" id="search-btn">Search</button>
-        </div>
-      </form>
-
-      <div id="status" class="status" role="status" aria-live="polite"></div>
-    </section>
-
-    <section id="results" class="results hidden">
-      <h2>Next departure</h2>
-      <div id="best-match"></div>
-
-      <h2>Following departures</h2>
-      <div id="matches" class="matches"></div>
-    </section>
+    <footer class="map-footer">
+      <span id="source-pill" class="source-pill">loading…</span>
+      <span id="train-count" class="map-meta-text"></span>
+      <span id="legend" class="legend"></span>
+      <span id="status" class="map-meta-text" role="status" aria-live="polite"></span>
+    </footer>
   </main>
 
-  <script src="./app.js"></script>
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
