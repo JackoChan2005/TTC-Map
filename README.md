@@ -16,21 +16,25 @@ Full dependency list: [DEPENDENCIES.md](DEPENDENCIES.md)
 
 ---
 
-## Quick Setup (recommended)
+## Quick Start (recommended)
 
-Run the automated setup script from the repo root — it creates the Python venv, installs all Python and Node dependencies, and regenerates `requirements.txt` from source:
+Two scripts in the repo root do everything. **Setup** (one-time) creates the Python venv, installs all Python and Node dependencies, points `PYTHON_BIN` in `node-api/env.config` at the venv automatically, and runs the first data sync. **Start** launches the server and opens [http://localhost:3000](http://localhost:3000) in your browser as soon as it's ready.
 
-**Windows (PowerShell / CMD)**
-```powershell
-python setup.py
+**Windows** — double-click the file, or run from a terminal in the repo root:
+```bat
+setup.bat
+start.bat
 ```
 
-**macOS / Linux / Git Bash**
+**macOS** — double-click in Finder, or run from a terminal in the repo root:
 ```bash
-bash Setup/Setup.sh
+./setup.command
+./start.command
 ```
 
-Once the script finishes, skip to [Configure env.config and run](#configure-envconfigconfiguring-envconfig-and-running).
+Press `Ctrl+C` in the terminal window to stop the server.
+
+> Prefer the underlying scripts? `python Setup.py` runs the platform-appropriate setup (without the data sync), and `bash Setup/Setup.sh` / `Setup\Setup.ps1` can be run directly.
 
 ---
 

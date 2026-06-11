@@ -121,7 +121,26 @@ finally {
 }
 
 # ─────────────────────────────────────────────
-# 4. Summary
+# 4. Point node-api/env.config PYTHON_BIN at the venv interpreter
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "Configuring node-api/env.config..."
+
+$envConfigPath = Join-Path $nodeApiDir "env.config"
+if (Test-Path $envConfigPath) {
+    $cfgLines = Get-Content $envConfigPath | ForEach-Object {
+        if ($_ -match "^PYTHON_BIN=") { "PYTHON_BIN=$venvPython" } else { $_ }
+    }
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllLines($envConfigPath, $cfgLines, $utf8NoBom)
+    Write-Host "PYTHON_BIN set to $venvPython"
+}
+else {
+    Write-Host "WARNING: env.config not found at $envConfigPath - set PYTHON_BIN manually."
+}
+
+# ─────────────────────────────────────────────
+# 5. Summary
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "==========================================="

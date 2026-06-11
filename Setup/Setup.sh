@@ -72,7 +72,20 @@ cd "$PROJECT_ROOT/node-api"
 npm ci
 echo "   ✅ Node packages installed"
 
-# ── 4. Summary ──
+# ── 4. Point node-api/env.config PYTHON_BIN at the venv interpreter ──
+echo ""
+echo "🔧 Configuring node-api/env.config..."
+
+ENV_CONFIG="$PROJECT_ROOT/node-api/env.config"
+if [ -f "$ENV_CONFIG" ]; then
+  sed -i.bak "s|^PYTHON_BIN=.*|PYTHON_BIN=$VENV_PY|" "$ENV_CONFIG"
+  rm -f "$ENV_CONFIG.bak"
+  echo "   ✅ PYTHON_BIN set to $VENV_PY"
+else
+  echo "   ⚠ env.config not found at $ENV_CONFIG — set PYTHON_BIN manually."
+fi
+
+# ── 5. Summary ──
 echo ""
 echo "═══════════════════════════════════════════"
 echo "  ✅  Setup complete!"
