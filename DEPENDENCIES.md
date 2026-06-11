@@ -2,6 +2,11 @@
 
 Everything needed to run the TTC-Map data pipeline and API server.
 
+> **Shortcut:** `setup.bat` (Windows) or `./setup.command` (macOS) in the repo root
+> automates sections 2–4 and runs the first sync. Then `start.bat` / `./start.command`
+> launches the server and opens the browser. The sections below describe what those
+> scripts do, for manual setup or troubleshooting.
+
 ## 1. System requirements
 
 | Tool | Version | Notes |
@@ -26,8 +31,8 @@ On macOS, `sqlite3` (the npm package) ships prebuilt binaries; if the prebuild f
 Install into a virtual environment:
 
 ```bash
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -47,19 +52,31 @@ cd node-api
 npm install
 ```
 
-## 4. Configuration (`node-api/env.config`)
+## 4. Configuration (`env.config` + `.env.local`)
+
+Config is split across two files in `node-api/`:
+
+| File | Tracked? | Purpose |
+|------|----------|---------|
+| `env.config` | yes | shared defaults — works as committed |
+| `.env.local` | no (gitignored) | machine-specific overrides — any variable set here wins |
 
 The Node server spawns the Python GTFS loader during sync, so `PYTHON_BIN`
 must point at an interpreter that has the requirements installed.
-**If you use a venv (recommended), set it to the venv's interpreter:**
+**The setup scripts (`setup.bat` / `setup.command` / `Setup/Setup.ps1` / `Setup/Setup.sh`)
+write this to `.env.local` automatically.** For a manual setup with a venv, create
+`node-api/.env.local` containing:
 
 ```
-PYTHON_BIN=/absolute/path/to/TTC-Map/venv/bin/python   # Windows: ...\venv\Scripts\python.exe
+PYTHON_BIN=/absolute/path/to/TTC-Map/.venv/bin/python   # Windows: ...\.venv\Scripts\python.exe
 ```
 
-The other defaults (`DATABASE_PATH`, `PYTHON_SYNC_*`) work as committed.
+The committed defaults (`DATABASE_PATH`, `PYTHON_SYNC_*`) need no changes.
 
 ## 5. Run it
+
+Easiest: `start.bat` (Windows) or `./start.command` (macOS) from the repo root —
+starts the server and opens the browser automatically. Manually:
 
 ```bash
 cd node-api

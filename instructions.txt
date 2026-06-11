@@ -1,18 +1,53 @@
 TTC Node API - Run Instructions
 
+Quick start (recommended)
+
+1) One-time setup, from the repo root
+Windows: setup.bat
+macOS:   ./setup.command
+(creates the Python venv, installs Python + Node dependencies,
+ writes PYTHON_BIN to node-api/.env.local so the server uses the
+ venv, and runs the first data sync - takes a few minutes)
+
+2) Start the server, from the repo root
+Windows: start.bat
+macOS:   ./start.command
+(starts the server and auto-opens http://localhost:3000 in your
+ browser once it is ready)
+
+3) Stop Process
+Control C
+
+
+Manual run (if not using the scripts above)
+
 1) Open terminal at node-api
 *\TTC-MAP\node-api
 
 2) Install dependencies (first time only)
 npm.cmd install
 
-3) Check/update env config in node-api/.env
+3) Config files
+node-api/env.config  = committed shared defaults (do not edit for
+                       machine-specific values):
 PORT=3000
+NODE_ENV=development
 DATABASE_PATH=../API/db/SubwaySystem.db
 JSON_SOURCE=ckan-package:b811ead4-6eaf-4adb-8408-d389fb5a069c
 CKAN_BASE_URL=https://ckan0.cf.opendata.inter.prod-toronto.ca
 CKAN_FETCH_RESOURCE=false
 SYNC_INTERVAL_MS=60000
+PYTHON_SYNC_ENABLED=true
+PYTHON_BIN=python
+PYTHON_SYNC_SCRIPT=API/src/update_db.py
+PYTHON_SYNC_DB_PATH=API/db/SubwaySystem.db
+
+node-api/.env.local  = your local overrides (gitignored). Any
+variable set here wins over env.config. At minimum it should
+contain PYTHON_BIN pointing at your venv interpreter - the setup
+scripts create this file automatically:
+PYTHON_BIN=C:\path\to\TTC-Map\.venv\Scripts\python.exe   (Windows)
+PYTHON_BIN=/path/to/TTC-Map/.venv/bin/python             (macOS)
 
 4) Start server
 npm.cmd start
@@ -85,13 +120,18 @@ npm.cmd run sync
 
 Python sync integration (uses existing API/src/update_db.py)
 
-1) Install Python deps once from repo root:
+1) The setup scripts (setup.bat / setup.command) handle all of this
+automatically. The steps below are only needed for a manual setup.
+
+2) Install Python deps once from repo root (inside your venv):
 pip install -r requirements.txt
 
-2) In node-api/env.config set:
+3) The committed env.config already enables the Python sync:
 PYTHON_SYNC_ENABLED=true
-PYTHON_BIN=python
 PYTHON_SYNC_SCRIPT=API/src/update_db.py
 PYTHON_SYNC_DB_PATH=API/db/SubwaySystem.db
 
-3) If you use a venv, point PYTHON_BIN to that interpreter path.
+4) Point PYTHON_BIN at your venv interpreter in node-api/.env.local
+(gitignored - overrides env.config):
+Windows: PYTHON_BIN=C:\path\to\TTC-Map\.venv\Scripts\python.exe
+macOS:   PYTHON_BIN=/path/to/TTC-Map/.venv/bin/python

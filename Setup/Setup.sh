@@ -12,7 +12,7 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 echo "📂 Project root: $PROJECT_ROOT"
 
 REQ_FILE="$PROJECT_ROOT/requirements.txt"
-VENV_DIR="$PROJECT_ROOT/venv"
+VENV_DIR="$PROJECT_ROOT/.venv"
 VENV_PY="$VENV_DIR/bin/python"
 API_DIR="$PROJECT_ROOT/API"
 
@@ -52,7 +52,7 @@ echo "📦 Upgrading pip and installing pipreqs..."
 "$VENV_PY" -m pip install pipreqs
 
 echo "🔍 Scanning Python files for imports with pipreqs..."
-"$VENV_PY" -m pipreqs "$API_DIR" --force --savepath "$REQ_FILE"
+"$VENV_PY" -m pipreqs.pipreqs "$API_DIR" --force --savepath "$REQ_FILE"
 if grep -q "^fastapi$" "$REQ_FILE"; then
   sed -i.bak 's/^fastapi$/fastapi[standard]/' "$REQ_FILE"
   rm -f "$REQ_FILE.bak"
@@ -72,14 +72,27 @@ cd "$PROJECT_ROOT/node-api"
 npm ci
 echo "   ✅ Node packages installed"
 
-# ── 4. Summary ──
+# ── 4. Point PYTHON_BIN at the venv interpreter via node-api/.env.local ──
+#      (gitignored local override; the committed env.config stays untouched)
+echo ""
+echo "🔧 Configuring node-api/.env.local..."
+
+ENV_LOCAL="$PROJECT_ROOT/node-api/.env.local"
+if [ -f "$ENV_LOCAL" ]; then
+  grep -v '^PYTHON_BIN=' "$ENV_LOCAL" > "$ENV_LOCAL.tmp" || true
+  mv "$ENV_LOCAL.tmp" "$ENV_LOCAL"
+fi
+echo "PYTHON_BIN=$VENV_PY" >> "$ENV_LOCAL"
+echo "   ✅ PYTHON_BIN set to $VENV_PY"
+
+# ── 5. Summary ──
 echo ""
 echo "═══════════════════════════════════════════"
 echo "  ✅  Setup complete!"
 echo "═══════════════════════════════════════════"
 echo ""
 echo "  PYTHON API (FastAPI):"
-echo "    Activate venv:   source venv/bin/activate"
+echo "    Activate venv:   source .venv/bin/activate"
 echo "    Init DB:         cd API/src && python update_db.py"
 echo "    Run server:      fastapi dev API/src/main.py"
 echo ""

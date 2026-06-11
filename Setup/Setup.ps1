@@ -10,7 +10,7 @@ $PROJECT_ROOT = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 Write-Host "Project root: $PROJECT_ROOT"
 
 $reqPath    = Join-Path $PROJECT_ROOT "requirements.txt"
-$venvDir    = Join-Path $PROJECT_ROOT "venv"
+$venvDir    = Join-Path $PROJECT_ROOT ".venv"
 $apiDir     = Join-Path $PROJECT_ROOT "API"
 $nodeApiDir = Join-Path $PROJECT_ROOT "node-api"
 
@@ -87,7 +87,7 @@ Write-Host "Upgrading pip and installing pipreqs..."
 & $venvPython -m pip install pipreqs
 
 Write-Host "Scanning Python files for imports with pipreqs..."
-& $venvPython -m pipreqs $apiDir --force --savepath $reqPath
+& $venvPython -m pipreqs.pipreqs $apiDir --force --savepath $reqPath
 if (Select-String -Path $reqPath -Pattern "^fastapi$") {
     (Get-Content $reqPath) `
         -replace "^fastapi$", "fastapi[standard]" `
@@ -121,7 +121,24 @@ finally {
 }
 
 # ─────────────────────────────────────────────
-# 4. Summary
+# 4. Point PYTHON_BIN at the venv interpreter via node-api/.env.local
+#    (gitignored local override; the committed env.config stays untouched)
+# ─────────────────────────────────────────────
+Write-Host ""
+Write-Host "Configuring node-api/.env.local..."
+
+$envLocalPath = Join-Path $nodeApiDir ".env.local"
+$localLines = @()
+if (Test-Path $envLocalPath) {
+    $localLines = @(Get-Content $envLocalPath | Where-Object { $_ -notmatch "^PYTHON_BIN=" })
+}
+$localLines += "PYTHON_BIN=$venvPython"
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllLines($envLocalPath, $localLines, $utf8NoBom)
+Write-Host "PYTHON_BIN set to $venvPython"
+
+# ─────────────────────────────────────────────
+# 5. Summary
 # ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "==========================================="
@@ -129,7 +146,7 @@ Write-Host "Setup complete!"
 Write-Host "==========================================="
 Write-Host ""
 Write-Host "PYTHON API (FastAPI):"
-Write-Host "  Activate venv:   .\venv\Scripts\Activate.ps1"
+Write-Host "  Activate venv:   .\.venv\Scripts\Activate.ps1"
 Write-Host "  Init DB:         cd API\src ; python update_db.py"
 Write-Host "  Run server:      fastapi dev API\src\main.py"
 Write-Host ""
