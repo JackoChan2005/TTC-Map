@@ -10,7 +10,7 @@ $PROJECT_ROOT = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 Write-Host "Project root: $PROJECT_ROOT"
 
 $reqPath    = Join-Path $PROJECT_ROOT "requirements.txt"
-$venvDir    = Join-Path $PROJECT_ROOT "venv"
+$venvDir    = Join-Path $PROJECT_ROOT ".venv"
 $apiDir     = Join-Path $PROJECT_ROOT "API"
 $nodeApiDir = Join-Path $PROJECT_ROOT "node-api"
 
@@ -146,7 +146,7 @@ Write-Host "Setup complete!"
 Write-Host "==========================================="
 Write-Host ""
 Write-Host "PYTHON API (FastAPI):"
-Write-Host "  Activate venv:   .\venv\Scripts\Activate.ps1"
+Write-Host "  Activate venv:   .\.venv\Scripts\Activate.ps1"
 Write-Host "  Init DB:         cd API\src ; python update_db.py"
 Write-Host "  Run server:      fastapi dev API\src\main.py"
 Write-Host ""
