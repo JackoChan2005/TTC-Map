@@ -53,7 +53,7 @@ class loader:
             print("No zip files found!")
 
     def load_data(self) -> None:
-        if not self.data_dir:
+        if not self.data_dir.exists():
             self.data_dir.mkdir(parents=True)
         self.download_Data()
         self.extract_data()
