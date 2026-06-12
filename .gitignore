@@ -21,3 +21,6 @@ node-api/.env
 node-api/.env.local
 node-api/data.db
 node-api/data/
+
+# dashboard build tooling
+dashboard/node_modules/
