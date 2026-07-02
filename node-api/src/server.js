@@ -6,6 +6,7 @@ const db = require('./db');
 const routes = require('./routes');
 const mapRoutes = require('./mapRoutes');
 const { runSync, startSyncCron } = require('./sync/syncJob');
+const rtRecorder = require('./map/rtRecorder');
 
 const app = express();
 
@@ -15,7 +16,6 @@ app.use('/api/v1', mapRoutes);
 app.use('/api', routes);
 
 const PORT = Number(process.env.PORT || 3000);
-const SYNC_INTERVAL_MS = Number(process.env.SYNC_INTERVAL_MS || 60_000);
 
 const startServer = async () => {
   await db.init();
@@ -27,14 +27,16 @@ const startServer = async () => {
     console.error(`Initial sync failed: ${error.message}`);
   }
 
-  const cronHandle = startSyncCron(SYNC_INTERVAL_MS);
+  const cronHandle = startSyncCron();
+  rtRecorder.start();
+
   const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`Sync scheduled every ${Math.floor(SYNC_INTERVAL_MS / 1000)} seconds`);
   });
 
   const shutdown = async () => {
     clearInterval(cronHandle);
+    rtRecorder.stop();
 
     server.close(async () => {
       try {
@@ -55,4 +57,3 @@ startServer().catch((error) => {
   console.error('Server startup failed:', error.message);
   process.exit(1);
 });
-

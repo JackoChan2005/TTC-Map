@@ -169,7 +169,7 @@ router.get('/route-search', async (req, res, next) => {
       return;
     }
 
-    const rows = await db.all(`
+    const rows = await db.gtfs.all(`
       SELECT
         sst.trip_id,
         sst.stop_sequence,
@@ -224,7 +224,7 @@ router.get('/route-search', async (req, res, next) => {
 
 router.get('/health', async (_req, res, next) => {
   try {
-    const latestRun = await db.get('SELECT * FROM sync_runs ORDER BY id DESC LIMIT 1');
+    const latestRun = await db.rt.get('SELECT * FROM sync_runs ORDER BY id DESC LIMIT 1');
     res.json({
       status: 'ok',
       source: getJsonSource(),
@@ -236,9 +236,9 @@ router.get('/health', async (_req, res, next) => {
   }
 });
 
-router.post('/sync/run', async (_req, res, next) => {
+router.post('/sync/run', async (req, res, next) => {
   try {
-    const result = await runSync();
+    const result = await runSync({ force: String(req.query.force || '').toLowerCase() === 'true' });
     res.json(result);
   } catch (error) {
     next(error);
@@ -247,7 +247,7 @@ router.post('/sync/run', async (_req, res, next) => {
 
 router.get('/sync/status', async (_req, res, next) => {
   try {
-    const latestRun = await db.get('SELECT * FROM sync_runs ORDER BY id DESC LIMIT 1');
+    const latestRun = await db.rt.get('SELECT * FROM sync_runs ORDER BY id DESC LIMIT 1');
     if (!latestRun) {
       res.status(404).json({ message: 'No sync run recorded yet' });
       return;
@@ -264,7 +264,7 @@ router.get('/records', async (req, res, next) => {
     const limit = Number.parseInt(req.query.limit, 10);
     const safeLimit = Number.isNaN(limit) ? 100 : Math.min(Math.max(limit, 1), 1000);
 
-    const rows = await db.all(
+    const rows = await db.rt.all(
       'SELECT id, source_key, payload, updated_at FROM synced_records ORDER BY id DESC LIMIT ?',
       [safeLimit]
     );
@@ -277,7 +277,7 @@ router.get('/records', async (req, res, next) => {
 
 router.get('/records/:sourceKey', async (req, res, next) => {
   try {
-    const row = await db.get(
+    const row = await db.rt.get(
       'SELECT id, source_key, payload, updated_at FROM synced_records WHERE source_key = ?',
       [req.params.sourceKey]
     );

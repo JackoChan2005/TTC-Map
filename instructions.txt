@@ -33,14 +33,16 @@ node-api/env.config  = committed shared defaults (do not edit for
 PORT=3000
 NODE_ENV=development
 DATABASE_PATH=../API/db/SubwaySystem.db
+RT_DATABASE_PATH=./data/realtime.db
 JSON_SOURCE=ckan-package:b811ead4-6eaf-4adb-8408-d389fb5a069c
 CKAN_BASE_URL=https://ckan0.cf.opendata.inter.prod-toronto.ca
 CKAN_FETCH_RESOURCE=false
-SYNC_INTERVAL_MS=60000
+GTFS_CHECK_INTERVAL_MS=21600000
+NTAS_POLL_MS=30000
+RT_SNAPSHOT_MAX_AGE_MS=90000
 PYTHON_SYNC_ENABLED=true
 PYTHON_BIN=python
 PYTHON_SYNC_SCRIPT=API/src/update_db.py
-PYTHON_SYNC_DB_PATH=API/db/SubwaySystem.db
 
 node-api/.env.local  = your local overrides (gitignored). Any
 variable set here wins over env.config. At minimum it should
@@ -61,12 +63,23 @@ Control C
 
 What happens on startup
 
-1) SQLite DB initializes (API/db/SubwaySystem.db)
-2) Initial sync runs once
-3) Cron sync runs every 60 seconds (SYNC_INTERVAL_MS=60000)
-4) Synced data is stored in:
-   - synced_records
-   - sync_runs
+There are two databases, split by ownership:
+- API/db/SubwaySystem.db     static GTFS schedule (written only by the
+                             Python updater; Node reads it read-only)
+- node-api/data/realtime.db  Node's own data: the realtime NTAS snapshot,
+                             synced_records, sync_runs, meta
+
+1) realtime.db initializes (created on first run)
+2) Initial GTFS check runs once: the server compares the CKAN feed's
+   metadata_modified against the version stored in the meta table and
+   only rebuilds SubwaySystem.db when the feed changed (or the db or
+   version marker is missing - e.g. on a fresh clone)
+3) The GTFS check repeats every 6 hours (GTFS_CHECK_INTERVAL_MS)
+4) The NTAS recorder polls realtime train positions every 30 seconds
+   (NTAS_POLL_MS) and keeps exactly one snapshot row in realtime.db.
+   The map serves that snapshot; if a poll fails or the snapshot is
+   older than RT_SNAPSHOT_MAX_AGE_MS, the map immediately falls back
+   to the schedule simulation (map-state responses show fallback:true)
 
 
 API endpoints
@@ -74,7 +87,7 @@ API endpoints
 1) Health
 GET /api/health
 
-2) Manual sync
+2) Manual sync (GTFS check; add ?force=true to force a full rebuild)
 POST /api/sync/run
 
 3) Sync status (latest run)
@@ -115,7 +128,8 @@ Use npm.cmd instead of npm
 2) Port already in use (EADDRINUSE)
 $env:PORT='3001'; npm.cmd start
 
-3) Test sync quickly
+3) Test sync quickly (only rebuilds when the GTFS feed changed;
+   pass -- --force to force a rebuild)
 npm.cmd run sync
 
 Python sync integration (uses existing API/src/update_db.py)
@@ -129,7 +143,6 @@ pip install -r requirements.txt
 3) The committed env.config already enables the Python sync:
 PYTHON_SYNC_ENABLED=true
 PYTHON_SYNC_SCRIPT=API/src/update_db.py
-PYTHON_SYNC_DB_PATH=API/db/SubwaySystem.db
 
 4) Point PYTHON_BIN at your venv interpreter in node-api/.env.local
 (gitignored - overrides env.config):

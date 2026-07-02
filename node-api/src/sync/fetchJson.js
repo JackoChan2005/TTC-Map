@@ -162,13 +162,20 @@ const fetchFromCkanPackage = async (packageId, ckanBaseUrl = DEFAULT_CKAN_BASE_U
 
 const isCkanPackageSource = (value) => typeof value === 'string' && value.startsWith(CKAN_SOURCE_PREFIX);
 
+const getCkanPackageId = (source) => {
+  if (!isCkanPackageSource(source)) {
+    return null;
+  }
+  return source.slice(CKAN_SOURCE_PREFIX.length).trim() || null;
+};
+
 const fetchJson = async (source) => {
   if (!source) {
     throw new Error('JSON source is required');
   }
 
   if (isCkanPackageSource(source)) {
-    const packageId = source.slice(CKAN_SOURCE_PREFIX.length).trim();
+    const packageId = getCkanPackageId(source);
     if (!packageId) {
       throw new Error('Missing package ID in CKAN source');
     }
@@ -180,5 +187,6 @@ const fetchJson = async (source) => {
 
 module.exports = {
   fetchJson,
-  getPackageMetadata
+  getPackageMetadata,
+  getCkanPackageId
 };

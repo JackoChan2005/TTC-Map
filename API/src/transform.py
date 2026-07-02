@@ -59,6 +59,12 @@ class transformer:
         print("Sending data to db...")
         globals.db_dir.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(globals.conn)
+        # WAL lets the Node server keep reading while this rebuild runs;
+        # Python is the only writer of this database.
+        conn.execute("PRAGMA journal_mode=WAL")
+        # Node's operational tables moved to node-api/data/realtime.db
+        conn.execute("DROP TABLE IF EXISTS synced_records")
+        conn.execute("DROP TABLE IF EXISTS sync_runs")
         calendar.to_sql("SERVICE_DAYS", conn, if_exists="replace", index=False)
         subway_stop_times.to_sql("SUBWAY_STOP_TIMES", conn, if_exists="replace", index=False)
 
