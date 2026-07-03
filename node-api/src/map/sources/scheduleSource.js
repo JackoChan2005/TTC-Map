@@ -15,7 +15,7 @@ const getTrainPositions = async (now = new Date()) => {
       continue;
     }
 
-    const rows = await db.all(`
+    const rows = await db.gtfs.all(`
       SELECT
         a.trip_id AS tripId,
         a.direction_id AS direction,

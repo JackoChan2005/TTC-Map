@@ -1,25 +1,28 @@
+// Two databases, split by ownership:
+//   gtfs — the Python-owned static GTFS database (SubwaySystem.db). Node only
+//          ever reads it; the Python updater is its single writer.
+//   rt   — Node's own database (realtime.db) for everything dynamic: the
+//          realtime snapshot, synced_records, sync_runs and meta.
+
 const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
-let db;
+const BUSY_TIMEOUT_MS = 5000;
 
-const resolveDbPath = () => {
-  const configured = process.env.DATABASE_PATH || './data.db';
-  return path.isAbsolute(configured)
-    ? configured
-    : path.resolve(__dirname, '..', configured);
+let gtfsDb;
+let rtDb;
+
+const resolveConfiguredPath = (configured, fallback) => {
+  const value = configured || fallback;
+  return path.isAbsolute(value) ? value : path.resolve(__dirname, '..', value);
 };
 
-const getDb = () => {
-  if (!db) {
-    throw new Error('Database has not been initialized. Call init() first.');
-  }
-  return db;
-};
+const resolveGtfsPath = () => resolveConfiguredPath(process.env.DATABASE_PATH, '../API/db/SubwaySystem.db');
+const resolveRtPath = () => resolveConfiguredPath(process.env.RT_DATABASE_PATH, './data/realtime.db');
 
-const run = (sql, params = []) => new Promise((resolve, reject) => {
-  getDb().run(sql, params, function onRun(err) {
+const runOn = (handle, sql, params = []) => new Promise((resolve, reject) => {
+  handle.run(sql, params, function onRun(err) {
     if (err) {
       reject(err);
       return;
@@ -28,8 +31,8 @@ const run = (sql, params = []) => new Promise((resolve, reject) => {
   });
 });
 
-const get = (sql, params = []) => new Promise((resolve, reject) => {
-  getDb().get(sql, params, (err, row) => {
+const getOn = (handle, sql, params = []) => new Promise((resolve, reject) => {
+  handle.get(sql, params, (err, row) => {
     if (err) {
       reject(err);
       return;
@@ -38,8 +41,8 @@ const get = (sql, params = []) => new Promise((resolve, reject) => {
   });
 });
 
-const all = (sql, params = []) => new Promise((resolve, reject) => {
-  getDb().all(sql, params, (err, rows) => {
+const allOn = (handle, sql, params = []) => new Promise((resolve, reject) => {
+  handle.all(sql, params, (err, rows) => {
     if (err) {
       reject(err);
       return;
@@ -48,20 +51,64 @@ const all = (sql, params = []) => new Promise((resolve, reject) => {
   });
 });
 
-const withTransaction = async (callback) => {
-  await run('BEGIN TRANSACTION');
-  try {
-    const result = await callback();
-    await run('COMMIT');
-    return result;
-  } catch (error) {
-    await run('ROLLBACK');
-    throw error;
+// Opened lazily: on a fresh clone the file does not exist until the first
+// GTFS sync has run, and the server must still be able to boot to run it.
+const openGtfs = () => new Promise((resolve, reject) => {
+  if (gtfsDb) {
+    resolve(gtfsDb);
+    return;
+  }
+
+  const dbPath = resolveGtfsPath();
+  if (!fs.existsSync(dbPath)) {
+    reject(new Error(`GTFS database not found at ${dbPath}. Run "npm run sync" first.`));
+    return;
+  }
+
+  const handle = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY, (err) => {
+    if (err) {
+      reject(err);
+      return;
+    }
+    handle.configure('busyTimeout', BUSY_TIMEOUT_MS);
+    gtfsDb = handle;
+    resolve(gtfsDb);
+  });
+});
+
+const getRt = () => {
+  if (!rtDb) {
+    throw new Error('Realtime database has not been initialized. Call init() first.');
+  }
+  return rtDb;
+};
+
+const gtfs = {
+  get: async (sql, params = []) => getOn(await openGtfs(), sql, params),
+  all: async (sql, params = []) => allOn(await openGtfs(), sql, params)
+};
+
+const rt = {
+  run: (sql, params = []) => runOn(getRt(), sql, params),
+  get: (sql, params = []) => getOn(getRt(), sql, params),
+  all: (sql, params = []) => allOn(getRt(), sql, params),
+  withTransaction: async (callback) => {
+    await runOn(getRt(), 'BEGIN TRANSACTION');
+    try {
+      const result = await callback();
+      await runOn(getRt(), 'COMMIT');
+      return result;
+    } catch (error) {
+      await runOn(getRt(), 'ROLLBACK');
+      throw error;
+    }
   }
 };
 
-const createSchema = async () => {
-  await run(`
+const createRtSchema = async () => {
+  await rt.run('PRAGMA journal_mode=WAL');
+
+  await rt.run(`
     CREATE TABLE IF NOT EXISTS synced_records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       source_key TEXT NOT NULL UNIQUE,
@@ -70,7 +117,7 @@ const createSchema = async () => {
     )
   `);
 
-  await run(`
+  await rt.run(`
     CREATE TABLE IF NOT EXISTS sync_runs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       ran_at TEXT NOT NULL,
@@ -79,54 +126,77 @@ const createSchema = async () => {
       message TEXT
     )
   `);
+
+  await rt.run(`
+    CREATE TABLE IF NOT EXISTS meta (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+
+  await rt.run(`
+    CREATE TABLE IF NOT EXISTS rt_snapshot (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      polled_at TEXT NOT NULL,
+      status TEXT NOT NULL,
+      positions TEXT NOT NULL
+    )
+  `);
 };
 
 const init = () => new Promise((resolve, reject) => {
-  if (db) {
-    resolve(db);
+  if (rtDb) {
+    resolve(rtDb);
     return;
   }
 
-  const dbPath = resolveDbPath();
+  const dbPath = resolveRtPath();
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-  db = new sqlite3.Database(dbPath, async (err) => {
+  const handle = new sqlite3.Database(dbPath, async (err) => {
     if (err) {
       reject(err);
       return;
     }
 
+    handle.configure('busyTimeout', BUSY_TIMEOUT_MS);
+    rtDb = handle;
+
     try {
-      await createSchema();
-      console.log(`Connected to SQLite database at ${dbPath}`);
-      resolve(db);
+      await createRtSchema();
+      console.log(`Connected to realtime database at ${dbPath}`);
+      resolve(rtDb);
     } catch (schemaError) {
+      rtDb = null;
       reject(schemaError);
     }
   });
 });
 
-const close = () => new Promise((resolve, reject) => {
-  if (!db) {
+const closeHandle = (handle) => new Promise((resolve, reject) => {
+  if (!handle) {
     resolve();
     return;
   }
-
-  db.close((err) => {
+  handle.close((err) => {
     if (err) {
       reject(err);
       return;
     }
-    db = null;
     resolve();
   });
 });
 
+const close = async () => {
+  await closeHandle(rtDb);
+  rtDb = null;
+  await closeHandle(gtfsDb);
+  gtfsDb = null;
+};
+
 module.exports = {
   init,
-  getDb,
-  run,
-  get,
-  all,
-  withTransaction,
-  close
+  gtfs,
+  rt,
+  close,
+  resolveGtfsPath
 };

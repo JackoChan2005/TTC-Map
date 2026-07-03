@@ -1,12 +1,14 @@
 // Source selection for the map state engine.
-//   MAP_SOURCE=auto      realtime (NTAS) with automatic schedule fallback
+//   MAP_SOURCE=auto      last recorded NTAS snapshot; falls back to schedule
+//                        the moment the snapshot is failed, missing or stale
 //   MAP_SOURCE=schedule  static GTFS simulation only
-//   MAP_SOURCE=ntas      realtime only (errors when the feed is down)
+//   MAP_SOURCE=ntas      live NTAS fetch (errors when the feed is down)
 
 const { loadTopology } = require('./topology');
 const { computeMapState } = require('./stateEngine');
 const scheduleSource = require('./sources/scheduleSource');
 const ntasSource = require('./sources/ntasSource');
+const snapshotSource = require('./sources/snapshotSource');
 
 const SOURCES = {
   schedule: scheduleSource,
@@ -27,10 +29,9 @@ const getMapState = async ({ now = new Date(), source } = {}) => {
   }
 
   try {
-    const positions = await ntasSource.getTrainPositions(now);
+    const positions = await snapshotSource.getTrainPositions(now);
     return computeMapState(topology, positions, { source: 'ntas' });
-  } catch (error) {
-    console.error(`NTAS source failed (${error.message}), falling back to schedule`);
+  } catch (_error) {
     const positions = await scheduleSource.getTrainPositions(now);
     const state = computeMapState(topology, positions, { source: 'schedule' });
     state.fallback = true;

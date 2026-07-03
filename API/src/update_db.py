@@ -1,13 +1,10 @@
 from load import loader
 from transform import transformer
 
-# TODO:
-#   make this run a full db update (ie just run load and 
-#   transform) but this only really needs updating every 6 
-#   weeks or so - cron job
-#   more likely will need to run the code that updates the 
-#   realtime stuff (need to add that to it's own table that 
-#   let's us update stuff on the fly)
+# Full static-GTFS rebuild (load + transform). The Node server decides when
+# to run this: it checks the CKAN feed's metadata_modified and only spawns
+# this script when the feed actually changed (or the db is missing).
+# Realtime data lives separately in node-api/data/realtime.db.
 
 class update_db:
     def __init__(self) -> None:

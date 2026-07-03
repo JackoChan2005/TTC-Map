@@ -3,15 +3,19 @@ require('../loadEnv');
 
 const fs = require('fs');
 const { spawn } = require('child_process');
-const sqlite3 = require('sqlite3').verbose();
 
 const db = require('../db');
-const { fetchJson } = require('./fetchJson');
+const { fetchJson, getPackageMetadata, getCkanPackageId } = require('./fetchJson');
 const { transformData } = require('./transform');
 
-const DEFAULT_INTERVAL_MS = 60 * 1000;
+// The GTFS feed changes every few weeks, so the cron only *checks* CKAN's
+// metadata_modified on this interval and rebuilds when it differs from the
+// version recorded in the meta table (or when the database is missing).
+const DEFAULT_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const ROOT_DIR = path.resolve(__dirname, '..', '..', '..');
 const PYTHON_SYNC_TABLE = 'SUBWAY_STOP_TIMES';
+const GTFS_VERSION_META_KEY = 'gtfs_last_modified';
+const INSERT_CHUNK_SIZE = 300;
 
 let syncInProgress = false;
 
@@ -25,8 +29,7 @@ const resolvePathFromRoot = (inputPath, fallback) => {
 const getPythonConfig = () => ({
   enabled: isTruthy(process.env.PYTHON_SYNC_ENABLED),
   pythonBin: process.env.PYTHON_BIN || 'python',
-  scriptPath: resolvePathFromRoot(process.env.PYTHON_SYNC_SCRIPT, 'API/src/update_db.py'),
-  dbPath: resolvePathFromRoot(process.env.PYTHON_SYNC_DB_PATH, 'API/db/SubwaySystem.db')
+  scriptPath: resolvePathFromRoot(process.env.PYTHON_SYNC_SCRIPT, 'API/src/update_db.py')
 });
 
 const runPythonUpdate = ({ pythonBin, scriptPath }) => new Promise((resolve, reject) => {
@@ -52,36 +55,6 @@ const runPythonUpdate = ({ pythonBin, scriptPath }) => new Promise((resolve, rej
   });
 });
 
-const openReadOnlyDb = (dbPath) => new Promise((resolve, reject) => {
-  const sqliteDb = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY, (err) => {
-    if (err) {
-      reject(err);
-      return;
-    }
-    resolve(sqliteDb);
-  });
-});
-
-const readAll = (sqliteDb, sql, params = []) => new Promise((resolve, reject) => {
-  sqliteDb.all(sql, params, (err, rows) => {
-    if (err) {
-      reject(err);
-      return;
-    }
-    resolve(rows);
-  });
-});
-
-const closeSqliteDb = (sqliteDb) => new Promise((resolve, reject) => {
-  sqliteDb.close((err) => {
-    if (err) {
-      reject(err);
-      return;
-    }
-    resolve();
-  });
-});
-
 const mapPythonRowsToRecords = (rows) => {
   const updatedAt = new Date().toISOString();
 
@@ -97,10 +70,58 @@ const mapPythonRowsToRecords = (rows) => {
   });
 };
 
-const syncFromPython = async () => {
+const getStoredGtfsVersion = () => db.rt
+  .get('SELECT value FROM meta WHERE key = ?', [GTFS_VERSION_META_KEY])
+  .then((row) => row?.value ?? null);
+
+const setStoredGtfsVersion = (value) => db.rt.run(
+  'INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
+  [GTFS_VERSION_META_KEY, value]
+);
+
+const fetchRemoteGtfsVersion = async () => {
+  const packageId = getCkanPackageId(process.env.JSON_SOURCE);
+  if (!packageId) {
+    return null;
+  }
+  const pkg = await getPackageMetadata(packageId, process.env.CKAN_BASE_URL || undefined);
+  return pkg.metadata_modified || null;
+};
+
+const syncFromPython = async ({ force = false } = {}) => {
   const pythonConfig = getPythonConfig();
   if (!pythonConfig.enabled) {
     return null;
+  }
+
+  const source = `python:${path.relative(ROOT_DIR, pythonConfig.scriptPath).replace(/\\/g, '/')}`;
+  const dbMissing = !fs.existsSync(db.resolveGtfsPath());
+  const storedVersion = await getStoredGtfsVersion();
+
+  let remoteVersion = null;
+  try {
+    remoteVersion = await fetchRemoteGtfsVersion();
+  } catch (error) {
+    // CKAN unreachable: keep serving the existing database rather than fail,
+    // unless we have nothing to serve yet.
+    if (!dbMissing && storedVersion) {
+      return {
+        source,
+        records: null,
+        updated: false,
+        message: `GTFS version check failed (${error.message}); keeping current data`
+      };
+    }
+  }
+
+  const upToDate = !force && !dbMissing && storedVersion && remoteVersion === storedVersion;
+  if (upToDate) {
+    return {
+      source,
+      records: null,
+      updated: false,
+      message: `GTFS feed unchanged (${remoteVersion})`
+    };
   }
 
   if (!fs.existsSync(pythonConfig.scriptPath)) {
@@ -109,23 +130,22 @@ const syncFromPython = async () => {
 
   await runPythonUpdate(pythonConfig);
 
-  if (!fs.existsSync(pythonConfig.dbPath)) {
-    throw new Error(`Python sync database not found at ${pythonConfig.dbPath}`);
+  if (!fs.existsSync(db.resolveGtfsPath())) {
+    throw new Error(`Python sync database not found at ${db.resolveGtfsPath()}`);
   }
 
-  const sqliteDb = await openReadOnlyDb(pythonConfig.dbPath);
-
-  try {
-    const rows = await readAll(sqliteDb, `SELECT * FROM ${PYTHON_SYNC_TABLE}`);
-    const records = mapPythonRowsToRecords(rows);
-
-    return {
-      source: `python:${path.relative(ROOT_DIR, pythonConfig.scriptPath).replace(/\\/g, '/')}`,
-      records
-    };
-  } finally {
-    await closeSqliteDb(sqliteDb);
+  const rows = await db.gtfs.all(`SELECT * FROM ${PYTHON_SYNC_TABLE}`);
+  const records = mapPythonRowsToRecords(rows);
+  if (remoteVersion) {
+    await setStoredGtfsVersion(remoteVersion);
   }
+
+  return {
+    source,
+    records,
+    updated: true,
+    message: `rebuilt from GTFS feed (${remoteVersion || 'version unknown'})`
+  };
 };
 
 const getJsonSource = () => {
@@ -137,14 +157,10 @@ const getJsonSource = () => {
   return process.env.JSON_SOURCE || './data/source.json';
 };
 
-const loadRecordsForSync = async () => {
-  const pythonSyncResult = await syncFromPython();
+const loadRecordsForSync = async ({ force = false } = {}) => {
+  const pythonSyncResult = await syncFromPython({ force });
   if (pythonSyncResult) {
-    return {
-      source: pythonSyncResult.source,
-      records: pythonSyncResult.records,
-      mode: 'python'
-    };
+    return { ...pythonSyncResult, mode: 'python' };
   }
 
   const source = getJsonSource();
@@ -154,31 +170,36 @@ const loadRecordsForSync = async () => {
   return {
     source,
     records,
+    updated: true,
+    message: null,
     mode: 'json'
   };
 };
 
 const persistRecords = async (records) => {
-  await db.withTransaction(async () => {
-    await db.run('DELETE FROM synced_records');
+  await db.rt.withTransaction(async () => {
+    await db.rt.run('DELETE FROM synced_records');
 
-    for (const record of records) {
-      await db.run(
-        'INSERT INTO synced_records (source_key, payload, updated_at) VALUES (?, ?, ?)',
-        [record.sourceKey, record.payload, record.updatedAt]
+    for (let i = 0; i < records.length; i += INSERT_CHUNK_SIZE) {
+      const chunk = records.slice(i, i + INSERT_CHUNK_SIZE);
+      const placeholders = chunk.map(() => '(?, ?, ?)').join(', ');
+      const params = chunk.flatMap((record) => [record.sourceKey, record.payload, record.updatedAt]);
+      await db.rt.run(
+        `INSERT INTO synced_records (source_key, payload, updated_at) VALUES ${placeholders}`,
+        params
       );
     }
   });
 };
 
 const logRun = async ({ status, recordCount, message }) => {
-  await db.run(
+  await db.rt.run(
     'INSERT INTO sync_runs (ran_at, status, record_count, message) VALUES (?, ?, ?, ?)',
     [new Date().toISOString(), status, recordCount, message || null]
   );
 };
 
-const runSync = async () => {
+const runSync = async ({ force = false } = {}) => {
   if (syncInProgress) {
     return {
       status: 'skipped',
@@ -189,20 +210,25 @@ const runSync = async () => {
   syncInProgress = true;
 
   try {
-    const { source, records, mode } = await loadRecordsForSync();
+    const { source, records, updated, message, mode } = await loadRecordsForSync({ force });
     const ranAt = new Date().toISOString();
 
-    await persistRecords(records);
+    if (updated && records) {
+      await persistRecords(records);
+    }
     await logRun({
       status: 'success',
-      recordCount: records.length
+      recordCount: records ? records.length : 0,
+      message
     });
 
     return {
       status: 'success',
       source,
       mode,
-      recordCount: records.length,
+      updated,
+      message,
+      recordCount: records ? records.length : 0,
       ranAt
     };
   } catch (error) {
@@ -217,21 +243,25 @@ const runSync = async () => {
   }
 };
 
-const startSyncCron = (intervalMs = Number(process.env.SYNC_INTERVAL_MS || DEFAULT_INTERVAL_MS)) => setInterval(() => {
+const startSyncCron = (intervalMs = Number(process.env.GTFS_CHECK_INTERVAL_MS || DEFAULT_CHECK_INTERVAL_MS)) => setInterval(() => {
   runSync()
     .then((result) => {
       if (result.status === 'success') {
-        console.log(`Scheduled sync completed at ${result.ranAt} (${result.recordCount} records)`);
+        const detail = result.updated
+          ? `${result.recordCount} records`
+          : (result.message || 'no update needed');
+        console.log(`Scheduled GTFS check completed at ${result.ranAt} (${detail})`);
       }
     })
     .catch((error) => {
-      console.error('Scheduled sync failed:', error.message);
+      console.error('Scheduled GTFS check failed:', error.message);
     });
 }, intervalMs);
 
 if (require.main === module) {
+  const force = process.argv.includes('--force');
   db.init()
-    .then(() => runSync())
+    .then(() => runSync({ force }))
     .then((result) => {
       console.log('Sync completed:', result);
     })

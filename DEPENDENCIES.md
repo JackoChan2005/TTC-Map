@@ -14,7 +14,7 @@ Everything needed to run the TTC-Map data pipeline and API server.
 | Git | any recent | to clone the repo |
 | Node.js + npm | Node 18+ (tested on v20.7.0 / npm 10) | runs the API server |
 | Python | 3.12 (tested on 3.12.5) | builds the GTFS database |
-| Internet access | — | downloads ~66 MB GTFS feed from Toronto Open Data each sync |
+| Internet access | — | downloads ~66 MB GTFS feed from Toronto Open Data when the feed changes (every few weeks); polls TTC's NTAS API for realtime positions |
 | Disk space | ~500 MB free | extracted GTFS files are large (stop_times.txt alone is ~280 MB) |
 
 On macOS, `sqlite3` (the npm package) ships prebuilt binaries; if the prebuild fails you also need Xcode Command Line Tools (`xcode-select --install`). On Windows, use `npm.cmd` instead of `npm` if PowerShell blocks scripts.
@@ -41,7 +41,7 @@ pip install -r requirements.txt
 | Package | Version | Purpose |
 |---------|---------|---------|
 | express | ^4.18.2 | HTTP server |
-| sqlite3 | ^5.1.6 | reads/writes the shared SQLite DB (native module) |
+| sqlite3 | ^5.1.6 | reads the GTFS DB (read-only) and owns `data/realtime.db` (native module) |
 | dotenv | ^16.0.3 | loads `env.config` |
 | nodemon | ^2.0.20 | dev only — auto-restart |
 
@@ -80,12 +80,16 @@ starts the server and opens the browser automatically. Manually:
 
 ```bash
 cd node-api
-npm run sync    # one-off: download GTFS + build DB (takes a few minutes)
-npm start       # starts server on http://localhost:3000 (also syncs on startup)
+npm run sync    # first run: download GTFS + build DB (takes a few minutes);
+                # later runs skip unless the feed changed (npm run sync -- --force to rebuild)
+npm start       # starts server on http://localhost:3000 (checks for GTFS updates on startup)
 ```
 
-A successful sync reports ~120k records. Data lands in `API/db/SubwaySystem.db`
-(`API/data/` and `API/db/` are created automatically).
+A successful first sync reports ~120k records. Static schedule data lands in
+`API/db/SubwaySystem.db` (written only by the Python updater; Node reads it
+read-only). Node keeps its own dynamic data — the realtime NTAS snapshot,
+`synced_records`, `sync_runs` — in `node-api/data/realtime.db`. All of these
+directories are created automatically.
 
 ## 6. Optional — hardware/firmware development only
 
