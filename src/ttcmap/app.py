@@ -11,7 +11,7 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from ttcmap.config import get_settings
@@ -68,6 +68,13 @@ def create_app() -> FastAPI:
             content={"message": exc.detail},
             headers=getattr(exc, "headers", None),
         )
+
+    @app.get("/favicon.ico", include_in_schema=False)
+    async def favicon() -> RedirectResponse:
+        # browsers request /favicon.ico for any page that declares no icon --
+        # /docs, or an API URL opened in a tab. Point them at the real one so
+        # the log is not full of 404s.
+        return RedirectResponse("/favicon.svg")
 
     app.include_router(gtfs.router, prefix="/api/v1", tags=["gtfs"])
     app.include_router(map_routes.router, prefix="/api/v1", tags=["map"])
