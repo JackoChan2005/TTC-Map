@@ -1,192 +1,93 @@
-# TTC Map Display
+# TTC Map
 
-A PCB display showing TTC subway routes and real-time train positions.
-
-Full dependency list: [DEPENDENCIES.md](DEPENDENCIES.md)
-
----
-
-## Prerequisites
-
-| Tool | Version |
-|------|---------|
-| Python | 3.12+ |
-| Node.js + npm | 18+ (tested on v20.7.0 / npm 10) |
-| Git | any recent |
-
----
-
-## Quick Start (recommended)
-
-Two scripts in the repo root do everything. **Setup** (one-time) creates the Python venv, installs all Python and Node dependencies, writes `PYTHON_BIN` to a gitignored `node-api/.env.local` so the server uses the venv automatically, and runs the first data sync. **Start** launches the server and opens [http://localhost:3000](http://localhost:3000) in your browser as soon as it's ready.
-
-**Windows** — double-click the file, or run from a terminal in the repo root:
-```bat
-setup.bat
-start.bat
-```
-
-**macOS** — double-click in Finder, or run from a terminal in the repo root:
-```bash
-./setup.command
-./start.command
-```
-
-Press `Ctrl+C` in the terminal window to stop the server.
-
-> **VS Code tip:** open the `TTC-Map` folder directly (not a parent folder). The editor then auto-detects the `.venv` created by setup and selects it as the Python interpreter.
-
-> Prefer the underlying scripts? `python Setup.py` runs the platform-appropriate setup (without the data sync), and `bash Setup/Setup.sh` / `Setup\Setup.ps1` can be run directly.
-
----
-
-## Manual Setup
-
-**1. Clone the repository**
-```bash
-git clone https://github.com/JackoChan2005/TTC-Map.git
-cd TTC-Map
-```
-
-**2. Create a Python virtual environment**
-
-Windows (PowerShell):
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-macOS / Linux:
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-**3. Install Python dependencies**
-```bash
-pip install -r requirements.txt
-```
-
-**4. Install Node dependencies**
-```bash
-cd node-api
-npm install
-```
-
-> **Windows PowerShell note:** if npm scripts are blocked, use `npm.cmd` in place of `npm` throughout.
-
----
-
-## Configuration and running
-
-The committed `node-api/env.config` holds shared defaults. Machine-specific values go in `node-api/.env.local` (gitignored) — anything set there overrides `env.config`, so you never need to edit the tracked file.
-
-**5. Point `PYTHON_BIN` at your venv**
-
-Create `node-api/.env.local` containing one line (the setup scripts do this for you):
+Realtime TTC subway state, served to two displays: a web map and an ESP32-driven
+LED board on a custom PCB.
 
 ```
-# macOS / Linux
-PYTHON_BIN=/absolute/path/to/TTC-Map/.venv/bin/python
-
-# Windows
-PYTHON_BIN=C:\path\to\TTC-Map\.venv\Scripts\python.exe
+Toronto Open Data (GTFS)  ─┐
+                           ├─► ttcmap API ─┬─► web frontend (SVG map + route search)
+TTC NTAS (realtime)       ─┘               └─► ESP32 / LED board (packed bitmask)
 ```
 
-> The Node server spawns this interpreter on every sync to load the GTFS feed.
-> If left as the default `python` from `env.config`, it may resolve to a system
-> install (e.g. Anaconda) that lacks the required packages, and the sync will fail.
+## Quick start
 
-**6. Run the first sync** (from the `node-api/` directory)
-
-Downloads the ~66 MB TTC GTFS feed and builds the SQLite database. Takes a few minutes; a successful run reports ~120 k records.
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.12+.
+Nothing else — no separate setup step, no virtualenv to activate.
 
 ```bash
-npm run sync
+uv run ttcmap serve
 ```
 
-Windows PowerShell:
-```powershell
-npm.cmd run sync
-```
+Or double-click `start.command` (macOS/Linux) / `start.bat` (Windows).
 
-**7. Start the server** (from the `node-api/` directory)
+Then open <http://localhost:8000> for the map and <http://localhost:8000/docs> for the
+interactive API reference.
 
-```bash
-npm start
-```
+The first run downloads the ~66 MB GTFS feed and builds the database, which takes a few
+minutes. The server answers requests while that happens; the map falls back to whatever data
+it has. Later runs check whether the feed changed and start in seconds when it has not.
 
-Windows PowerShell:
-```powershell
-npm.cmd start
-```
+## Commands
 
-**8. Open the frontend:** [http://localhost:3000](http://localhost:3000)
+| Command | What it does |
+|---|---|
+| `uv run ttcmap serve` | Run the API and web frontend |
+| `uv run ttcmap refresh` | Check the GTFS feed, rebuild if it changed (`--force` to rebuild anyway) |
+| `uv run ttcmap build-network` | Regenerate `shared/network.json` from the extracted feed |
+| `uv run pytest` | Run the test suite |
+| `uv run ruff check src tests` | Lint |
 
----
+## API
 
-## Alternative: Python FastAPI only
-
-To run just the FastAPI data pipeline without the Node server:
-
-**1. Activate the virtual environment**
-
-Windows:
-```powershell
-.venv\Scripts\Activate.ps1
-```
-macOS / Linux:
-```bash
-source .venv/bin/activate
-```
-
-**2. Build the database**
-```bash
-cd API/src
-python update_db.py
-```
-
-**3. Start the API**
-```bash
-fastapi dev main.py
-```
-
----
-
-## API Endpoints
+All endpoints are under `/api/v1`. Full schemas at `/docs`.
 
 | Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/health` | Health check |
-| POST | `/api/sync/run` | Trigger a manual sync |
-| GET | `/api/sync/status` | Latest sync run status |
-| GET | `/api/records?limit=100` | List synced records |
-| GET | `/api/records/:sourceKey` | Get record by source key |
-| GET | `/api/route-search?route=1` | Search by route number |
-| GET | `/api/route-search?route=1&at=<ISO8601>` | Search by route at a specific time (`at` defaults to now) |
+|---|---|---|
+| GET | `/api/v1/health` | Service, GTFS and realtime status |
+| GET | `/api/v1/network` | Canonical topology — lines, stations, platforms |
+| GET | `/api/v1/layout/{name}` | Station x/y for a visual design (`geographic`) |
+| GET | `/api/v1/map-state` | Train positions. `?source=auto\|schedule\|ntas`, `?at=<ISO8601>` |
+| GET | `/api/v1/led-state` | LED frame as JSON. `?map=rev-a` |
+| GET | `/api/v1/led-state.bin` | LED frame as a raw bitmask — see [docs/FIRMWARE_API.md](docs/FIRMWARE_API.md) |
+| GET | `/api/v1/departures` | Next departures. `?route=1&at=<ISO8601>` |
+| GET | `/api/v1/gtfs/status` | Feed version and last refresh result |
+| POST | `/api/v1/gtfs/refresh` | Trigger a check. `?force=true` to rebuild regardless |
 
----
+`map-state` serves the realtime NTAS feed when it is healthy and falls back to a schedule
+simulation otherwise, marking the response `"fallback": true`. It never serves stale realtime
+positions: one failed poll drops it to the schedule.
+
+## Layout
+
+| Path | Contents |
+|---|---|
+| `src/ttcmap/` | The API — GTFS pipeline, map state engine, sources, renderers, routes |
+| `web/` | Static frontend (route search + SVG map) |
+| `firmware/` | ESP32 firmware (PlatformIO, ESP-IDF, `esp32doit-devkit-v1`) |
+| `hardware/` | KiCad project and `led-maps/` board revisions |
+| `shared/` | Generated `network.json` and `layouts/` |
+| `tests/` | pytest suite |
+| `data/` | Gitignored: GTFS extract and `ttc.db` |
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit together and
+[docs/FIRMWARE_API.md](docs/FIRMWARE_API.md) for the ESP32 contract.
+
+## Configuration
+
+Everything has a working default; the app runs with no config at all. To override, copy
+`.env.example` to `.env` and uncomment what you need. The full list of settings is
+`src/ttcmap/config.py`.
 
 ## Troubleshooting
 
-**PowerShell blocks npm scripts**  
-Use `npm.cmd` instead of `npm`.
+**Port already in use** — `uv run ttcmap serve --port 8001`, or set `PORT` in `.env`.
 
-**Port already in use (EADDRINUSE)**  
-```powershell
-$env:PORT='3001'; npm.cmd start
-```
+**`Topology not found` / `503` from `/api/v1/network`** — the first GTFS refresh has not
+finished. Check progress in the server log, or run `uv run ttcmap refresh` directly.
 
-**Sync fails with import errors / missing packages**  
-Verify that `PYTHON_BIN` in `node-api/.env.local` points to the venv interpreter, not a system Python. Re-running the setup script fixes this.
+**Map shows "schedule simulation (realtime unavailable)"** — TTC's NTAS feed is unreachable or
+returned too few platforms. This is expected behaviour, not a failure; the map keeps working
+from the schedule. `/api/v1/health` shows the last poll result.
 
-**Port change**  
-Add `PORT=3001` (or any port) to `node-api/.env.local` — both the server and the start scripts pick it up.
-
-**`sqlite3` build fails on macOS**  
-Install Xcode Command Line Tools:
-```bash
-xcode-select --install
-```
-
-See [instructions.txt](instructions.txt) for additional API details and troubleshooting.
+**Rebuild seems stuck** — the pandas merge over `stop_times.txt` (~280 MB extracted) takes
+several minutes. It runs off the event loop, so the API stays responsive.
