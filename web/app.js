@@ -152,7 +152,7 @@ form.addEventListener('submit', async (event) => {
 
   const selectedAt = atTimeInput.value ? new Date(atTimeInput.value) : new Date();
   const atIso = Number.isNaN(selectedAt.getTime()) ? new Date().toISOString() : selectedAt.toISOString();
-  const url = `/api/route-search?route=${encodeURIComponent(route)}&at=${encodeURIComponent(atIso)}`;
+  const url = `/api/v1/departures?route=${encodeURIComponent(route)}&at=${encodeURIComponent(atIso)}`;
 
   showStatus('Searching departures…');
   clearResults();
