@@ -18,7 +18,7 @@ means writing something that returns `TrainPosition[]`. Neither knows about the 
 
 | Contract | Shape |
 |---|---|
-| `TrainPosition` | `line, direction, from_station, to_station, progress, trip_id` — `to_station=None` means at `from_station` |
+| `TrainPosition` | `line, direction, from_station, to_station, progress, trip_id` — `to_station=None` means at `from_station`. Realtime positions also carry `eta_s, progress_floor, key`; see *Realtime* below |
 | `MapState` | `{generatedAt, source, trainCount, trains[], stationsWithTrains}` (+ `fallback` when degraded) |
 | `shared/network.json` | Canonical topology: lines, ordered stations, platform → station map |
 | `shared/layouts/<name>.json` | x/y per station for one visual design |
@@ -37,6 +37,8 @@ means writing something that returns `TrainPosition[]`. Neither knows about the 
 | `map/state.py` | The pure engine. No database, no HTTP, no clock beyond `generatedAt` |
 | `map/toronto_time.py` | Service-day and late-night window handling — the only copy |
 | `map/topology.py` | Loads and caches `network.json`, layouts |
+| `map/segments.py` | Median traversal time per segment, measured from the schedule |
+| `map/interpolate.py` | NTAS countdowns → positions; ages them between polls |
 | `map/sources/schedule.py` | Interpolates position between consecutive scheduled stops |
 | `map/sources/ntas.py` | Live NTAS fetch across all 148 platforms |
 | `map/sources/snapshot.py` | Reads the recorder's snapshot; raises when unusable |
@@ -61,6 +63,34 @@ the API stays responsive throughout.
 fewer than half the platforms respond, the whole poll is treated as failed rather than serving
 a half-blank map.
 
+NTAS answers "next train in N minutes" — a countdown to a destination, not a position — so the
+snapshot stores ETAs and `map/interpolate.py` converts them per request, using the segment
+traversal times `map/segments.py` measures from the schedule:
+
+```
+remaining = eta_s - age_of_snapshot
+progress  = 1 - remaining / span        while 0 < remaining < span
+```
+
+Three consequences fall out of that one rule:
+
+- **Motion between polls.** Ageing a countdown is subtraction, so the board sees trains move on
+  every request rather than jumping every 30s. No velocity estimate and no per-train tracking —
+  and because the anchor is a fixed future event, error shrinks as a train nears its platform
+  instead of accumulating the way dead reckoning would.
+- **One sighting per train.** Every platform reports every train heading its way, so a live poll
+  parses ~195 sightings of ~65 trains. A train whose ETA exceeds its segment's own span has not
+  entered that segment yet and is already being reported by the platform behind, so it is
+  dropped. What survives is the segment the train is actually on.
+- **No reversing.** NTAS reports whole minutes and revises each poll, so a held train can read
+  "2 minutes" twice running. `carry_floor` seeds each new reading with where the last poll had
+  that train, so a revision can only move it forwards.
+
+The floor is keyed on `line|direction|station|nth-arrival`, which is a queue slot rather than a
+vehicle. When the nearest train arrives everything behind it shifts down an index, so a reading
+further out than the projection by more than a minute's rounding is treated as a different train
+and gets no floor.
+
 **Serving.** `map-state?source=auto` reads the snapshot and falls back to the schedule the
 moment it is failed, missing, or older than 90s — stale realtime positions are never shown.
 `?source=schedule` and `?source=ntas` force one path, which is what makes the fallback
@@ -68,10 +98,18 @@ testable.
 
 ## Known limits
 
-NTAS carries no train ids, so adjacent stations can double-count one train, and position
-within a segment is approximate. Positions are deduped per (line, direction, station), which
-bounds the error but does not remove it. A dedup heuristic merging adjacent-station sightings
-per line/direction is the obvious next improvement.
+NTAS still carries no train ids, so nothing here tracks a vehicle; it tracks queue slots and
+countdowns, which is enough to place trains but not to follow one.
+
+Two effects are left. NTAS reports whole minutes, so arrivals bunch into cohorts that expire
+together — `ARRIVED_GRACE_S` holds an arrived train across its dwell until the next segment
+picks it up, which overcounts by ~15% at the end of a poll cycle. Preferring the overcount is
+deliberate: an LED that lingers reads as a dwelling train, one that blinks reads as a bug. And
+segment spans are medians over the whole schedule, so a train held mid-segment sits still
+rather than slowing down.
+
+Both would be fixed by a feed carrying vehicle ids. Neither is worth more inference on top of
+this one.
 
 ## Possible extensions
 
