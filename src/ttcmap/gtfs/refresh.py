@@ -18,6 +18,7 @@ from datetime import UTC, datetime
 from ttcmap.config import get_settings
 from ttcmap.db import get_meta, set_meta, table_exists
 from ttcmap.gtfs import build, ckan, network
+from ttcmap.map import segments, topology
 
 log = logging.getLogger(__name__)
 
@@ -57,6 +58,11 @@ def _rebuild() -> int:
     # regenerating the topology is part of the rebuild, so network.json cannot
     # drift from the schedule tables the way it did when this was a manual step
     network.write_network(data_dir)
+    # both caches are derived from what we just replaced, and POST /gtfs/refresh
+    # has no other invalidation point, so drop them here rather than at the call
+    # sites
+    topology.clear_cache()
+    segments.clear_cache()
     return count
 
 
