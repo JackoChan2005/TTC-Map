@@ -27,6 +27,19 @@ class TrainPosition:
     progress: float = 0.0
     trip_id: str | None = None
 
+    # NTAS reports a countdown to the destination, not a position, so realtime
+    # positions carry the ETA and have `progress` filled in later by
+    # ttcmap.map.interpolate once the age of the observation is known.
+    # Schedule positions compute `progress` directly and leave this None.
+    eta_s: float | None = None
+    # Lower bound carried across polls so a revised ETA cannot run a train
+    # backwards down the line. See interpolate.carry_floor.
+    progress_floor: float = 0.0
+    # Stable identity for one sighting: line|direction|station|nth-arrival.
+    # NTAS has no train ids, so this is only good for matching consecutive
+    # polls of the same queue position, which is all the floor needs.
+    key: str | None = None
+
 
 @dataclass
 class MapState:
