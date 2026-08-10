@@ -43,7 +43,13 @@ class Settings(BaseSettings):
     # NTAS realtime feed
     ntas_base_url: str = "https://ntas.ttc.ca/api/ntas/get-next-train-time/"
     ntas_poll_s: int = 30
-    ntas_arriving_min: int = 1
+    # How far ahead to accept arrivals. At 1 a train only existed for its final
+    # minute and most of the map stayed dark. It only has to clear the slowest
+    # segment (276s measured from the schedule) for every train to be seen on
+    # the segment it is actually on; interpolate drops anything further out as a
+    # duplicate of the platform behind, so 6, 8 and 10 minutes all render
+    # identically to 5.
+    ntas_arriving_min: int = 5
     ntas_concurrency: int = 10
     ntas_timeout_s: float = 5.0
     # deadline for a whole poll across every platform, so an unresponsive feed

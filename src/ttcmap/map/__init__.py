@@ -12,6 +12,7 @@ import asyncio
 from datetime import UTC, datetime
 
 from ttcmap.config import get_settings
+from ttcmap.map import interpolate
 from ttcmap.map.sources import ntas, schedule, snapshot
 from ttcmap.map.state import MapState, compute_map_state
 from ttcmap.map.topology import load_topology
@@ -29,7 +30,9 @@ async def get_map_state(now: datetime | None = None, source: str | None = None) 
         return compute_map_state(topology, positions, source="schedule")
 
     if mode == "ntas":
-        positions = await ntas.get_train_positions()
+        # fetched just now, so there is nothing to age — but the countdowns
+        # still have to be turned into positions
+        positions = interpolate.advance(await ntas.get_train_positions(), 0.0)
         return compute_map_state(topology, positions, source="ntas")
 
     if mode != "auto":

@@ -5,9 +5,19 @@ returns the next arrival times in minutes:
 
     [{"line": "2", "direction": "0", "nextTrains": "1, 3, 6", ...}]
 
-A train arriving within `ntas_arriving_min` minutes is placed approaching that
-platform's station from the previous station on the line. NTAS carries no train
-ids, so positions are deduped per (line, direction, station).
+Every arrival in that list is a train, so all of them are kept — "3" and "6"
+above are the two trains queued behind the one arriving in a minute. Each is
+placed approaching that platform's station from the previous station on the
+line, and carries its ETA rather than a position: NTAS measures time-to-arrival,
+and ttcmap.map.interpolate turns that into a position using the segment's
+traversal time. Every train on the network is approaching *some* platform, so
+keeping the full list covers the whole map rather than just the last minute of
+each approach.
+
+NTAS carries no train ids, so positions are deduped per
+(line, direction, station, nth-arrival) — the nth entry of a platform's queue is
+the same train from one poll to the next, which is enough to keep a train moving
+forwards but is not a real vehicle identity.
 
 The hand-rolled concurrency lanes of the original become an asyncio.Semaphore
 over a shared keep-alive client.
@@ -27,19 +37,27 @@ log = logging.getLogger(__name__)
 name = "ntas"
 
 
-def _first_arrival_minutes(entry: dict) -> int | None:
-    first = str(entry.get("nextTrains") or "").split(",")[0].strip()
-    try:
-        return int(first)
-    except ValueError:
-        return None
+def _arrival_minutes(entry: dict) -> list[int]:
+    """Every arrival in "1, 3, 6", in order. Unparseable entries are dropped."""
+    minutes = []
+    for field in str(entry.get("nextTrains") or "").split(","):
+        try:
+            minutes.append(int(field.strip()))
+        except ValueError:
+            continue
+    return minutes
 
 
 def positions_from_responses(
-    topology: dict, responses: list[tuple[str, list]]
+    topology: dict, responses: list[tuple[str, list]], arriving_min: int | None = None
 ) -> list[TrainPosition]:
-    """Pure: map (platform_id, entries) pairs onto deduped TrainPositions."""
-    arriving_min = get_settings().ntas_arriving_min
+    """Pure: map (platform_id, entries) pairs onto deduped TrainPositions.
+
+    `arriving_min` is how far ahead to look, in minutes; it defaults to the
+    configured window and is a parameter so tests do not depend on settings.
+    """
+    if arriving_min is None:
+        arriving_min = get_settings().ntas_arriving_min
     by_key: dict[str, TrainPosition] = {}
 
     for platform_id, entries in responses:
@@ -48,10 +66,6 @@ def positions_from_responses(
             continue
 
         for entry in entries:
-            minutes = _first_arrival_minutes(entry)
-            if minutes is None or minutes > arriving_min:
-                continue
-
             try:
                 direction = int(entry["direction"])
             except (KeyError, TypeError, ValueError):
@@ -60,13 +74,20 @@ def positions_from_responses(
             station = platform["station"]
             origin = previous_station(topology, platform["line"], direction, station)
 
-            by_key[f"{platform['line']}|{direction}|{station}"] = TrainPosition(
-                line=platform["line"],
-                direction=direction,
-                from_station=origin or station,
-                to_station=station if origin else None,
-                progress=1 - (minutes / (arriving_min + 1)) if origin else 0.0,
-            )
+            for nth, minutes in enumerate(_arrival_minutes(entry)):
+                if minutes > arriving_min:
+                    # the list is ascending, so nothing after this is closer
+                    break
+
+                key = f"{platform['line']}|{direction}|{station}|{nth}"
+                by_key[key] = TrainPosition(
+                    line=platform["line"],
+                    direction=direction,
+                    from_station=origin or station,
+                    to_station=station if origin else None,
+                    eta_s=float(max(minutes, 0) * 60),
+                    key=key,
+                )
 
     return list(by_key.values())
 

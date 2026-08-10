@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
 from ttcmap.config import get_settings
+from ttcmap.map import interpolate
 from ttcmap.map.sources import ntas
 from ttcmap.map.state import TrainPosition
 
@@ -50,11 +51,17 @@ async def poll_once() -> Snapshot:
     """
     global _snapshot
     settings = get_settings()
+    previous = _snapshot
     try:
         positions = await asyncio.wait_for(
             ntas.get_train_positions(), timeout=settings.ntas_poll_timeout_s
         )
-        _snapshot = Snapshot(polled_at=datetime.now(UTC), status="ok", positions=positions)
+        polled_at = datetime.now(UTC)
+        if previous is not None and previous.status == "ok":
+            positions = interpolate.carry_floor(
+                positions, previous.positions, (polled_at - previous.polled_at).total_seconds()
+            )
+        _snapshot = Snapshot(polled_at=polled_at, status="ok", positions=positions)
     except TimeoutError:
         log.warning(
             "NTAS poll exceeded %ss; map falls back to schedule", settings.ntas_poll_timeout_s
