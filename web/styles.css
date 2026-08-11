@@ -125,6 +125,10 @@ button.secondary:hover {
   min-height: 20px;
 }
 
+.status.error {
+  color: #9f1239;
+}
+
 .hidden {
   display: none;
 }
@@ -158,6 +162,21 @@ button.secondary:hover {
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
+}
+
+.line-color-line-1 {
+  background: #d5c82b;
+  color: #000;
+}
+
+.line-color-line-2 {
+  background: #008000;
+  color: #fff;
+}
+
+.line-color-line-4 {
+  background: #b300b3;
+  color: #fff;
 }
 
 .direction {

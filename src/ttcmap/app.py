@@ -21,6 +21,7 @@ from ttcmap.logging_config import configure as configure_logging
 from ttcmap.map import recorder, topology
 from ttcmap.routes import departures, gtfs
 from ttcmap.routes import map as map_routes
+from ttcmap.security import security_headers
 
 log = logging.getLogger(__name__)
 
@@ -58,6 +59,7 @@ def create_app() -> FastAPI:
         summary="Realtime TTC subway state for the web map and the ESP32 LED board",
         lifespan=lifespan,
     )
+    app.middleware("http")(security_headers)
 
     @app.exception_handler(HTTPException)
     async def http_exception_handler(_request: Request, exc: HTTPException) -> JSONResponse:
@@ -75,6 +77,12 @@ def create_app() -> FastAPI:
         # /docs, or an API URL opened in a tab. Point them at the real one so
         # the log is not full of 404s.
         return RedirectResponse("/favicon.svg")
+
+    @app.get("/map", include_in_schema=False)
+    @app.get("/map/", include_in_schema=False)
+    async def legacy_map() -> RedirectResponse:
+        """Keep old map bookmarks working after the schematic map moved to `/`."""
+        return RedirectResponse("/")
 
     app.include_router(gtfs.router, prefix="/api/v1", tags=["gtfs"])
     app.include_router(map_routes.router, prefix="/api/v1", tags=["map"])

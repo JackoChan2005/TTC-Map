@@ -36,6 +36,8 @@ it has. Later runs check whether the feed changed and start in seconds when it h
 | `uv run ttcmap build-network` | Regenerate `shared/network.json` from the extracted feed |
 | `uv run pytest` | Run the test suite |
 | `uv run ruff check src tests` | Lint |
+| `node --test tests/web/*.test.mjs` | Run frontend tests (optional Node.js) |
+| `node scripts/build-schematic.mjs` | Regenerate the schematic layout (optional Node.js) |
 
 ## API
 
@@ -45,7 +47,7 @@ All endpoints are under `/api/v1`. Full schemas at `/docs`.
 |---|---|---|
 | GET | `/api/v1/health` | Service, GTFS and realtime status |
 | GET | `/api/v1/network` | Canonical topology — lines, stations, platforms |
-| GET | `/api/v1/layout/{name}` | Station x/y for a visual design (`geographic`) |
+| GET | `/api/v1/layout/{name}` | Station x/y for a visual design (`schematic`, `geographic`) |
 | GET | `/api/v1/map-state` | Train positions. `?source=auto\|schedule\|ntas`, `?at=<ISO8601>` |
 | GET | `/api/v1/led-state` | LED frame as JSON. `?map=rev-a` |
 | GET | `/api/v1/led-state.bin` | LED frame as a raw bitmask — see [docs/FIRMWARE_API.md](docs/FIRMWARE_API.md) |
@@ -62,7 +64,8 @@ positions: one failed poll drops it to the schedule.
 | Path | Contents |
 |---|---|
 | `src/ttcmap/` | The API — GTFS pipeline, map state engine, sources, renderers, routes |
-| `web/` | Static frontend (route search + SVG map) |
+| `web/` | Static frontend (schematic SVG map + route search) |
+| `scripts/` | Dependency-free schematic layout generator |
 | `firmware/` | ESP32 firmware (PlatformIO, ESP-IDF, `esp32doit-devkit-v1`) |
 | `hardware/` | KiCad project and `led-maps/` board revisions |
 | `shared/` | Generated `network.json` and `layouts/` |

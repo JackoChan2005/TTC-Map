@@ -24,8 +24,7 @@ const loadNetwork = async () => {
       const last = network.stations[line.stations[line.stations.length - 1]];
       linesByRouteId[line.routeId] = {
         name: line.name,
-        color: line.color,
-        textColor: line.textColor,
+        className: /^line-[124]$/.test(line.id) ? `line-color-${line.id}` : '',
         terminals: { 0: last ? last.name : null, 1: first ? first.name : null }
       };
     }
@@ -91,9 +90,8 @@ const createDepartureCard = (record, { highlight = false } = {}) => {
 
   const top = node('div', 'card-top');
   const pill = node('span', 'line-pill', line ? line.name : `Route ${payload.route_id ?? '?'}`);
-  if (line) {
-    pill.style.background = line.color;
-    pill.style.color = line.textColor;
+  if (line?.className) {
+    pill.classList.add(line.className);
   }
   top.appendChild(pill);
 
@@ -130,7 +128,7 @@ const createDepartureCard = (record, { highlight = false } = {}) => {
 
 const showStatus = (message, isError = false) => {
   statusEl.textContent = message;
-  statusEl.style.color = isError ? '#9f1239' : '#556173';
+  statusEl.classList.toggle('error', isError);
 };
 
 const clearResults = () => {

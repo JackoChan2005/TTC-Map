@@ -45,6 +45,14 @@ means writing something that returns `TrainPosition[]`. Neither knows about the 
 | `map/recorder.py` | Polls NTAS every 30s into an in-memory snapshot |
 | `renderers/led.py` | `MapState` → packed bitmask for a board revision |
 
+The web side is split along the same contract boundary:
+
+- `web/js/mapModel.js` validates API data and builds schematic-map view models.
+- `web/js/render/svgMap.js` is the thin DOM/SVG renderer.
+- `scripts/lib/schematic.mjs` deterministically converts the geographic layout to octolinear
+  station coordinates.
+- `security.py` applies CSP and browser hardening headers to API and static responses.
+
 ## Data flow
 
 **Static schedule.** On startup and every 6 hours, `gtfs/refresh.py` compares CKAN's
@@ -111,8 +119,15 @@ rather than slowing down.
 Both would be fixed by a feed carrying vehicle ids. Neither is worth more inference on top of
 this one.
 
+## Web renderer
+
+The root page renders `shared/layouts/schematic.json` as an octolinear SVG map and polls
+`/api/v1/map-state` every 10 seconds. The pure modules under `web/js/` validate every API
+payload before building line, station, and train view models; the DOM renderer only draws
+those validated models. `/search/` retains departure search, and `/map/` redirects old
+bookmarks to the schematic homepage. See `docs/UI_PLAN.md` for the design and test strategy.
+
 ## Possible extensions
 
-WebSocket or SSE push instead of 10s polling; a schematic layout file for a cleaner web map
-(purely a new file in `shared/layouts/`); history playback, since `MapState` is serializable;
-another city via a different GTFS feed and a regenerated `network.json`.
+WebSocket or SSE push instead of 10s polling; history playback, since `MapState` is
+serializable; another city via a different GTFS feed and a regenerated `network.json`.
