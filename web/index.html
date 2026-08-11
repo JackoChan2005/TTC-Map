@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTC Map</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/site.css">
+</head>
+<body>
+  <header class="banner">
+    <div class="banner-text">
+      <h1>TTC Map</h1>
+      <p class="banner-tagline">Toronto's subway, live</p>
+    </div>
+    <a class="banner-button" href="/search/">TTC LIVE SEARCH</a>
+  </header>
+
+  <main class="map-stage">
+    <svg id="map" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Schematic TTC subway map with live train positions"></svg>
+
+    <footer class="map-footer">
+      <span id="source-pill" class="source-pill">loading…</span>
+      <span id="train-count" class="map-meta-text"></span>
+      <span id="legend" class="legend"></span>
+      <span id="status" class="map-meta-text" role="status" aria-live="polite"></span>
+    </footer>
+  </main>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

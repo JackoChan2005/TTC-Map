@@ -31,10 +31,10 @@ Banner: project title left, **TTC LIVE SEARCH** button top-right → `/search/`.
 
 ```
 shared/layouts/schematic.json        generated octolinear layout (data)
-node-api/scripts/
+scripts/
   lib/schematic.mjs                  pure layout generator (testable)
   build-schematic.mjs                CLI wrapper
-node-api/public/
+web/
   js/                                ES modules, no DOM (unit-testable in Node)
     geometry.js                      octolinear paths, length, point-at-t
     mapModel.js                      network+layout+state -> view models,
@@ -44,7 +44,7 @@ node-api/public/
   main.js                            page glue: fetch -> validate -> render
   css/site.css                       banner + map page styles
   search/                            moved search page (own html + app.js)
-node-api/src/securityHeaders.js      CSP & friends, single concern
+src/ttcmap/security.py               CSP & friends, FastAPI middleware
 ```
 
 Coupling points are data contracts only: `network.json`, `layouts/*.json`,
@@ -72,7 +72,8 @@ markup.
 
 ## Testing strategy
 
-Pure modules are imported directly by `node --test` (no browser needed):
+Pure modules are imported directly by `node --test tests/web/*.test.mjs`
+(no browser or npm install needed):
 
 - `geometry`: straight/diagonal/elbow path shapes, path length,
   point-along-path interpolation + angles, clamping.
@@ -90,6 +91,6 @@ tested modules.
 
 - Layouts, LED maps, and cities are data files; adding one touches no code.
 - The schematic generator is deterministic — regenerating after a GTFS update
-  is one npm script.
+  uses `node scripts/build-schematic.mjs`.
 - View models are plain serializable objects: a future canvas/WebGL renderer
   or animation layer consumes the same shapes.
