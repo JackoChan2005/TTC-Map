@@ -64,5 +64,8 @@ serializable), other cities via a different GTFS + regenerated network.json.
 
 ## Next up
 1. ESP32 firmware: HTTP poll of `/api/v1/led-state` + 74HC595 driver (Phase 3 hardware half).
-2. Schematic layout file for a cleaner web map.
-3. Dedup heuristic for NTAS double-counting (merge adjacent-station sightings per line/direction).
+2. Dedup heuristic for NTAS double-counting (merge adjacent-station sightings per line/direction).
+
+The schematic layout shipped with the frontend redesign — see
+`docs/UI_PLAN.md` for the main-page design, module structure, security
+posture, and test strategy.
