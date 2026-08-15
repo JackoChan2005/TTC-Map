@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const express = require('express');
 
 const { getMapState, SOURCES } = require('./map');
@@ -42,6 +43,43 @@ router.get('/map-state', async (req, res, next) => {
     }
 
     res.json(await getMapState({ now, source }));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/led-state.bin', async (req, res, next) => {
+  try {
+    const mapName = req.query.map || 'rev-a';
+    const ledMap = loadLedMap(mapName);
+    if (!ledMap) {
+      res.status(404).json({ message: `LED map "${mapName}" not found` });
+      return;
+    }
+
+    const state = await getMapState({ source: req.query.source });
+    const frame = renderLedState(state, ledMap);
+    const body = Buffer.from(frame.bits, 'hex');
+    const etag = `"${crypto.createHash('sha256')
+      .update(`${frame.map}|${frame.ledCount}|${frame.bits}|${frame.source}`)
+      .digest('hex')
+      .slice(0, 16)}"`;
+
+    res.set({
+      ETag: etag,
+      'Cache-Control': 'no-cache',
+      'X-Led-Count': String(frame.ledCount),
+      'X-Generated-At': frame.generatedAt,
+      'X-Source': frame.source,
+      'X-Map': frame.map
+    });
+
+    if (req.get('If-None-Match') === etag) {
+      res.status(304).end();
+      return;
+    }
+
+    res.type('application/octet-stream').send(body);
   } catch (error) {
     next(error);
   }

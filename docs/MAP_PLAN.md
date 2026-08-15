@@ -63,6 +63,6 @@ WebSocket/SSE push, schematic layout file, history playback (MapState is
 serializable), other cities via a different GTFS + regenerated network.json.
 
 ## Next up
-1. ESP32 firmware: HTTP poll of `/api/v1/led-state` + 74HC595 driver (Phase 3 hardware half).
+1. Validate the ESP32 binary contract and 74HC595 wiring; see `docs/ESP32_SMOKE_TEST.md`.
 2. Schematic layout file for a cleaner web map.
 3. Dedup heuristic for NTAS double-counting (merge adjacent-station sightings per line/direction).
