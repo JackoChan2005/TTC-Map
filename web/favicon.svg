@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#111827"/>
+  <!-- official line colours from shared/network.json -->
+  <path d="M14 4 V28" stroke="#D5C82B" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M3 17 H29" stroke="#008000" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M21 9 H28" stroke="#B300B3" stroke-width="3" stroke-linecap="round"/>
+  <!-- interchange dot -->
+  <circle cx="14" cy="17" r="2.6" fill="#fff"/>
+</svg>
