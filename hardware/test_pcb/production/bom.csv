@@ -1,0 +1,6 @@
+﻿Designator,Footprint,Quantity,Value,LCSC Part #
+"D1, D10, D11, D12, D13, D14, D15, D16, D17, D18, D19, D2, D20, D21, D22, D23, D24, D3, D4, D5, D6, D7, D8, D9",0603,24,LED,
+R1,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,1,5k,
+R2,R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,1,10k,
+U1,HTSSOP-32-1EP_6.1x11mm_P0.65mm_EP5.2x11mm_Mask4.11x4.36mm_ThermalVias,1,TLC5947DAP,
+U2,ESP32_30pin,1,~,
