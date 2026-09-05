@@ -1,0 +1,22 @@
+# KiCad local settings
+*.kicad_prl
+
+# KiCad backups
+*-backups/
+*.bak
+*-bak
+*.bck
+.history/
+
+# Legacy/generated cache
+fp-info-cache
+
+# Autosave / temporary files
+_autosave-*
+*.tmp
+
+# Editor / OS junk
+*~
+.*.swp
+.DS_Store
+Thumbs.db
