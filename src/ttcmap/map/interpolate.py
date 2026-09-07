@@ -65,7 +65,9 @@ def progress_from_eta(eta_s: float, span_s: float) -> float:
     return 1.0 - (eta_s / span_s)
 
 
-def advance(positions: list[TrainPosition], elapsed_s: float) -> list[TrainPosition]:
+def advance(
+    positions: list[TrainPosition], elapsed_s: float, spans: dict | None = None
+) -> list[TrainPosition]:
     """Age each position by `elapsed_s`, fill in `progress`, drop duplicates.
 
     Positions without an ETA (the schedule source) already carry a computed
@@ -80,7 +82,11 @@ def advance(positions: list[TrainPosition], elapsed_s: float) -> list[TrainPosit
             continue
 
         remaining = position.eta_s - elapsed_s
-        span = span_for(position.from_station, position.to_station)
+        span = (
+            spans.get((position.from_station, position.to_station), 120.0)
+            if spans is not None
+            else span_for(position.from_station, position.to_station)
+        )
 
         # long arrived: the next segment's sighting has taken this train over,
         # so holding it here would draw it twice. Unconditional — a floor must
@@ -115,6 +121,7 @@ def carry_floor(
     positions: list[TrainPosition],
     previous: list[TrainPosition],
     elapsed_s: float,
+    spans: dict | None = None,
 ) -> list[TrainPosition]:
     """Seed each new position's floor from where the last poll had that train.
 
@@ -141,7 +148,11 @@ def carry_floor(
         if position.key is None or position.eta_s is None:
             continue
         remaining = position.eta_s - elapsed_s
-        span = span_for(position.from_station, position.to_station)
+        span = (
+            spans.get((position.from_station, position.to_station), 120.0)
+            if spans is not None
+            else span_for(position.from_station, position.to_station)
+        )
         projected[position.key] = (remaining, progress_from_eta(remaining, span))
 
     seeded = []

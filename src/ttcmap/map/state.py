@@ -18,7 +18,7 @@ from typing import Any
 AT_STATION_THRESHOLD = 0.2
 
 
-@dataclass
+@dataclass(frozen=True)
 class TrainPosition:
     line: str
     direction: int
@@ -49,6 +49,8 @@ class MapState:
     trains: list[dict[str, Any]]
     stationsWithTrains: dict[str, int]
     fallback: bool = False
+    generation: str | None = None
+    lineSources: dict = field(default_factory=dict)
     _extra: dict = field(default_factory=dict, repr=False)
 
     def as_dict(self) -> dict:
@@ -59,6 +61,8 @@ class MapState:
             "trains": self.trains,
             "stationsWithTrains": self.stationsWithTrains,
         }
+        payload["generation"] = self.generation
+        payload["lineSources"] = self.lineSources
         if self.fallback:
             payload["fallback"] = True
         return payload

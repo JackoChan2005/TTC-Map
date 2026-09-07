@@ -24,7 +24,7 @@ const loadNetwork = async () => {
       const last = network.stations[line.stations[line.stations.length - 1]];
       linesByRouteId[line.routeId] = {
         name: line.name,
-        className: /^line-[124]$/.test(line.id) ? `line-color-${line.id}` : '',
+        className: /^line-[12456]$/.test(line.id) ? `line-color-${line.id}` : '',
         terminals: { 0: last ? last.name : null, 1: first ? first.name : null }
       };
     }
@@ -57,6 +57,7 @@ const formatGtfsTime = (value) => {
 // "King Station - Southbound Platform" -> "King" (direction is shown separately)
 const cleanStopName = (value) => String(value || '')
   .replace(/ - (North|South|East|West)bound Platform$/i, '')
+  .replace(/ - Subway Platform$/i, '')
   .replace(/ Station$/i, '');
 
 const formatDelta = (seconds) => {

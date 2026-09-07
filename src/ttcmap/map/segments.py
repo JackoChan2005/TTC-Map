@@ -15,10 +15,8 @@ into the span; it is a few seconds against a two-minute run.
 """
 
 import logging
-from functools import lru_cache
 
-from ttcmap.db import query
-from ttcmap.map.topology import load_topology
+from ttcmap.db import Dataset, read_dataset
 
 log = logging.getLogger(__name__)
 
@@ -32,18 +30,13 @@ MAX_SPAN_S = 900
 DEFAULT_SPAN_S = 120.0
 
 _SQL = """
-    SELECT
-        a.stop_id AS fromStop,
-        b.stop_id AS toStop,
-        b.departing_time_sec - a.departing_time_sec AS span,
-        COUNT(*) AS n
-    FROM SUBWAY_STOP_TIMES a
-    JOIN SUBWAY_STOP_TIMES b
-      ON b.trip_id = a.trip_id
-     AND b.stop_sequence = a.stop_sequence + 1
-    WHERE b.departing_time_sec - a.departing_time_sec BETWEEN ? AND ?
+    SELECT stop_id AS fromStop, next_stop_id AS toStop,
+           next_departing_time_sec - departing_time_sec AS span, COUNT(*) AS n
+    FROM SUBWAY_STOP_TIMES
+    WHERE next_departing_time_sec - departing_time_sec BETWEEN ? AND ?
     GROUP BY fromStop, toStop, span
 """
+_cache: dict[str, dict] = {}
 
 
 def _weighted_median(histogram: list[tuple[int, int]]) -> float:
@@ -58,14 +51,17 @@ def _weighted_median(histogram: list[tuple[int, int]]) -> float:
     return float(ordered[-1][0])
 
 
-@lru_cache(maxsize=1)
-def segment_spans() -> dict[tuple[str, str], float]:
+def segment_spans(dataset: Dataset | None = None) -> dict[tuple[str, str], float]:
     """(from_station, to_station) -> median seconds. Direction is implied by order."""
-    topology = load_topology()
-    platforms = topology["platforms"]
+    if dataset is None:
+        with read_dataset() as current:
+            return segment_spans(current)
+    if dataset.generation in _cache:
+        return _cache[dataset.generation]
+    platforms = dataset.network["platforms"]
 
     histograms: dict[tuple[str, str], list[tuple[int, int]]] = {}
-    for row in query(_SQL, (MIN_SPAN_S, MAX_SPAN_S)):
+    for row in dataset.conn.execute(_SQL, (MIN_SPAN_S, MAX_SPAN_S)):
         origin = platforms.get(str(row["fromStop"]))
         destination = platforms.get(str(row["toStop"]))
         if not origin or not destination:
@@ -77,12 +73,15 @@ def segment_spans() -> dict[tuple[str, str], float]:
 
     spans = {pair: _weighted_median(hist) for pair, hist in histograms.items()}
     log.info("Measured %d segment traversal times from the schedule", len(spans))
+    if len(_cache) >= 2:
+        _cache.clear()
+    _cache[dataset.generation] = spans
     return spans
 
 
 def clear_cache() -> None:
     """Called after a GTFS refresh, alongside topology.clear_cache()."""
-    segment_spans.cache_clear()
+    _cache.clear()
 
 
 def span_for(from_station: str, to_station: str | None) -> float:

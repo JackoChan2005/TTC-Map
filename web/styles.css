@@ -247,3 +247,6 @@ button.secondary:hover {
     flex-direction: column;
   }
 }
+
+.line-color-line-5 { background: #FF8000; color: #fff; }
+.line-color-line-6 { background: #808080; color: #fff; }

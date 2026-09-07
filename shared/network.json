@@ -4,7 +4,8 @@
   "lines": [
     {
       "id": "line-1",
-      "routeId": 1,
+      "routeId": "1",
+      "number": "1",
       "name": "Yonge-University Line",
       "color": "#D5C82B",
       "textColor": "#000000",
@@ -51,7 +52,8 @@
     },
     {
       "id": "line-2",
-      "routeId": 2,
+      "routeId": "2",
+      "number": "2",
       "name": "Bloor-Danforth Line",
       "color": "#008000",
       "textColor": "#FFFFFF",
@@ -91,7 +93,8 @@
     },
     {
       "id": "line-4",
-      "routeId": 4,
+      "routeId": "4",
+      "number": "4",
       "name": "Sheppard Line",
       "color": "#B300B3",
       "textColor": "#FFFFFF",
@@ -102,395 +105,149 @@
         "99925",
         "99926"
       ]
+    },
+    {
+      "id": "line-5",
+      "routeId": "5",
+      "number": "5",
+      "name": "Eglinton Line",
+      "color": "#FF8000",
+      "textColor": "#FFFFFF",
+      "stations": [
+        "station-mount-dennis",
+        "station-keelesdale",
+        "station-caledonia",
+        "station-fairbank",
+        "station-oakwood",
+        "99920",
+        "station-forest-hill",
+        "station-chaplin",
+        "station-avenue",
+        "99993",
+        "station-mount-pleasant",
+        "station-leaside",
+        "station-laird",
+        "station-sunnybrook-park",
+        "station-don-valley",
+        "station-aga-khan-park-museum",
+        "station-wynford",
+        "station-sloane",
+        "station-o-connor",
+        "station-pharmacy",
+        "station-hakimi-lebovic",
+        "station-golden-mile",
+        "station-birchmount",
+        "station-ionview",
+        "99947"
+      ]
+    },
+    {
+      "id": "line-6",
+      "routeId": "6",
+      "number": "6",
+      "name": "Finch West Line",
+      "color": "#808080",
+      "textColor": "#FFFFFF",
+      "stations": [
+        "station-humber-college",
+        "station-westmore",
+        "station-martin-grove",
+        "station-albion",
+        "station-stevenson",
+        "station-mount-olive",
+        "station-rowntree-mills",
+        "station-pearldale",
+        "station-duncanwoods",
+        "station-milvan-rumike",
+        "station-emery",
+        "station-signet-arrow",
+        "station-norfinch-oakdale",
+        "station-jane-and-finch",
+        "station-driftwood",
+        "station-tobermory",
+        "station-sentinel",
+        "99991"
+      ]
     }
   ],
   "stations": {
-    "99992": {
-      "name": "Finch",
-      "lat": 43.780846,
-      "lon": -79.415291,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99984": {
-      "name": "North York Centre",
-      "lat": 43.767868,
-      "lon": -79.412758,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99977": {
-      "name": "Sheppard-Yonge",
-      "lat": 43.761646,
-      "lon": -79.41169,
-      "lines": [
-        "line-1",
-        "line-4"
-      ],
-      "interchange": true
-    },
-    "99965": {
-      "name": "York Mills",
-      "lat": 43.744846,
-      "lon": -79.406487,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99987": {
-      "name": "Lawrence",
-      "lat": 43.725948,
-      "lon": -79.402687,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99993": {
-      "name": "Eglinton",
-      "lat": 43.70525,
-      "lon": -79.398392,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99997": {
-      "name": "Davisville",
-      "lat": 43.697746,
-      "lon": -79.396988,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99974": {
-      "name": "St Clair",
-      "lat": 43.687748,
-      "lon": -79.392586,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99970": {
-      "name": "Summerhill",
-      "lat": 43.682632,
-      "lon": -79.391174,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99979": {
-      "name": "Rosedale",
-      "lat": 43.676746,
-      "lon": -79.388786,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99999": {
-      "name": "Bloor-Yonge",
-      "lat": 43.670994,
-      "lon": -79.385956,
-      "lines": [
-        "line-1",
-        "line-2"
-      ],
-      "interchange": true
-    },
-    "99967": {
-      "name": "Wellesley",
-      "lat": 43.665348,
-      "lon": -79.383385,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99998": {
-      "name": "College",
-      "lat": 43.660789,
-      "lon": -79.383102,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99995": {
-      "name": "TMU",
-      "lat": 43.656517,
-      "lon": -79.381226,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99981": {
-      "name": "Queen",
-      "lat": 43.652737,
-      "lon": -79.379616,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99988": {
-      "name": "King",
-      "lat": 43.649059,
-      "lon": -79.378113,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99969": {
-      "name": "Union",
-      "lat": 43.645523,
-      "lon": -79.379723,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99975": {
-      "name": "St Andrew",
-      "lat": 43.647606,
-      "lon": -79.385002,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99983": {
-      "name": "Osgoode",
-      "lat": 43.651123,
-      "lon": -79.386955,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99971": {
-      "name": "St Patrick",
-      "lat": 43.654617,
-      "lon": -79.388222,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99980": {
-      "name": "Queen's Park",
-      "lat": 43.659836,
-      "lon": -79.390694,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99985": {
-      "name": "Museum",
-      "lat": 43.666622,
-      "lon": -79.393471,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99972": {
-      "name": "St George",
-      "lat": 43.668846,
-      "lon": -79.398087,
-      "lines": [
-        "line-1",
-        "line-2"
-      ],
-      "interchange": true
-    },
-    "spadina": {
-      "name": "Spadina",
-      "lat": 43.670249,
-      "lon": -79.405189,
-      "lines": [
-        "line-1",
-        "line-2"
-      ],
-      "interchange": true
-    },
-    "99994": {
-      "name": "Dupont",
-      "lat": 43.674301,
-      "lon": -79.40712,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99973": {
-      "name": "St Clair West",
-      "lat": 43.684048,
-      "lon": -79.415894,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
     "99920": {
       "name": "Cedarvale",
       "lat": 43.699146,
       "lon": -79.436089,
       "lines": [
-        "line-1"
+        "line-1",
+        "line-5"
       ],
-      "interchange": false
+      "interchange": true
     },
-    "99990": {
-      "name": "Glencairn",
-      "lat": 43.708584,
-      "lon": -79.440796,
+    "99925": {
+      "name": "Leslie",
+      "lat": 43.770847,
+      "lon": -79.36779,
       "lines": [
-        "line-1"
+        "line-4"
       ],
       "interchange": false
     },
-    "99986": {
-      "name": "Lawrence West",
-      "lat": 43.716347,
-      "lon": -79.444191,
+    "99926": {
+      "name": "Don Mills",
+      "lat": 43.775547,
+      "lon": -79.346588,
       "lines": [
-        "line-1"
+        "line-4"
       ],
       "interchange": false
     },
-    "99963": {
-      "name": "Yorkdale",
-      "lat": 43.724594,
-      "lon": -79.447693,
+    "99927": {
+      "name": "Bessarion",
+      "lat": 43.769199,
+      "lon": -79.376312,
       "lines": [
-        "line-1"
+        "line-4"
       ],
       "interchange": false
     },
-    "99966": {
-      "name": "Wilson",
-      "lat": 43.734547,
-      "lon": -79.45079,
+    "99928": {
+      "name": "Bayview",
+      "lat": 43.766872,
+      "lon": -79.386703,
       "lines": [
-        "line-1"
+        "line-4"
       ],
       "interchange": false
     },
-    "99978": {
-      "name": "Sheppard West",
-      "lat": 43.750046,
-      "lon": -79.462593,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99996": {
-      "name": "Downsview Park",
-      "lat": 43.753349,
-      "lon": -79.479698,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99991": {
-      "name": "Finch West",
-      "lat": 43.76535,
-      "lon": -79.490807,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99964": {
-      "name": "York University",
-      "lat": 43.774097,
-      "lon": -79.499886,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99982": {
-      "name": "Pioneer Village",
-      "lat": 43.777027,
-      "lon": -79.509743,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99989": {
-      "name": "Highway 407",
-      "lat": 43.78344,
-      "lon": -79.523232,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99968": {
-      "name": "Vaughan Metropolitan Centre",
-      "lat": 43.794239,
-      "lon": -79.527489,
-      "lines": [
-        "line-1"
-      ],
-      "interchange": false
-    },
-    "99946": {
-      "name": "Kipling",
-      "lat": 43.63715,
-      "lon": -79.535995,
+    "99935": {
+      "name": "Woodbine",
+      "lat": 43.686546,
+      "lon": -79.312683,
       "lines": [
         "line-2"
       ],
       "interchange": false
     },
-    "99950": {
-      "name": "Islington",
-      "lat": 43.645149,
-      "lon": -79.524193,
+    "99936": {
+      "name": "Warden",
+      "lat": 43.711647,
+      "lon": -79.279587,
       "lines": [
         "line-2"
       ],
       "interchange": false
     },
-    "99940": {
-      "name": "Royal York",
-      "lat": 43.64835,
-      "lon": -79.510994,
+    "99937": {
+      "name": "Victoria Park",
+      "lat": 43.694447,
+      "lon": -79.288986,
       "lines": [
         "line-2"
       ],
       "interchange": false
     },
-    "99943": {
-      "name": "Old Mill",
-      "lat": 43.650146,
-      "lon": -79.495094,
-      "lines": [
-        "line-2"
-      ],
-      "interchange": false
-    },
-    "99949": {
-      "name": "Jane",
-      "lat": 43.650146,
-      "lon": -79.483894,
+    "99938": {
+      "name": "Sherbourne",
+      "lat": 43.672104,
+      "lon": -79.37616,
       "lines": [
         "line-2"
       ],
@@ -505,46 +262,19 @@
       ],
       "interchange": false
     },
-    "99951": {
-      "name": "High Park",
-      "lat": 43.653999,
-      "lon": -79.466751,
+    "99940": {
+      "name": "Royal York",
+      "lat": 43.64835,
+      "lon": -79.510994,
       "lines": [
         "line-2"
       ],
       "interchange": false
     },
-    "99948": {
-      "name": "Keele",
-      "lat": 43.655247,
-      "lon": -79.459892,
-      "lines": [
-        "line-2"
-      ],
-      "interchange": false
-    },
-    "99953": {
-      "name": "Dundas West",
-      "lat": 43.656849,
-      "lon": -79.453392,
-      "lines": [
-        "line-2"
-      ],
-      "interchange": false
-    },
-    "99945": {
-      "name": "Lansdowne",
-      "lat": 43.659245,
-      "lon": -79.442467,
-      "lines": [
-        "line-2"
-      ],
-      "interchange": false
-    },
-    "99954": {
-      "name": "Dufferin",
-      "lat": 43.660198,
-      "lon": -79.435478,
+    "99941": {
+      "name": "Pape",
+      "lat": 43.680149,
+      "lon": -79.344788,
       "lines": [
         "line-2"
       ],
@@ -559,6 +289,133 @@
       ],
       "interchange": false
     },
+    "99943": {
+      "name": "Old Mill",
+      "lat": 43.650146,
+      "lon": -79.495094,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99944": {
+      "name": "Main Street",
+      "lat": 43.68895,
+      "lon": -79.301582,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99945": {
+      "name": "Lansdowne",
+      "lat": 43.659245,
+      "lon": -79.442467,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99946": {
+      "name": "Kipling",
+      "lat": 43.63715,
+      "lon": -79.535995,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99947": {
+      "name": "Kennedy",
+      "lat": 43.732246,
+      "lon": -79.263885,
+      "lines": [
+        "line-2",
+        "line-5"
+      ],
+      "interchange": true
+    },
+    "99948": {
+      "name": "Keele",
+      "lat": 43.655247,
+      "lon": -79.459892,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99949": {
+      "name": "Jane",
+      "lat": 43.650146,
+      "lon": -79.483894,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99950": {
+      "name": "Islington",
+      "lat": 43.645149,
+      "lon": -79.524193,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99951": {
+      "name": "High Park",
+      "lat": 43.653999,
+      "lon": -79.466751,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99952": {
+      "name": "Greenwood",
+      "lat": 43.682648,
+      "lon": -79.330284,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99953": {
+      "name": "Dundas West",
+      "lat": 43.656849,
+      "lon": -79.453392,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99954": {
+      "name": "Dufferin",
+      "lat": 43.660198,
+      "lon": -79.435478,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99955": {
+      "name": "Donlands",
+      "lat": 43.681049,
+      "lon": -79.337784,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
+    "99956": {
+      "name": "Coxwell",
+      "lat": 43.684147,
+      "lon": -79.322784,
+      "lines": [
+        "line-2"
+      ],
+      "interchange": false
+    },
     "99957": {
       "name": "Christie",
       "lat": 43.664063,
@@ -568,28 +425,10 @@
       ],
       "interchange": false
     },
-    "99962": {
-      "name": "Bathurst",
-      "lat": 43.666447,
-      "lon": -79.411186,
-      "lines": [
-        "line-2"
-      ],
-      "interchange": false
-    },
-    "99961": {
-      "name": "Bay",
-      "lat": 43.670238,
-      "lon": -79.389793,
-      "lines": [
-        "line-2"
-      ],
-      "interchange": false
-    },
-    "99938": {
-      "name": "Sherbourne",
-      "lat": 43.672104,
-      "lon": -79.37616,
+    "99958": {
+      "name": "Chester",
+      "lat": 43.678238,
+      "lon": -79.352493,
       "lines": [
         "line-2"
       ],
@@ -613,873 +452,2119 @@
       ],
       "interchange": false
     },
-    "99958": {
-      "name": "Chester",
-      "lat": 43.678238,
-      "lon": -79.352493,
+    "99961": {
+      "name": "Bay",
+      "lat": 43.670238,
+      "lon": -79.389793,
       "lines": [
         "line-2"
       ],
       "interchange": false
     },
-    "99941": {
-      "name": "Pape",
-      "lat": 43.680149,
-      "lon": -79.344788,
+    "99962": {
+      "name": "Bathurst",
+      "lat": 43.666447,
+      "lon": -79.411186,
       "lines": [
         "line-2"
       ],
       "interchange": false
     },
-    "99955": {
-      "name": "Donlands",
-      "lat": 43.681049,
-      "lon": -79.337784,
+    "99963": {
+      "name": "Yorkdale",
+      "lat": 43.724594,
+      "lon": -79.447693,
       "lines": [
-        "line-2"
+        "line-1"
       ],
       "interchange": false
     },
-    "99952": {
-      "name": "Greenwood",
-      "lat": 43.682648,
-      "lon": -79.330284,
+    "99964": {
+      "name": "York University",
+      "lat": 43.774097,
+      "lon": -79.499886,
       "lines": [
-        "line-2"
+        "line-1"
       ],
       "interchange": false
     },
-    "99956": {
-      "name": "Coxwell",
-      "lat": 43.684147,
-      "lon": -79.322784,
+    "99965": {
+      "name": "York Mills",
+      "lat": 43.744846,
+      "lon": -79.406487,
       "lines": [
-        "line-2"
+        "line-1"
       ],
       "interchange": false
     },
-    "99935": {
-      "name": "Woodbine",
-      "lat": 43.686546,
-      "lon": -79.312683,
+    "99966": {
+      "name": "Wilson",
+      "lat": 43.734547,
+      "lon": -79.45079,
       "lines": [
-        "line-2"
+        "line-1"
       ],
       "interchange": false
     },
-    "99944": {
-      "name": "Main Street",
-      "lat": 43.68895,
-      "lon": -79.301582,
+    "99967": {
+      "name": "Wellesley",
+      "lat": 43.665348,
+      "lon": -79.383385,
       "lines": [
-        "line-2"
+        "line-1"
       ],
       "interchange": false
     },
-    "99937": {
-      "name": "Victoria Park",
-      "lat": 43.694447,
-      "lon": -79.288986,
+    "99968": {
+      "name": "Vaughan Metropolitan Centre",
+      "lat": 43.794239,
+      "lon": -79.527489,
       "lines": [
-        "line-2"
+        "line-1"
       ],
       "interchange": false
     },
-    "99936": {
-      "name": "Warden",
-      "lat": 43.711647,
-      "lon": -79.279587,
+    "99969": {
+      "name": "Union",
+      "lat": 43.645523,
+      "lon": -79.379723,
       "lines": [
-        "line-2"
+        "line-1"
       ],
       "interchange": false
     },
-    "99947": {
-      "name": "Kennedy",
-      "lat": 43.732246,
-      "lon": -79.263885,
+    "99970": {
+      "name": "Summerhill",
+      "lat": 43.682632,
+      "lon": -79.391174,
       "lines": [
-        "line-2"
+        "line-1"
       ],
       "interchange": false
     },
-    "99928": {
-      "name": "Bayview",
-      "lat": 43.766872,
-      "lon": -79.386703,
+    "99971": {
+      "name": "St Patrick",
+      "lat": 43.654617,
+      "lon": -79.388222,
       "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99972": {
+      "name": "St George",
+      "lat": 43.668846,
+      "lon": -79.398087,
+      "lines": [
+        "line-1",
+        "line-2"
+      ],
+      "interchange": true
+    },
+    "99973": {
+      "name": "St Clair West",
+      "lat": 43.684048,
+      "lon": -79.415894,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99974": {
+      "name": "St Clair",
+      "lat": 43.687748,
+      "lon": -79.392586,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99975": {
+      "name": "St Andrew",
+      "lat": 43.647606,
+      "lon": -79.385002,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99977": {
+      "name": "Sheppard-Yonge",
+      "lat": 43.761646,
+      "lon": -79.41169,
+      "lines": [
+        "line-1",
         "line-4"
       ],
-      "interchange": false
+      "interchange": true
     },
-    "99927": {
-      "name": "Bessarion",
-      "lat": 43.769199,
-      "lon": -79.376312,
+    "99978": {
+      "name": "Sheppard West",
+      "lat": 43.750046,
+      "lon": -79.462593,
       "lines": [
-        "line-4"
+        "line-1"
       ],
       "interchange": false
     },
-    "99925": {
-      "name": "Leslie",
-      "lat": 43.770847,
-      "lon": -79.36779,
+    "99979": {
+      "name": "Rosedale",
+      "lat": 43.676746,
+      "lon": -79.388786,
       "lines": [
-        "line-4"
+        "line-1"
       ],
       "interchange": false
     },
-    "99926": {
-      "name": "Don Mills",
-      "lat": 43.775547,
-      "lon": -79.346588,
+    "99980": {
+      "name": "Queen's Park",
+      "lat": 43.659836,
+      "lon": -79.390694,
       "lines": [
-        "line-4"
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99981": {
+      "name": "Queen",
+      "lat": 43.652737,
+      "lon": -79.379616,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99982": {
+      "name": "Pioneer Village",
+      "lat": 43.777027,
+      "lon": -79.509743,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99983": {
+      "name": "Osgoode",
+      "lat": 43.651123,
+      "lon": -79.386955,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99984": {
+      "name": "North York Centre",
+      "lat": 43.767868,
+      "lon": -79.412758,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99985": {
+      "name": "Museum",
+      "lat": 43.666622,
+      "lon": -79.393471,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99986": {
+      "name": "Lawrence West",
+      "lat": 43.716347,
+      "lon": -79.444191,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99987": {
+      "name": "Lawrence",
+      "lat": 43.725948,
+      "lon": -79.402687,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99988": {
+      "name": "King",
+      "lat": 43.649059,
+      "lon": -79.378113,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99989": {
+      "name": "Highway 407",
+      "lat": 43.78344,
+      "lon": -79.523232,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99990": {
+      "name": "Glencairn",
+      "lat": 43.708584,
+      "lon": -79.440796,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99991": {
+      "name": "Finch West",
+      "lat": 43.76535,
+      "lon": -79.490807,
+      "lines": [
+        "line-1",
+        "line-6"
+      ],
+      "interchange": true
+    },
+    "99992": {
+      "name": "Finch",
+      "lat": 43.780846,
+      "lon": -79.415291,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99993": {
+      "name": "Eglinton",
+      "lat": 43.70525,
+      "lon": -79.398392,
+      "lines": [
+        "line-1",
+        "line-5"
+      ],
+      "interchange": true
+    },
+    "99994": {
+      "name": "Dupont",
+      "lat": 43.674301,
+      "lon": -79.40712,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99995": {
+      "name": "TMU",
+      "lat": 43.656517,
+      "lon": -79.381226,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99996": {
+      "name": "Downsview Park",
+      "lat": 43.753349,
+      "lon": -79.479698,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99997": {
+      "name": "Davisville",
+      "lat": 43.697746,
+      "lon": -79.396988,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99998": {
+      "name": "College",
+      "lat": 43.660789,
+      "lon": -79.383102,
+      "lines": [
+        "line-1"
+      ],
+      "interchange": false
+    },
+    "99999": {
+      "name": "Bloor-Yonge",
+      "lat": 43.670994,
+      "lon": -79.385956,
+      "lines": [
+        "line-1",
+        "line-2"
+      ],
+      "interchange": true
+    },
+    "spadina": {
+      "name": "Spadina",
+      "lat": 43.670249,
+      "lon": -79.405189,
+      "lines": [
+        "line-1",
+        "line-2"
+      ],
+      "interchange": true
+    },
+    "station-aga-khan-park-museum": {
+      "name": "Aga Khan Park & Museum",
+      "lat": 43.722553,
+      "lon": -79.332397,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-albion": {
+      "name": "Albion",
+      "lat": 43.741295,
+      "lon": -79.58934,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-avenue": {
+      "name": "Avenue",
+      "lat": 43.704742,
+      "lon": -79.408844,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-birchmount": {
+      "name": "Birchmount",
+      "lat": 43.730167,
+      "lon": -79.277191,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-caledonia": {
+      "name": "Caledonia",
+      "lat": 43.692307,
+      "lon": -79.465767,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-chaplin": {
+      "name": "Chaplin",
+      "lat": 43.702927,
+      "lon": -79.417473,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-don-valley": {
+      "name": "Don Valley",
+      "lat": 43.721645,
+      "lon": -79.337929,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-driftwood": {
+      "name": "Driftwood",
+      "lat": 43.758083,
+      "lon": -79.51339,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-duncanwoods": {
+      "name": "Duncanwoods",
+      "lat": 43.748909,
+      "lon": -79.557648,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-emery": {
+      "name": "Emery",
+      "lat": 43.752182,
+      "lon": -79.542244,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-fairbank": {
+      "name": "Fairbank",
+      "lat": 43.69558,
+      "lon": -79.449921,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-forest-hill": {
+      "name": "Forest Hill",
+      "lat": 43.700775,
+      "lon": -79.425774,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-golden-mile": {
+      "name": "Golden Mile",
+      "lat": 43.727882,
+      "lon": -79.287666,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-hakimi-lebovic": {
+      "name": "Hakimi Lebovic",
+      "lat": 43.726974,
+      "lon": -79.291664,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-humber-college": {
+      "name": "Humber College",
+      "lat": 43.72963,
+      "lon": -79.60141,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-ionview": {
+      "name": "Ionview",
+      "lat": 43.731373,
+      "lon": -79.271988,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-jane-and-finch": {
+      "name": "Jane and Finch",
+      "lat": 43.757278,
+      "lon": -79.5177,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-keelesdale": {
+      "name": "Keelesdale",
+      "lat": 43.690781,
+      "lon": -79.474747,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-laird": {
+      "name": "Laird",
+      "lat": 43.713413,
+      "lon": -79.364891,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-leaside": {
+      "name": "Leaside",
+      "lat": 43.710941,
+      "lon": -79.376732,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-martin-grove": {
+      "name": "Martin Grove",
+      "lat": 43.736759,
+      "lon": -79.592323,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-milvan-rumike": {
+      "name": "Milvan Rumike",
+      "lat": 43.750027,
+      "lon": -79.552345,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-mount-dennis": {
+      "name": "Mount Dennis",
+      "lat": 43.688465,
+      "lon": -79.48716,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-mount-olive": {
+      "name": "Mount Olive",
+      "lat": 43.74342,
+      "lon": -79.582024,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-mount-pleasant": {
+      "name": "Mount Pleasant",
+      "lat": 43.708473,
+      "lon": -79.390381,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-norfinch-oakdale": {
+      "name": "Norfinch Oakdale",
+      "lat": 43.755978,
+      "lon": -79.524216,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-o-connor": {
+      "name": "O'Connor",
+      "lat": 43.724808,
+      "lon": -79.302086,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-oakwood": {
+      "name": "Oakwood",
+      "lat": 43.697453,
+      "lon": -79.442909,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-pearldale": {
+      "name": "Pearldale",
+      "lat": 43.747868,
+      "lon": -79.562416,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-pharmacy": {
+      "name": "Pharmacy",
+      "lat": 43.725819,
+      "lon": -79.296951,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-rowntree-mills": {
+      "name": "Rowntree Mills",
+      "lat": 43.746349,
+      "lon": -79.568748,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-sentinel": {
+      "name": "Sentinel",
+      "lat": 43.761028,
+      "lon": -79.500031,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-signet-arrow": {
+      "name": "Signet Arrow",
+      "lat": 43.753338,
+      "lon": -79.536224,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-sloane": {
+      "name": "Sloane",
+      "lat": 43.725925,
+      "lon": -79.312653,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-stevenson": {
+      "name": "Stevenson",
+      "lat": 43.743263,
+      "lon": -79.587036,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-sunnybrook-park": {
+      "name": "Sunnybrook Park",
+      "lat": 43.717335,
+      "lon": -79.349075,
+      "lines": [
+        "line-5"
+      ],
+      "interchange": false
+    },
+    "station-tobermory": {
+      "name": "Tobermory",
+      "lat": 43.759342,
+      "lon": -79.508034,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-westmore": {
+      "name": "Westmore",
+      "lat": 43.734779,
+      "lon": -79.600624,
+      "lines": [
+        "line-6"
+      ],
+      "interchange": false
+    },
+    "station-wynford": {
+      "name": "Wynford",
+      "lat": 43.724072,
+      "lon": -79.326645,
+      "lines": [
+        "line-5"
       ],
       "interchange": false
     }
   },
   "platforms": {
-    "14111": {
-      "station": "99992",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13789": {
-      "station": "99984",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13860": {
-      "station": "99977",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13792": {
-      "station": "99965",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13793": {
-      "station": "99987",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13795": {
-      "station": "99993",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13798": {
-      "station": "99997",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13799": {
-      "station": "99974",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13802": {
-      "station": "99970",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13803": {
-      "station": "99979",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13864": {
-      "station": "99999",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13806": {
-      "station": "99967",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13807": {
-      "station": "99998",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13810": {
-      "station": "99995",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13811": {
-      "station": "99981",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13814": {
-      "station": "99988",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13815": {
-      "station": "99969",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13817": {
-      "station": "99975",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13820": {
-      "station": "99983",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13821": {
-      "station": "99971",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13824": {
-      "station": "99980",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13825": {
-      "station": "99985",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13858": {
-      "station": "99972",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13853": {
-      "station": "spadina",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13828": {
-      "station": "99994",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13829": {
-      "station": "99973",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13832": {
-      "station": "99920",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13833": {
-      "station": "99990",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13836": {
-      "station": "99986",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13837": {
-      "station": "99963",
-      "line": "line-1",
-      "direction": 0
-    },
-    "13840": {
-      "station": "99966",
-      "line": "line-1",
-      "direction": 0
-    },
-    "14945": {
-      "station": "99978",
-      "line": "line-1",
-      "direction": 0
-    },
-    "15664": {
-      "station": "99996",
-      "line": "line-1",
-      "direction": 0
-    },
-    "15659": {
-      "station": "99991",
-      "line": "line-1",
-      "direction": 0
-    },
-    "15666": {
-      "station": "99964",
-      "line": "line-1",
-      "direction": 0
-    },
-    "15656": {
-      "station": "99982",
-      "line": "line-1",
-      "direction": 0
-    },
-    "15661": {
-      "station": "99989",
-      "line": "line-1",
-      "direction": 0
-    },
-    "15662": {
-      "station": "99968",
-      "line": "line-1",
-      "direction": 0
-    },
-    "15663": {
-      "station": "99968",
-      "line": "line-1",
-      "direction": 1
-    },
-    "15660": {
-      "station": "99989",
-      "line": "line-1",
-      "direction": 1
-    },
-    "15657": {
-      "station": "99982",
-      "line": "line-1",
-      "direction": 1
-    },
-    "15667": {
-      "station": "99964",
-      "line": "line-1",
-      "direction": 1
-    },
-    "15658": {
-      "station": "99991",
-      "line": "line-1",
-      "direction": 1
-    },
-    "15665": {
-      "station": "99996",
-      "line": "line-1",
-      "direction": 1
-    },
-    "14110": {
-      "station": "99978",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13839": {
-      "station": "99966",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13838": {
-      "station": "99963",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13835": {
-      "station": "99986",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13834": {
-      "station": "99990",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13831": {
-      "station": "99920",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13830": {
-      "station": "99973",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13827": {
-      "station": "99994",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13854": {
-      "station": "spadina",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13857": {
-      "station": "99972",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13826": {
-      "station": "99985",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13823": {
-      "station": "99980",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13822": {
-      "station": "99971",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13819": {
-      "station": "99983",
-      "line": "line-1",
-      "direction": 1
-    },
-    "18373": {
-      "station": "99975",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13816": {
-      "station": "99969",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13813": {
-      "station": "99988",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13812": {
-      "station": "99981",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13809": {
-      "station": "99995",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13808": {
-      "station": "99998",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13805": {
-      "station": "99967",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13863": {
-      "station": "99999",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13804": {
-      "station": "99979",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13801": {
-      "station": "99970",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13800": {
-      "station": "99974",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13797": {
-      "station": "99997",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13796": {
-      "station": "99993",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13794": {
-      "station": "99987",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13791": {
-      "station": "99965",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13859": {
-      "station": "99977",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13790": {
-      "station": "99984",
-      "line": "line-1",
-      "direction": 1
-    },
-    "14944": {
-      "station": "99992",
-      "line": "line-1",
-      "direction": 1
-    },
-    "13785": {
-      "station": "99946",
+    "13731": {
+      "station": "99936",
       "line": "line-2",
-      "direction": 0
-    },
-    "13784": {
-      "station": "99950",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13781": {
-      "station": "99940",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13780": {
-      "station": "99943",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13777": {
-      "station": "99949",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13776": {
-      "station": "99939",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13773": {
-      "station": "99951",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13772": {
-      "station": "99948",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13769": {
-      "station": "99953",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13768": {
-      "station": "99945",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13765": {
-      "station": "99954",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13764": {
-      "station": "99942",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13761": {
-      "station": "99957",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13760": {
-      "station": "99962",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13852": {
-      "station": "spadina",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13856": {
-      "station": "99972",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13757": {
-      "station": "99961",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13756": {
-      "station": "99999",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13753": {
-      "station": "99938",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13752": {
-      "station": "99959",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13749": {
-      "station": "99960",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13748": {
-      "station": "99958",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13746": {
-      "station": "99941",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13743": {
-      "station": "99955",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13742": {
-      "station": "99952",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13739": {
-      "station": "99956",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13738": {
-      "station": "99935",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13735": {
-      "station": "99944",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13734": {
-      "station": "99937",
-      "line": "line-2",
-      "direction": 0
+      "direction": 1,
+      "stopCode": "13731"
     },
     "13732": {
       "station": "99936",
       "line": "line-2",
-      "direction": 0
-    },
-    "14947": {
-      "station": "99947",
-      "line": "line-2",
-      "direction": 0
-    },
-    "13865": {
-      "station": "99947",
-      "line": "line-2",
-      "direction": 1
-    },
-    "13731": {
-      "station": "99936",
-      "line": "line-2",
-      "direction": 1
+      "direction": 0,
+      "stopCode": "13732"
     },
     "13733": {
       "station": "99937",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13733"
+    },
+    "13734": {
+      "station": "99937",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13734"
+    },
+    "13735": {
+      "station": "99944",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13735"
     },
     "13736": {
       "station": "99944",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13736"
     },
     "13737": {
       "station": "99935",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13737"
+    },
+    "13738": {
+      "station": "99935",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13738"
+    },
+    "13739": {
+      "station": "99956",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13739"
     },
     "13740": {
       "station": "99956",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13740"
     },
     "13741": {
       "station": "99952",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13741"
+    },
+    "13742": {
+      "station": "99952",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13742"
+    },
+    "13743": {
+      "station": "99955",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13743"
     },
     "13744": {
       "station": "99955",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13744"
     },
     "13745": {
       "station": "99941",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13745"
+    },
+    "13746": {
+      "station": "99941",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13746"
     },
     "13747": {
       "station": "99958",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13747"
+    },
+    "13748": {
+      "station": "99958",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13748"
+    },
+    "13749": {
+      "station": "99960",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13749"
     },
     "13750": {
       "station": "99960",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13750"
     },
     "13751": {
       "station": "99959",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13751"
+    },
+    "13752": {
+      "station": "99959",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13752"
+    },
+    "13753": {
+      "station": "99938",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13753"
     },
     "13754": {
       "station": "99938",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13754"
     },
     "13755": {
       "station": "99999",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13755"
+    },
+    "13756": {
+      "station": "99999",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13756"
+    },
+    "13757": {
+      "station": "99961",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13757"
     },
     "13758": {
       "station": "99961",
       "line": "line-2",
-      "direction": 1
-    },
-    "13855": {
-      "station": "99972",
-      "line": "line-2",
-      "direction": 1
-    },
-    "13851": {
-      "station": "spadina",
-      "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13758"
     },
     "13759": {
       "station": "99962",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13759"
+    },
+    "13760": {
+      "station": "99962",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13760"
+    },
+    "13761": {
+      "station": "99957",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13761"
     },
     "13762": {
       "station": "99957",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13762"
     },
     "13763": {
       "station": "99942",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13763"
+    },
+    "13764": {
+      "station": "99942",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13764"
+    },
+    "13765": {
+      "station": "99954",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13765"
     },
     "13766": {
       "station": "99954",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13766"
     },
     "13767": {
       "station": "99945",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13767"
+    },
+    "13768": {
+      "station": "99945",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13768"
+    },
+    "13769": {
+      "station": "99953",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13769"
     },
     "13770": {
       "station": "99953",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13770"
     },
     "13771": {
       "station": "99948",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13771"
+    },
+    "13772": {
+      "station": "99948",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13772"
+    },
+    "13773": {
+      "station": "99951",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13773"
     },
     "13774": {
       "station": "99951",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13774"
     },
     "13775": {
       "station": "99939",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13775"
+    },
+    "13776": {
+      "station": "99939",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13776"
+    },
+    "13777": {
+      "station": "99949",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13777"
     },
     "13778": {
       "station": "99949",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13778"
     },
     "13779": {
       "station": "99943",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13779"
+    },
+    "13780": {
+      "station": "99943",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13780"
+    },
+    "13781": {
+      "station": "99940",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13781"
     },
     "13782": {
       "station": "99940",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13782"
     },
     "13783": {
       "station": "99950",
       "line": "line-2",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13783"
     },
-    "14948": {
+    "13784": {
+      "station": "99950",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13784"
+    },
+    "13785": {
       "station": "99946",
       "line": "line-2",
-      "direction": 1
+      "direction": 0,
+      "stopCode": "13785"
     },
-    "13862": {
-      "station": "99977",
-      "line": "line-4",
-      "direction": 0
+    "13789": {
+      "station": "99984",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13789"
     },
-    "13844": {
-      "station": "99928",
-      "line": "line-4",
-      "direction": 0
+    "13790": {
+      "station": "99984",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13790"
     },
-    "18375": {
-      "station": "99927",
-      "line": "line-4",
-      "direction": 0
+    "13791": {
+      "station": "99965",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13791"
     },
-    "13848": {
-      "station": "99925",
-      "line": "line-4",
-      "direction": 0
+    "13792": {
+      "station": "99965",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13792"
     },
-    "14949": {
-      "station": "99926",
-      "line": "line-4",
-      "direction": 0
+    "13793": {
+      "station": "99987",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13793"
     },
-    "14109": {
-      "station": "99926",
-      "line": "line-4",
-      "direction": 1
+    "13794": {
+      "station": "99987",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13794"
     },
-    "13847": {
-      "station": "99925",
-      "line": "line-4",
-      "direction": 1
+    "13795": {
+      "station": "99993",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13795"
     },
-    "13846": {
-      "station": "99927",
-      "line": "line-4",
-      "direction": 1
+    "13796": {
+      "station": "99993",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13796"
+    },
+    "13797": {
+      "station": "99997",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13797"
+    },
+    "13798": {
+      "station": "99997",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13798"
+    },
+    "13799": {
+      "station": "99974",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13799"
+    },
+    "13800": {
+      "station": "99974",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13800"
+    },
+    "13801": {
+      "station": "99970",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13801"
+    },
+    "13802": {
+      "station": "99970",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13802"
+    },
+    "13803": {
+      "station": "99979",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13803"
+    },
+    "13804": {
+      "station": "99979",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13804"
+    },
+    "13805": {
+      "station": "99967",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13805"
+    },
+    "13806": {
+      "station": "99967",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13806"
+    },
+    "13807": {
+      "station": "99998",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13807"
+    },
+    "13808": {
+      "station": "99998",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13808"
+    },
+    "13809": {
+      "station": "99995",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13809"
+    },
+    "13810": {
+      "station": "99995",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13810"
+    },
+    "13811": {
+      "station": "99981",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13811"
+    },
+    "13812": {
+      "station": "99981",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13812"
+    },
+    "13813": {
+      "station": "99988",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13813"
+    },
+    "13814": {
+      "station": "99988",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13814"
+    },
+    "13815": {
+      "station": "99969",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13815"
+    },
+    "13816": {
+      "station": "99969",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13816"
+    },
+    "13817": {
+      "station": "99975",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13817"
+    },
+    "13818": {
+      "station": "99975",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13818"
+    },
+    "13819": {
+      "station": "99983",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13819"
+    },
+    "13820": {
+      "station": "99983",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13820"
+    },
+    "13821": {
+      "station": "99971",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13821"
+    },
+    "13822": {
+      "station": "99971",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13822"
+    },
+    "13823": {
+      "station": "99980",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13823"
+    },
+    "13824": {
+      "station": "99980",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13824"
+    },
+    "13825": {
+      "station": "99985",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13825"
+    },
+    "13826": {
+      "station": "99985",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13826"
+    },
+    "13827": {
+      "station": "99994",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13827"
+    },
+    "13828": {
+      "station": "99994",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13828"
+    },
+    "13829": {
+      "station": "99973",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13829"
+    },
+    "13830": {
+      "station": "99973",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13830"
+    },
+    "13831": {
+      "station": "99920",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13831"
+    },
+    "13832": {
+      "station": "99920",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13832"
+    },
+    "13833": {
+      "station": "99990",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13833"
+    },
+    "13834": {
+      "station": "99990",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13834"
+    },
+    "13835": {
+      "station": "99986",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13835"
+    },
+    "13836": {
+      "station": "99986",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13836"
+    },
+    "13837": {
+      "station": "99963",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13837"
+    },
+    "13838": {
+      "station": "99963",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13838"
+    },
+    "13839": {
+      "station": "99966",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13839"
+    },
+    "13840": {
+      "station": "99966",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13840"
     },
     "13843": {
       "station": "99928",
       "line": "line-4",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13843"
+    },
+    "13844": {
+      "station": "99928",
+      "line": "line-4",
+      "direction": 0,
+      "stopCode": "13844"
+    },
+    "13845": {
+      "station": "99927",
+      "line": "line-4",
+      "direction": 0,
+      "stopCode": "13845"
+    },
+    "13846": {
+      "station": "99927",
+      "line": "line-4",
+      "direction": 1,
+      "stopCode": "13846"
+    },
+    "13847": {
+      "station": "99925",
+      "line": "line-4",
+      "direction": 1,
+      "stopCode": "13847"
+    },
+    "13848": {
+      "station": "99925",
+      "line": "line-4",
+      "direction": 0,
+      "stopCode": "13848"
+    },
+    "13851": {
+      "station": "spadina",
+      "line": "line-2",
+      "direction": 1,
+      "stopCode": "13851"
+    },
+    "13852": {
+      "station": "spadina",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13852"
+    },
+    "13853": {
+      "station": "spadina",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13853"
+    },
+    "13854": {
+      "station": "spadina",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13854"
+    },
+    "13855": {
+      "station": "99972",
+      "line": "line-2",
+      "direction": 1,
+      "stopCode": "13855"
+    },
+    "13856": {
+      "station": "99972",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "13856"
+    },
+    "13857": {
+      "station": "99972",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13857"
+    },
+    "13858": {
+      "station": "99972",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13858"
+    },
+    "13859": {
+      "station": "99977",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13859"
+    },
+    "13860": {
+      "station": "99977",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13860"
     },
     "13861": {
       "station": "99977",
       "line": "line-4",
-      "direction": 1
+      "direction": 1,
+      "stopCode": "13861"
+    },
+    "13862": {
+      "station": "99977",
+      "line": "line-4",
+      "direction": 0,
+      "stopCode": "13862"
+    },
+    "13863": {
+      "station": "99999",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "13863"
+    },
+    "13864": {
+      "station": "99999",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "13864"
+    },
+    "13865": {
+      "station": "99947",
+      "line": "line-2",
+      "direction": 1,
+      "stopCode": "13865"
+    },
+    "14109": {
+      "station": "99926",
+      "line": "line-4",
+      "direction": 1,
+      "stopCode": "14109"
+    },
+    "14110": {
+      "station": "99978",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "14110"
+    },
+    "14111": {
+      "station": "99992",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "14111"
+    },
+    "14944": {
+      "station": "99992",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "14944"
+    },
+    "14945": {
+      "station": "99978",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "14945"
+    },
+    "14947": {
+      "station": "99947",
+      "line": "line-2",
+      "direction": 0,
+      "stopCode": "14947"
+    },
+    "14948": {
+      "station": "99946",
+      "line": "line-2",
+      "direction": 1,
+      "stopCode": "14948"
+    },
+    "14949": {
+      "station": "99926",
+      "line": "line-4",
+      "direction": 0,
+      "stopCode": "14949"
+    },
+    "15656": {
+      "station": "99982",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "15656"
+    },
+    "15657": {
+      "station": "99982",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "15657"
+    },
+    "15658": {
+      "station": "99991",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "15658"
+    },
+    "15659": {
+      "station": "99991",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "15659"
+    },
+    "15660": {
+      "station": "99989",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "15660"
+    },
+    "15661": {
+      "station": "99989",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "15661"
+    },
+    "15662": {
+      "station": "99968",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "15662"
+    },
+    "15663": {
+      "station": "99968",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "15663"
+    },
+    "15664": {
+      "station": "99996",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "15664"
+    },
+    "15665": {
+      "station": "99996",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "15665"
+    },
+    "15666": {
+      "station": "99964",
+      "line": "line-1",
+      "direction": 0,
+      "stopCode": "15666"
+    },
+    "15667": {
+      "station": "99964",
+      "line": "line-1",
+      "direction": 1,
+      "stopCode": "15667"
+    },
+    "16067": {
+      "station": "station-mount-dennis",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16067"
+    },
+    "16068": {
+      "station": "station-mount-dennis",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16068"
+    },
+    "16069": {
+      "station": "99920",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16069"
+    },
+    "16070": {
+      "station": "99920",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16070"
+    },
+    "16071": {
+      "station": "station-avenue",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16071"
+    },
+    "16072": {
+      "station": "station-avenue",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16072"
+    },
+    "16073": {
+      "station": "99993",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16073"
+    },
+    "16074": {
+      "station": "99993",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16074"
+    },
+    "16075": {
+      "station": "station-laird",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16075"
+    },
+    "16076": {
+      "station": "station-laird",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16076"
+    },
+    "16077": {
+      "station": "station-don-valley",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16077"
+    },
+    "16078": {
+      "station": "station-don-valley",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16078"
+    },
+    "16079": {
+      "station": "station-sloane",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16079"
+    },
+    "16080": {
+      "station": "station-sloane",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16080"
+    },
+    "16081": {
+      "station": "99947",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16081"
+    },
+    "16082": {
+      "station": "99947",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16082"
+    },
+    "16083": {
+      "station": "station-caledonia",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16083"
+    },
+    "16084": {
+      "station": "station-caledonia",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16084"
+    },
+    "16085": {
+      "station": "station-golden-mile",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16085"
+    },
+    "16086": {
+      "station": "station-golden-mile",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16086"
+    },
+    "16202": {
+      "station": "station-keelesdale",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16202"
+    },
+    "16203": {
+      "station": "station-keelesdale",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16203"
+    },
+    "16204": {
+      "station": "station-fairbank",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16204"
+    },
+    "16205": {
+      "station": "station-fairbank",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16205"
+    },
+    "16206": {
+      "station": "station-oakwood",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16206"
+    },
+    "16207": {
+      "station": "station-oakwood",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16207"
+    },
+    "16208": {
+      "station": "station-forest-hill",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16208"
+    },
+    "16209": {
+      "station": "station-forest-hill",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16209"
+    },
+    "16210": {
+      "station": "station-chaplin",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16210"
+    },
+    "16211": {
+      "station": "station-chaplin",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16211"
+    },
+    "16212": {
+      "station": "station-mount-pleasant",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16212"
+    },
+    "16213": {
+      "station": "station-mount-pleasant",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16213"
+    },
+    "16214": {
+      "station": "station-leaside",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16214"
+    },
+    "16215": {
+      "station": "station-leaside",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16215"
+    },
+    "16216": {
+      "station": "station-sunnybrook-park",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16216"
+    },
+    "16217": {
+      "station": "station-sunnybrook-park",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16217"
+    },
+    "16218": {
+      "station": "station-aga-khan-park-museum",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16218"
+    },
+    "16219": {
+      "station": "station-aga-khan-park-museum",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16219"
+    },
+    "16220": {
+      "station": "station-wynford",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16220"
+    },
+    "16221": {
+      "station": "station-wynford",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16221"
+    },
+    "16222": {
+      "station": "station-o-connor",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16222"
+    },
+    "16223": {
+      "station": "station-o-connor",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16223"
+    },
+    "16224": {
+      "station": "station-pharmacy",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16224"
+    },
+    "16225": {
+      "station": "station-pharmacy",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16225"
+    },
+    "16226": {
+      "station": "station-hakimi-lebovic",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16226"
+    },
+    "16227": {
+      "station": "station-hakimi-lebovic",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16227"
+    },
+    "16228": {
+      "station": "station-birchmount",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16228"
+    },
+    "16229": {
+      "station": "station-birchmount",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16229"
+    },
+    "16230": {
+      "station": "station-ionview",
+      "line": "line-5",
+      "direction": 0,
+      "stopCode": "16230"
+    },
+    "16231": {
+      "station": "station-ionview",
+      "line": "line-5",
+      "direction": 1,
+      "stopCode": "16231"
+    },
+    "16289": {
+      "station": "station-humber-college",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16289"
+    },
+    "16290": {
+      "station": "station-humber-college",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16290"
+    },
+    "16291": {
+      "station": "station-westmore",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16291"
+    },
+    "16292": {
+      "station": "station-westmore",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16292"
+    },
+    "16293": {
+      "station": "station-martin-grove",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16293"
+    },
+    "16294": {
+      "station": "station-martin-grove",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16294"
+    },
+    "16295": {
+      "station": "station-albion",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16295"
+    },
+    "16296": {
+      "station": "station-albion",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16296"
+    },
+    "16297": {
+      "station": "station-stevenson",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16297"
+    },
+    "16298": {
+      "station": "station-stevenson",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16298"
+    },
+    "16299": {
+      "station": "station-mount-olive",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16299"
+    },
+    "16300": {
+      "station": "station-mount-olive",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16300"
+    },
+    "16301": {
+      "station": "station-rowntree-mills",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16301"
+    },
+    "16302": {
+      "station": "station-rowntree-mills",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16302"
+    },
+    "16303": {
+      "station": "station-pearldale",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16303"
+    },
+    "16304": {
+      "station": "station-pearldale",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16304"
+    },
+    "16305": {
+      "station": "station-duncanwoods",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16305"
+    },
+    "16306": {
+      "station": "station-duncanwoods",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16306"
+    },
+    "16307": {
+      "station": "station-milvan-rumike",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16307"
+    },
+    "16308": {
+      "station": "station-milvan-rumike",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16308"
+    },
+    "16309": {
+      "station": "station-emery",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16309"
+    },
+    "16310": {
+      "station": "station-emery",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16310"
+    },
+    "16311": {
+      "station": "station-signet-arrow",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16311"
+    },
+    "16312": {
+      "station": "station-signet-arrow",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16312"
+    },
+    "16313": {
+      "station": "station-norfinch-oakdale",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16313"
+    },
+    "16314": {
+      "station": "station-norfinch-oakdale",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16314"
+    },
+    "16315": {
+      "station": "station-jane-and-finch",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16315"
+    },
+    "16316": {
+      "station": "station-jane-and-finch",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16316"
+    },
+    "16317": {
+      "station": "station-driftwood",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16317"
+    },
+    "16318": {
+      "station": "station-driftwood",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16318"
+    },
+    "16319": {
+      "station": "station-tobermory",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16319"
+    },
+    "16320": {
+      "station": "station-tobermory",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16320"
+    },
+    "16321": {
+      "station": "station-sentinel",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16321"
+    },
+    "16322": {
+      "station": "station-sentinel",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16322"
+    },
+    "16323": {
+      "station": "99991",
+      "line": "line-6",
+      "direction": 0,
+      "stopCode": "16323"
+    },
+    "16324": {
+      "station": "99991",
+      "line": "line-6",
+      "direction": 1,
+      "stopCode": "16324"
     }
   }
 }

@@ -9,6 +9,7 @@ JSON_SOURCE and CKAN_FETCH_RESOURCE are all gone.
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # repo root: src/ttcmap/config.py -> src/ttcmap -> src -> repo
@@ -29,7 +30,7 @@ class Settings(BaseSettings):
     data_dir: Path = Path("data")
     db_path: Path = Path("data/ttc.db")
     shared_dir: Path = Path("shared")
-    led_maps_dir: Path = Path("hardware/led-maps")
+    led_maps_dir: Path = Path("Hardware/led-maps")
     web_dir: Path = Path("web")
 
     # Toronto Open Data (CKAN) — one package id for both the version check and
@@ -56,6 +57,30 @@ class Settings(BaseSettings):
     # cannot block the recorder for longer than one cycle
     ntas_poll_timeout_s: float = 25.0
     snapshot_max_age_s: float = 90.0
+
+    ntas_enabled_lines: set[str] = {"1", "2", "4"}
+    ntas_min_coverage_by_line: dict[str, float] = {"1": 0.5, "2": 0.5, "4": 0.5, "5": 0.9}
+
+    @model_validator(mode="after")
+    def validate_ntas(self):
+        if not self.ntas_enabled_lines <= {"1", "2", "4", "5"}:
+            raise ValueError("NTAS supports configured lines 1, 2, 4, 5 only")
+        if not self.ntas_enabled_lines <= self.ntas_min_coverage_by_line.keys():
+            raise ValueError("Every enabled NTAS line needs a coverage threshold")
+        if any(not 0 < v <= 1 for v in self.ntas_min_coverage_by_line.values()):
+            raise ValueError("NTAS coverage thresholds must be in (0, 1]")
+        if (
+            min(
+                self.ntas_concurrency,
+                self.ntas_poll_s,
+                self.ntas_timeout_s,
+                self.ntas_poll_timeout_s,
+                self.snapshot_max_age_s,
+            )
+            <= 0
+        ):
+            raise ValueError("NTAS polling limits must be positive")
+        return self
 
     # auto | schedule | ntas
     map_source: str = "auto"

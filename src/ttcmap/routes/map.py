@@ -5,6 +5,7 @@ from datetime import datetime
 import httpx
 from fastapi import APIRouter, HTTPException, Query, Request, Response
 
+from ttcmap.db import read_dataset
 from ttcmap.map import SOURCES, get_map_state
 from ttcmap.map.topology import load_layout, load_topology
 from ttcmap.renderers.led import etag_for, load_led_map, render_led_state
@@ -27,11 +28,24 @@ def _validate_source(source: str | None) -> str | None:
     return source
 
 
+@router.get("/map-config")
+def get_map_config() -> dict:
+    try:
+        with read_dataset() as dataset:
+            return {
+                "generation": dataset.generation,
+                "network": dataset.network,
+                "layout": dataset.payload["layouts"]["schematic"],
+            }
+    except RuntimeError as error:
+        raise HTTPException(503, str(error)) from error
+
+
 @router.get("/network")
 def get_network() -> dict:
     try:
         return load_topology()
-    except FileNotFoundError as error:
+    except (FileNotFoundError, RuntimeError) as error:
         raise HTTPException(503, str(error)) from error
 
 
@@ -39,6 +53,8 @@ def get_network() -> dict:
 def get_layout(name: str) -> dict:
     try:
         layout = load_layout(name)
+    except RuntimeError as error:
+        raise HTTPException(503, str(error)) from error
     except ValueError as error:
         raise HTTPException(400, str(error)) from error
     if layout is None:
@@ -54,9 +70,11 @@ async def _state_or_503(source: str | None, at: str | None = None):
     """
     try:
         return await get_map_state(now=_parse_at(at), source=_validate_source(source))
-    except FileNotFoundError as error:
+    except (FileNotFoundError, RuntimeError) as error:
         raise HTTPException(503, str(error)) from error
-    except (RuntimeError, httpx.HTTPError) as error:
+    except ValueError as error:
+        raise HTTPException(400, str(error)) from error
+    except httpx.HTTPError as error:
         raise HTTPException(503, f"Source unavailable: {error}") from error
 
 
@@ -79,9 +97,7 @@ async def _render(map_name: str, source: str | None) -> tuple[dict, dict]:
 
 
 @router.get("/led-state")
-async def get_led_state(
-    map: str = Query("rev-a"), source: str | None = None
-) -> dict:
+async def get_led_state(map: str = Query("rev-a"), source: str | None = None) -> dict:
     _, rendered = await _render(map, source)
     return {k: v for k, v in rendered.items() if not k.startswith("_")}
 

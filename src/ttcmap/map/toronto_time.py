@@ -20,12 +20,14 @@ WEEKDAY_COLUMNS = frozenset(
 class ServiceWindow:
     day: str
     sec: int
+    date: str = ""
 
 
 def get_toronto_parts(moment: datetime) -> ServiceWindow:
     """Weekday name and seconds-since-midnight in Toronto local time."""
     local = moment.astimezone(TORONTO_TZ)
     return ServiceWindow(
+        date=local.strftime("%Y%m%d"),
         day=local.strftime("%A").lower(),
         sec=local.hour * 3600 + local.minute * 60 + local.second,
     )
@@ -38,10 +40,12 @@ def get_service_windows(moment: datetime) -> list[ServiceWindow]:
     day, so 01:30 Thursday is also 25:30 Wednesday. Both are returned.
     """
     today = get_toronto_parts(moment)
-    yesterday = get_toronto_parts(moment - timedelta(days=1))
-
-    windows = [
-        ServiceWindow(day=today.day, sec=today.sec),
-        ServiceWindow(day=yesterday.day, sec=today.sec + 24 * 3600),
+    yesterday = moment.astimezone(TORONTO_TZ).date() - timedelta(days=1)
+    return [
+        today,
+        ServiceWindow(
+            day=yesterday.strftime("%A").lower(),
+            date=yesterday.strftime("%Y%m%d"),
+            sec=today.sec + 86400,
+        ),
     ]
-    return [w for w in windows if w.day in WEEKDAY_COLUMNS]

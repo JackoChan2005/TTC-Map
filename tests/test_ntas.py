@@ -83,3 +83,13 @@ def test_repeat_sightings_of_a_queue_slot_are_deduped():
     )
     assert len(positions) == 2
     assert {p.key for p in positions} == {"line-2|0|b|0", "line-2|0|b|1"}
+
+
+def test_unsorted_and_negative_arrivals_do_not_hide_valid_predictions():
+    positions = parse([("p1", [{"line": "2", "direction": "0", "nextTrains": "9, -1, 2, 1"}])])
+    assert [p.eta_s for p in positions] == [60, 120]
+
+
+def test_wrong_line_or_direction_is_not_assigned_to_platform():
+    assert parse([("p1", [{"line": "5", "direction": "0", "nextTrains": "1"}])]) == []
+    assert parse([("p1", [{"line": "2", "direction": "1", "nextTrains": "1"}])]) == []

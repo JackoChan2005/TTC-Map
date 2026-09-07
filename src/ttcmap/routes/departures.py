@@ -5,31 +5,18 @@ answered the same question with two different implementations of Toronto service
 time. Both now go through ttcmap.map.toronto_time.
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, HTTPException
 
-from ttcmap.db import query
-from ttcmap.map.toronto_time import WEEKDAY_COLUMNS, get_toronto_parts
+from ttcmap.db import DatasetUnavailable, read_dataset
+from ttcmap.gtfs.service_calendar import active_services, require_schedule
+from ttcmap.map.toronto_time import TORONTO_TZ, get_service_windows, get_toronto_parts
 
 router = APIRouter()
 
 DEPARTURE_WINDOW_SECONDS = 120
 MAX_ROWS = 200
-
-_SQL = """
-    SELECT
-        sst.trip_id, sst.stop_sequence, sst.route_id, sst.service_id,
-        sst.direction_id, sst.stop_id, sst.stop_name,
-        sst.arrival_time, sst.departure_time, sst.departing_time_sec
-    FROM SUBWAY_STOP_TIMES sst
-    JOIN SERVICE_DAYS sd ON sd.service_id = sst.service_id
-    WHERE sd.{day} = 1
-      AND CAST(sst.route_id AS TEXT) = ?
-      AND sst.departing_time_sec BETWEEN ? AND ?
-    ORDER BY sst.departure_time
-    LIMIT ?
-"""
 
 
 def normalize_route(value: str) -> str:
@@ -53,14 +40,51 @@ def get_departures(route: str, at: str | None = None) -> dict:
     else:
         moment = datetime.now(UTC)
 
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=TORONTO_TZ)
     window = get_toronto_parts(moment)
-    if window.day not in WEEKDAY_COLUMNS:
-        raise HTTPException(400, 'Query parameter "at" must be a valid date/time')
+    windows = get_service_windows(moment)
+    end_window = get_toronto_parts(moment + timedelta(seconds=DEPARTURE_WINDOW_SECONDS))
+    if end_window.date != window.date:
+        from dataclasses import replace
 
-    rows = query(
-        _SQL.format(day=window.day),
-        (requested_route, window.sec, window.sec + DEPARTURE_WINDOW_SECONDS, MAX_ROWS),
-    )
+        windows.append(replace(end_window, sec=window.sec - 86400))
+    rows = []
+    try:
+        with read_dataset() as dataset:
+            require_schedule(dataset, window.date, windows[1], {"line-" + requested_route})
+            require_schedule(
+                dataset,
+                end_window.date,
+                get_service_windows(moment + timedelta(seconds=DEPARTURE_WINDOW_SECONDS))[1],
+                {"line-" + requested_route},
+            )
+            for service_window in windows:
+                services = active_services(dataset, service_window)
+                if not services:
+                    continue
+                matches = dataset.conn.execute(
+                    "SELECT * FROM SUBWAY_STOP_TIMES WHERE line_id=? AND service_id IN ("
+                    + ",".join("?" for _ in services)
+                    + ") AND departing_time_sec BETWEEN ? AND ? "
+                    "ORDER BY departing_time_sec LIMIT ?",
+                    (
+                        "line-" + requested_route,
+                        *sorted(services),
+                        service_window.sec,
+                        service_window.sec + DEPARTURE_WINDOW_SECONDS,
+                        MAX_ROWS,
+                    ),
+                )
+                for row in matches:
+                    row = dict(row)
+                    row["service_date"] = service_window.date
+                    row["delta"] = row["departing_time_sec"] - service_window.sec
+                    rows.append(row)
+    except DatasetUnavailable as error:
+        raise HTTPException(503, str(error)) from error
+    rows.sort(key=lambda row: (row["delta"], row["trip_id"], row["stop_sequence"]))
+    rows = rows[:MAX_ROWS]
 
     if not rows:
         raise HTTPException(
@@ -70,10 +94,10 @@ def get_departures(route: str, at: str | None = None) -> dict:
 
     matches = [
         {
-            "sourceKey": f"{row['trip_id']}-{row['stop_sequence']}",
+            "sourceKey": f"{row['service_date']}:{row['trip_id']}-{row['stop_sequence']}",
             "recordTime": row["departure_time"],
             "updatedAt": None,
-            "deltaSeconds": row["departing_time_sec"] - window.sec,
+            "deltaSeconds": row["delta"],
             "payload": row,
         }
         for row in rows

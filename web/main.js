@@ -1,3 +1,4 @@
+import { createMapPoller } from './js/pollMap.js';
 // Main page bootstrap: fetch -> validate -> build models -> render.
 
 import {
@@ -31,41 +32,38 @@ const setStatus = (message) => {
   statusEl.textContent = message;
 };
 
-const start = async () => {
-  let network;
-  let layout;
-  try {
-    const [rawNetwork, rawLayout] = await Promise.all([
-      fetchJson('/api/v1/network'),
-      fetchJson('/api/v1/layout/schematic')
-    ]);
-    network = validateNetwork(rawNetwork);
-    layout = validateLayout(rawLayout);
-  } catch (error) {
-    setStatus(`Failed to load the map: ${error.message}`);
-    return;
+let network, layout, linePaths, trainLayer;
+const poll = createMapPoller({
+  fetchConfig: () => fetchJson('/api/v1/map-config'),
+  fetchState: async () => validateMapState(await fetchJson('/api/v1/map-state')),
+  onConfig: (config) => {
+    network = validateNetwork(config.network);
+    layout = validateLayout(config.layout);
+    linePaths = buildLinePaths(network, layout);
+    trainLayer = drawBase(svg, layout, linePaths, buildStationMarkers(network, layout));
+    renderLegend(legendEl, linePaths);
+  },
+  onState: (state) => {
+    drawTrains(trainLayer, buildTrainMarkers(state, network, layout));
+    renderLegend(legendEl, linePaths, state.lineSources);
+    sourcePill.textContent = sourceLabel(state);
+    sourcePill.classList.toggle('live', state.source === 'ntas');
+    trainCountEl.textContent = trainCountLabel(state.trains.length);
+    setStatus(`Updated ${formatClock(state.generatedAt) || 'just now'}`);
   }
+});
 
-  const linePaths = buildLinePaths(network, layout);
-  const trainLayer = drawBase(svg, layout, linePaths, buildStationMarkers(network, layout));
-  renderLegend(legendEl, linePaths);
-
-  const refresh = async () => {
-    try {
-      const state = validateMapState(await fetchJson('/api/v1/map-state'));
-      drawTrains(trainLayer, buildTrainMarkers(state, network, layout));
-
-      sourcePill.textContent = sourceLabel(state);
-      sourcePill.classList.toggle('live', state.source === 'ntas');
-      trainCountEl.textContent = trainCountLabel(state.trains.length);
-      setStatus(`Updated ${formatClock(state.generatedAt) || 'just now'}`);
-    } catch (error) {
-      setStatus(`Update failed: ${error.message}`);
-    }
-  };
-
-  await refresh();
-  setInterval(refresh, REFRESH_MS);
+const refresh = async () => {
+  try {
+    await poll();
+  } catch (error) {
+    trainLayer?.replaceChildren();
+    sourcePill.textContent = 'unavailable';
+    sourcePill.classList.remove('live');
+    trainCountEl.textContent = '';
+    setStatus(`Update failed: ${error.message}`);
+  } finally {
+    setTimeout(refresh, REFRESH_MS);
+  }
 };
-
-start();
+refresh();

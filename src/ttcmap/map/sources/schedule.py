@@ -1,68 +1,74 @@
-"""Schedule-based train positions.
-
-Ported from node-api/src/map/sources/scheduleSource.js. A train is between
-consecutive stops A and B when A's departure has passed and B's has not. This is
-static GTFS, so it is a simulation of where trains *should* be, not live data —
-it is what the map falls back to when the realtime feed is unavailable.
-"""
+"""Scheduled estimates, using one published dataset and Toronto service dates."""
 
 from datetime import UTC, datetime
 
-from ttcmap.db import query
+from ttcmap.db import Dataset, read_dataset
+from ttcmap.gtfs.service_calendar import active_services, require_schedule
 from ttcmap.map.state import TrainPosition
-from ttcmap.map.topology import load_topology
-from ttcmap.map.toronto_time import WEEKDAY_COLUMNS, get_service_windows
-
-name = "schedule"
-
-# `day` is interpolated into the SQL because a column name cannot be bound as a
-# parameter. It is safe only because it comes from WEEKDAY_COLUMNS, never from
-# the request — keep that guard if this query is ever edited.
-_SQL = """
-    SELECT
-        a.trip_id           AS tripId,
-        a.direction_id      AS direction,
-        a.stop_id           AS fromStop,
-        b.stop_id           AS toStop,
-        a.departing_time_sec AS depSec,
-        b.departing_time_sec AS arrSec
-    FROM SUBWAY_STOP_TIMES a
-    JOIN SUBWAY_STOP_TIMES b
-      ON b.trip_id = a.trip_id
-     AND b.stop_sequence = a.stop_sequence + 1
-    JOIN SERVICE_DAYS sd
-      ON sd.service_id = a.service_id
-    WHERE sd.{day} = 1
-      AND a.departing_time_sec <= ?
-      AND b.departing_time_sec > ?
-"""
+from ttcmap.map.toronto_time import get_service_windows
 
 
-def get_train_positions(now: datetime | None = None) -> list[TrainPosition]:
-    now = now or datetime.now(UTC)
-    topology = load_topology()
-    by_trip: dict[str, TrainPosition] = {}
-
-    for window in get_service_windows(now):
-        if window.day not in WEEKDAY_COLUMNS:
+def _rows(dataset: Dataset, now: datetime, lines: set[str]):
+    windows = get_service_windows(now)
+    require_schedule(dataset, windows[0].date, windows[1], lines)
+    for window in windows:
+        services = active_services(dataset, window)
+        if not services or not lines:
             continue
+        params = (*sorted(services), *sorted(lines), window.sec, window.sec)
+        rows = dataset.conn.execute(
+            "SELECT * FROM SUBWAY_STOP_TIMES WHERE service_id IN ("
+            + ",".join("?" for _ in services)
+            + ") AND line_id IN ("
+            + ",".join("?" for _ in lines)
+            + ") AND departing_time_sec<=? AND next_departing_time_sec>?",
+            params,
+        )
+        yield window, rows
 
-        rows = query(_SQL.format(day=window.day), (window.sec, window.sec))
 
+def operating_lines(dataset: Dataset, now: datetime, lines: set[str] | None = None) -> set[str]:
+    windows = get_service_windows(now)
+    require_schedule(dataset, windows[0].date, windows[1], lines)
+    result = set()
+    for window in windows:
+        services = active_services(dataset, window)
+        if not services:
+            continue
+        rows = dataset.conn.execute(
+            "SELECT line_id FROM SUBWAY_STOP_TIMES WHERE service_id IN ("
+            + ",".join("?" for _ in services)
+            + ") GROUP BY line_id,trip_id HAVING MIN(departing_time_sec)<=? "
+            "AND MAX(departing_time_sec)>=?",
+            (*sorted(services), window.sec, window.sec),
+        )
+        result.update(row[0] for row in rows)
+    return result if lines is None else result & lines
+
+
+def get_train_positions(
+    now: datetime | None = None, *, dataset: Dataset | None = None, lines: set[str] | None = None
+) -> list[TrainPosition]:
+    now = now or datetime.now(UTC)
+    if dataset is None:
+        with read_dataset() as current:
+            return get_train_positions(now, dataset=current, lines=lines)
+    if lines is None:
+        lines = {line["id"] for line in dataset.network["lines"]}
+    platforms = dataset.network["platforms"]
+    positions = []
+    for window, rows in _rows(dataset, now, lines):
         for row in rows:
-            origin = topology["platforms"].get(str(row["fromStop"]))
-            destination = topology["platforms"].get(str(row["toStop"]))
-            if not origin or not destination:
-                continue
-
-            span = row["arrSec"] - row["depSec"]
-            by_trip[row["tripId"]] = TrainPosition(
-                line=origin["line"],
-                direction=row["direction"],
-                trip_id=row["tripId"],
-                from_station=origin["station"],
-                to_station=destination["station"],
-                progress=(window.sec - row["depSec"]) / span if span > 0 else 0.0,
+            a, b = platforms[row["stop_id"]], platforms[row["next_stop_id"]]
+            span = row["next_departing_time_sec"] - row["departing_time_sec"]
+            positions.append(
+                TrainPosition(
+                    line=row["line_id"],
+                    direction=row["direction_id"],
+                    trip_id=f"{window.date}:{row['trip_id']}",
+                    from_station=a["station"],
+                    to_station=b["station"],
+                    progress=(window.sec - row["departing_time_sec"]) / span,
+                )
             )
-
-    return list(by_trip.values())
+    return positions
