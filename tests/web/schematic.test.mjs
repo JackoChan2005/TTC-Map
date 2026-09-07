@@ -68,3 +68,17 @@ test('end-to-end layout has the schematic name and all stations', () => {
   assert.strictEqual(layout.name, 'schematic');
   assert.strictEqual(Object.keys(layout.stations).length, 5);
 });
+
+
+test('committed five-line schematic is reproducible with unique station positions', async () => {
+  const fs = await import('node:fs/promises');
+  const network = JSON.parse(await fs.readFile(new URL('../../shared/network.json', import.meta.url)));
+  const geographic = JSON.parse(await fs.readFile(new URL('../../shared/layouts/geographic.json', import.meta.url)));
+  const schematic = JSON.parse(await fs.readFile(new URL('../../shared/layouts/schematic.json', import.meta.url)));
+  assert.deepEqual(buildSchematicLayout(network, geographic), schematic);
+  assert.equal(new Set(Object.values(schematic.stations).map(p => `${p.x},${p.y}`)).size,
+    Object.keys(network.stations).length);
+  for (const line of network.lines) {
+    for (const station of line.stations) assert.ok(schematic.stations[station]);
+  }
+});

@@ -6,14 +6,56 @@ one file. The realtime snapshot no longer lives in SQLite at all — see
 ttcmap.map.recorder.
 """
 
+import json
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
+from dataclasses import dataclass
 from typing import Any
 
 from ttcmap.config import get_settings
 
 BUSY_TIMEOUT_MS = 5000
+
+
+class DatasetUnavailable(RuntimeError):
+    """No compatible, completely published schedule is available."""
+
+
+@dataclass
+class Dataset:
+    conn: sqlite3.Connection
+    payload: dict
+    version: str | None
+    revision: str
+
+    @property
+    def generation(self) -> str:
+        return self.payload["generation"]
+
+    @property
+    def network(self) -> dict:
+        return self.payload["network"]
+
+
+@contextmanager
+def read_dataset() -> Iterator[Dataset]:
+    """Pin every query in a computation to one SQLite WAL read snapshot."""
+    if not get_settings().database_path.exists():
+        raise DatasetUnavailable("GTFS dataset not built; run ttcmap refresh")
+    with connect(readonly=True) as conn:
+        conn.execute("BEGIN")
+        try:
+            row = conn.execute("SELECT * FROM active_dataset WHERE id=1").fetchone()
+        except sqlite3.OperationalError as error:
+            raise DatasetUnavailable("GTFS migration pending; run ttcmap refresh") from error
+        if row is None:
+            raise DatasetUnavailable("GTFS dataset not published")
+        from ttcmap.gtfs.build import IMPORTER_REVISION
+
+        if row["revision"] != IMPORTER_REVISION:
+            raise DatasetUnavailable("GTFS importer upgrade pending; run ttcmap refresh")
+        yield Dataset(conn, json.loads(row["payload"]), row["version"], row["revision"])
 
 
 @contextmanager

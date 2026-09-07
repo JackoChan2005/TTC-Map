@@ -1,3 +1,5 @@
+import { lineSourceLabel } from '../format.js';
+
 // DOM-only SVG rendering of precomputed view models. No fetch, no logic —
 // everything it draws was built and validated in mapModel.js.
 
@@ -92,16 +94,17 @@ export const drawTrains = (trainLayer, trainMarkers) => {
   }
 };
 
-export const renderLegend = (container, linePaths) => {
+export const renderLegend = (container, linePaths, lineSources = {}) => {
   container.replaceChildren(...linePaths.map((line) => {
     const item = document.createElement('span');
     item.className = 'legend-item';
 
     const swatch = document.createElement('span');
-    const lineClass = /^line-[124]$/.test(line.id) ? ` line-color-${line.id}` : '';
+    const lineClass = /^line-[12456]$/.test(line.id) ? ` line-color-${line.id}` : '';
     swatch.className = `legend-swatch${lineClass}`;
 
-    item.append(swatch, document.createTextNode(line.name));
+    const label = lineSourceLabel(lineSources[line.id]);
+    item.append(swatch, document.createTextNode(`${line.name}${label ? ': ' + label : ''}`));
     return item;
   }));
 };

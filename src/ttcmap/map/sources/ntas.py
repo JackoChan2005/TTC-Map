@@ -25,12 +25,15 @@ over a shared keep-alive client.
 
 import asyncio
 import logging
+from dataclasses import dataclass, replace
+from datetime import UTC, datetime
+from itertools import zip_longest
 
 import httpx
 
 from ttcmap.config import get_settings
 from ttcmap.map.state import TrainPosition
-from ttcmap.map.topology import load_topology, previous_station
+from ttcmap.map.topology import previous_station
 
 log = logging.getLogger(__name__)
 
@@ -42,10 +45,12 @@ def _arrival_minutes(entry: dict) -> list[int]:
     minutes = []
     for field in str(entry.get("nextTrains") or "").split(","):
         try:
-            minutes.append(int(field.strip()))
+            minute = int(field.strip())
+            if minute >= 0:
+                minutes.append(minute)
         except ValueError:
             continue
-    return minutes
+    return sorted(minutes)
 
 
 def positions_from_responses(
@@ -71,6 +76,10 @@ def positions_from_responses(
             except (KeyError, TypeError, ValueError):
                 continue
 
+            if direction != platform["direction"] or str(entry.get("line")) != platform[
+                "line"
+            ].removeprefix("line-"):
+                continue
             station = platform["station"]
             origin = previous_station(topology, platform["line"], direction, station)
 
@@ -92,37 +101,107 @@ def positions_from_responses(
     return list(by_key.values())
 
 
-async def _fetch_platform(
-    client: httpx.AsyncClient, semaphore: asyncio.Semaphore, platform_id: str
-) -> tuple[str, list]:
-    async with semaphore:
-        response = await client.get(platform_id)
-        response.raise_for_status()
-        return platform_id, response.json()
+@dataclass(frozen=True)
+class LinePoll:
+    line: str
+    generation: str
+    polled_at: datetime
+    positions: tuple[TrainPosition, ...] = ()
+    expected: tuple[int, int] = (0, 0)
+    valid: tuple[int, int] = (0, 0)
+    prediction_count: int = 0
+    status: str = "error"
+    reason: str | None = "poll_failed"
 
 
-async def get_train_positions() -> list[TrainPosition]:
+def valid_response(platform: dict, entries: object) -> bool:
+    if not isinstance(entries, list):
+        return False
+    for entry in entries:
+        if not isinstance(entry, dict):
+            return False
+        if (
+            str(entry.get("line")) != platform["line"].removeprefix("line-")
+            or str(entry.get("direction")) != str(platform["direction"])
+            or str(entry.get("stopCode")) != platform["stopCode"]
+            or not isinstance(entry.get("nextTrains"), str)
+        ):
+            return False
+        # Empty is a valid queue. A nonempty wholly malformed queue is not healthy.
+        if entry["nextTrains"].strip() and not _arrival_minutes(entry):
+            return False
+    return True
+
+
+async def poll_lines(topology: dict, generation: str, arriving_min: int) -> dict[str, LinePoll]:
     settings = get_settings()
-    topology = load_topology()
-    platform_ids = list(topology["platforms"].keys())
-
+    by_line = {
+        line["id"]: []
+        for line in topology["lines"]
+        if line["id"].removeprefix("line-") in settings.ntas_enabled_lines
+    }
+    for pid, platform in topology["platforms"].items():
+        if platform["line"] in by_line:
+            by_line[platform["line"]].append(pid)
+    # Interleave lines before tasks enter the shared semaphore; no late-line starvation.
+    order = [pid for group in zip_longest(*by_line.values()) for pid in group if pid]
+    if not order:
+        return {}
+    started = datetime.now(UTC)
     semaphore = asyncio.Semaphore(settings.ntas_concurrency)
-    limits = httpx.Limits(max_connections=settings.ntas_concurrency)
-
+    completed = {}
     async with httpx.AsyncClient(
-        base_url=settings.ntas_base_url, timeout=settings.ntas_timeout_s, limits=limits
+        base_url=settings.ntas_base_url, timeout=settings.ntas_timeout_s
     ) as client:
-        settled = await asyncio.gather(
-            *(_fetch_platform(client, semaphore, pid) for pid in platform_ids),
-            return_exceptions=True,
-        )
 
-    ok = [result for result in settled if not isinstance(result, BaseException)]
-    # a partial feed would silently blank out sections of the map, so treat it
-    # as unavailable and let the caller fall back to the schedule
-    if len(ok) < len(platform_ids) / 2:
-        raise RuntimeError(
-            f"NTAS unavailable: only {len(ok)}/{len(platform_ids)} platforms responded"
-        )
+        async def fetch(pid):
+            async with semaphore:
+                observed = datetime.now(UTC)
+                try:
+                    response = await client.get(topology["platforms"][pid]["stopCode"])
+                    response.raise_for_status()
+                    entries = response.json()
+                    if valid_response(topology["platforms"][pid], entries):
+                        completed[pid] = (observed, entries)
+                except (httpx.HTTPError, ValueError):
+                    pass
 
-    return positions_from_responses(topology, ok)
+        tasks = [asyncio.create_task(fetch(pid)) for pid in order]
+        try:
+            await asyncio.wait(tasks, timeout=settings.ntas_poll_timeout_s)
+        finally:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+    results = {}
+    for line, pids in by_line.items():
+        expected, valid = [0, 0], [0, 0]
+        positions, prediction_count = [], 0
+        for pid in pids:
+            direction = topology["platforms"][pid]["direction"]
+            expected[direction] += 1
+            if pid not in completed:
+                continue
+            valid[direction] += 1
+            observed, entries = completed[pid]
+            prediction_count += sum(len(_arrival_minutes(e)) for e in entries)
+            offset = (observed - started).total_seconds()
+            positions.extend(
+                replace(pos, eta_s=pos.eta_s + offset)
+                for pos in positions_from_responses(topology, [(pid, entries)], arriving_min)
+            )
+        threshold = settings.ntas_min_coverage_by_line[line.removeprefix("line-")]
+        ok = all(expected[d] and valid[d] / expected[d] >= threshold for d in (0, 1))
+        results[line] = LinePoll(
+            line,
+            generation,
+            started,
+            tuple(positions) if ok else (),
+            tuple(expected),
+            tuple(valid),
+            prediction_count,
+            "ok" if ok else "error",
+            None if ok else "insufficient_coverage",
+        )
+    return results

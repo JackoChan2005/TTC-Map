@@ -32,9 +32,20 @@ def _refresh(args: argparse.Namespace) -> int:
 
 
 def _build_network(args: argparse.Namespace) -> int:
-    from ttcmap.gtfs.network import write_network
+    from pathlib import Path
 
-    write_network()
+    from ttcmap.gtfs.ckan import feed_input
+    from ttcmap.gtfs.network import write_network
+    from ttcmap.gtfs.refresh import active_metadata
+    from ttcmap.gtfs.refresh_lock import refresh_lock
+
+    with refresh_lock():
+        if args.data_dir:
+            write_network(Path(args.data_dir))
+        else:
+            active, _, _ = active_metadata()
+            with feed_input(None, active.get("feedCache")) as (directory, _):
+                write_network(directory)
     return 0
 
 
@@ -56,6 +67,9 @@ def main(argv: list[str] | None = None) -> int:
 
     build = sub.add_parser(
         "build-network", help="regenerate shared/network.json from the extracted feed"
+    )
+    build.add_argument(
+        "--data-dir", help="explicit extracted GTFS directory; defaults to verified cache"
     )
     build.set_defaults(func=_build_network)
 

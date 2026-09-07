@@ -1,80 +1,59 @@
-# How the data flows (plain-language guide)
+# How rail data reaches the displays
 
-This project shows where Toronto's subway trains are right now on both a web
-map and an ESP32-driven LED board. This page explains where the data comes
-from, how it moves through the system, and what happens when realtime data is
-unavailable.
-
-## The two kinds of information
-
-Think of a train station: there is a printed **timetable** on the wall and a
-live **departures board** overhead.
-
-1. **Schedule data.** The City of Toronto publishes the TTC's full subway
-   schedule as open data. It changes only every few weeks.
-2. **Realtime data.** The TTC's next-train service reports how many minutes
-   remain until trains reach each platform. The app polls it every 30 seconds
-   and converts those countdowns into positions between stations.
-
-## The journey of the data
+The application supports Lines 1, 2, 4, 5 Eglinton and 6 Finch West. All five
+have scheduled positions. NTAS is enabled for 1/2/4 by default. Line 5 can be
+enabled after coverage validation; Line 6 is scheduled only.
 
 ```text
- City of Toronto open data          TTC next-train service
-       (schedule)                       (realtime)
-           |                                 |
-           v                                 v
- GTFS refresh stores data in       recorder keeps one fresh
- data/ttc.db and rebuilds the      snapshot in memory
- shared network topology
-           |                                 |
-           +----------------+----------------+
-                            v
-               the Python map engine picks:
-          fresh realtime when it is available,
-             otherwise a schedule simulation
-                            |
-                            v
-                    one MapState frame
-                            |
-                 +----------+----------+
-                 v                     v
-          web map in a browser   packed LED bitmask
-                                      |
-                                      v
-                              ESP32 and 74HC595s
+Toronto merged GTFS ZIP                 TTC NTAS platform countdowns
+         |                                         |
+verified cache + isolated extraction    bounded, fair per-line polling
+         |                                         |
+validate schedules, calendars,          immutable per-line observations
+station identities and layout           with dataset generation + time
+         |                                         |
+SQLite transaction publishes            reject failed, stale or
+schedule + active_dataset               mismatched-generation observations
+         |                                         |
+         +-------------- map state ----------------+
+                         |
+             one selected source per line
+                         |
+                web map + LED bitmask
 ```
 
-Everything runs in one Python service started with `uv run ttcmap serve`.
-The web map and the firmware consume different representations of the same
-MapState, so they cannot disagree about where a train is.
+A refresh imports only the five public rail line numbers. Lines 5 and 6 use
+GTFS route type 0; ordinary streetcars also use type 0 and are excluded. Public
+line numbers and stable station IDs are independent of TTC's feed-specific IDs.
+The reviewed crosswalk is `shared/stations.json`.
 
-## The rules the system follows
+The published SQLite dataset contains stop times, base service calendars,
+date-specific exceptions, topology and both layouts. All change in one commit.
+Each map computation reads them in one transaction, so a concurrent refresh
+cannot combine yesterday's topology with today's schedule. The generation hash
+covers schedule/calendar content, topology, layouts and importer inputs.
 
-**Only rebuild the timetable when it changes.** Every six hours the service
-checks the city's feed metadata. It downloads and rebuilds `data/ttc.db` only
-when the published feed has changed. The rebuild uses staging tables and a
-transaction, so requests keep reading the previous complete schedule until
-the replacement is ready.
+The schedule source applies Toronto service dates, calendar validity and holiday
+exceptions. It includes the previous service day's departures above 24:00.
+Positions are departure-to-departure estimates, including dwell in the segment
+span; the simulator uses local civil-clock seconds, including on DST dates.
 
-**Never serve stale realtime positions.** Each successful 30-second poll
-replaces the in-memory snapshot. If a poll fails or the snapshot becomes more
-than 90 seconds old, the map engine immediately switches to the schedule
-simulation and labels the response as a fallback. Live positions return after
-the next healthy poll.
+NTAS predictions are arrival countdowns, not GPS locations or durable vehicle
+identities. Polling has a shared concurrency limit and a 25-second HTTP deadline.
+Completed lines remain usable when another line times out. HTTP success alone is
+not sufficient: payload association and coverage are checked per direction.
+A failed line loses live positions immediately; observations expire after 90
+seconds. The arrival cutoff expands to cover the published segment durations.
 
-**Keep display details outside the map engine.** The web renderer uses a
-layout file, while the LED renderer uses `hardware/led-maps/<revision>.json` to
-turn occupied stations into packed bits. Adding a board revision changes the
-mapping file rather than the train-position logic.
+Automatic mode chooses exactly one source for each line. `lineSources` explains
+the choice and `source` is `ntas`, `schedule`, or `mixed`. A deliberately scheduled
+line is not an outage. Empty predictions during scheduled operating service cause
+labelled estimates, not a claim that service is actually running or suspended.
+If a required schedule is unavailable, the endpoint returns 503 instead of an
+apparently successful partial map.
 
-## How the LED board receives a frame
-
-The ESP32 requests `/api/v1/led-state.bin?map=rev-a`. A successful response is
-a compact bitmask: one bit per physical LED. The response also includes an
-`ETag`; the firmware sends it with the next request so an unchanged frame can
-return `304 Not Modified` without shifting the same data again.
-
-If the laptop becomes unreachable, the firmware holds the last valid frame
-for a configured grace period and then blanks the outputs so an old display
-is not mistaken for current train data. See `docs/FIRMWARE_API.md` for the wire
-contract and `docs/ESP32_SMOKE_TEST.md` for setup steps.
+The browser loads `/api/v1/map-config` for matching topology/layout/generation,
+and reloads it when map-state generation changes. It serializes polling and
+clears train markers on failed updates. The existing LED bit layout is unchanged;
+new-line trains can light existing interchange LEDs, but new physical stations
+need a verified board mapping. See [FIRMWARE_API.md](FIRMWARE_API.md).

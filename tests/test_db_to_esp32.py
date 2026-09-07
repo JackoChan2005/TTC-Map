@@ -15,12 +15,13 @@ from fastapi.testclient import TestClient
 
 import ttcmap.map as map_engine
 from ttcmap.config import get_settings
+from ttcmap.gtfs.build import IMPORTER_REVISION
 from ttcmap.map import recorder
-from ttcmap.map.recorder import Snapshot
+from ttcmap.map.recorder import Snapshot as RecorderSnapshot
+from ttcmap.map.sources.ntas import LinePoll
 from ttcmap.map.state import TrainPosition
 from ttcmap.map.topology import clear_cache
 from ttcmap.routes import map as map_routes
-
 
 NOW = datetime(2026, 8, 5, 16, 0, tzinfo=UTC)  # Wednesday, noon in Toronto
 
@@ -29,6 +30,13 @@ class FrozenDateTime(datetime):
     @classmethod
     def now(cls, tz=None):
         return NOW if tz is not None else NOW.replace(tzinfo=None)
+
+
+def Snapshot(polled_at, status="ok", positions=()):
+    line = LinePoll(
+        "line-1", "test-generation", polled_at, tuple(positions), prediction_count=1, status=status
+    )
+    return RecorderSnapshot(polled_at, {"line-1": line}, status)
 
 
 @pytest.fixture()
@@ -114,6 +122,28 @@ def pipeline(tmp_path, monkeypatch):
             ],
         )
 
+    with sqlite3.connect(settings.database_path) as conn:
+        conn.execute("ALTER TABLE SUBWAY_STOP_TIMES ADD COLUMN line_id TEXT DEFAULT 'line-1'")
+        conn.execute("ALTER TABLE SUBWAY_STOP_TIMES ADD COLUMN next_stop_id TEXT")
+        conn.execute("ALTER TABLE SUBWAY_STOP_TIMES ADD COLUMN next_departing_time_sec INTEGER")
+        conn.execute(
+            "UPDATE SUBWAY_STOP_TIMES SET next_stop_id='union-platform', "
+            "next_departing_time_sec=43800 WHERE stop_id='finch-platform'"
+        )
+        conn.execute("ALTER TABLE SERVICE_DAYS ADD COLUMN start_date TEXT DEFAULT '20260101'")
+        conn.execute("ALTER TABLE SERVICE_DAYS ADD COLUMN end_date TEXT DEFAULT '20261231'")
+        conn.execute(
+            "CREATE TABLE SERVICE_EXCEPTIONS (service_id TEXT,date TEXT,exception_type INT)"
+        )
+        conn.execute("CREATE TABLE active_dataset (id INT,payload TEXT,version TEXT,revision TEXT)")
+        conn.execute(
+            "INSERT INTO active_dataset VALUES (1,?,'fixture',?)",
+            (
+                json.dumps({"generation": "test-generation", "network": topology, "layouts": {}}),
+                IMPORTER_REVISION,
+            ),
+        )
+
     clear_cache()
     recorder.set_snapshot(None)
     app = FastAPI()
@@ -165,9 +195,7 @@ def test_bad_realtime_snapshot_falls_back_to_database(pipeline, status, age_s):
         Snapshot(
             polled_at=NOW - timedelta(seconds=age_s),
             status=status,
-            positions=[
-                TrainPosition(line="line-1", direction=0, from_station="99969")
-            ],
+            positions=[TrainPosition(line="line-1", direction=0, from_station="99969")],
         )
     )
 
@@ -183,9 +211,7 @@ def test_fresh_realtime_snapshot_reaches_the_esp32_without_db_fallback(pipeline)
         Snapshot(
             polled_at=NOW - timedelta(seconds=5),
             status="ok",
-            positions=[
-                TrainPosition(line="line-1", direction=0, from_station="99969")
-            ],
+            positions=[TrainPosition(line="line-1", direction=0, from_station="99969")],
         )
     )
 

@@ -86,7 +86,14 @@ export const validateMapState = (raw) => {
 
   return {
     generatedAt: asString(raw.generatedAt),
-    source: asString(raw.source) === 'ntas' ? 'ntas' : 'schedule',
+    source: ['ntas', 'mixed'].includes(raw.source) ? raw.source : 'schedule',
+    generation: asString(raw.generation),
+    lineSources: Object.fromEntries(Object.entries(raw.lineSources || {}).filter(
+      ([key, value]) => /^line-[12456]$/.test(key) && value && typeof value === 'object'
+    ).map(([key, value]) => [key, {
+      source: ['ntas', 'schedule'].includes(value.source) ? value.source : null,
+      reason: asString(value.reason)
+    }])),
     fallback: raw.fallback === true,
     trains
   };

@@ -1,0 +1,765 @@
+{
+  "99920": {
+    "aliases": [],
+    "gtfsParents": [
+      "43298"
+    ],
+    "name": "Cedarvale"
+  },
+  "99925": {
+    "aliases": [],
+    "gtfsParents": [
+      "13689"
+    ],
+    "name": "Leslie"
+  },
+  "99926": {
+    "aliases": [],
+    "gtfsParents": [
+      "13682"
+    ],
+    "name": "Don Mills"
+  },
+  "99927": {
+    "aliases": [],
+    "gtfsParents": [
+      "14578"
+    ],
+    "name": "Bessarion"
+  },
+  "99928": {
+    "aliases": [],
+    "gtfsParents": [
+      "14577"
+    ],
+    "name": "Bayview"
+  },
+  "99935": {
+    "aliases": [],
+    "gtfsParents": [
+      "3194"
+    ],
+    "name": "Woodbine"
+  },
+  "99936": {
+    "aliases": [],
+    "gtfsParents": [
+      "43294"
+    ],
+    "name": "Warden"
+  },
+  "99937": {
+    "aliases": [],
+    "gtfsParents": [
+      "43293"
+    ],
+    "name": "Victoria Park"
+  },
+  "99938": {
+    "aliases": [],
+    "gtfsParents": [
+      "14574"
+    ],
+    "name": "Sherbourne"
+  },
+  "99939": {
+    "aliases": [],
+    "gtfsParents": [
+      "43282"
+    ],
+    "name": "Runnymede"
+  },
+  "99940": {
+    "aliases": [],
+    "gtfsParents": [
+      "43279"
+    ],
+    "name": "Royal York"
+  },
+  "99941": {
+    "aliases": [],
+    "gtfsParents": [
+      "43289"
+    ],
+    "name": "Pape"
+  },
+  "99942": {
+    "aliases": [],
+    "gtfsParents": [
+      "43285"
+    ],
+    "name": "Ossington"
+  },
+  "99943": {
+    "aliases": [],
+    "gtfsParents": [
+      "43280"
+    ],
+    "name": "Old Mill"
+  },
+  "99944": {
+    "aliases": [],
+    "gtfsParents": [
+      "43292"
+    ],
+    "name": "Main Street"
+  },
+  "99945": {
+    "aliases": [],
+    "gtfsParents": [
+      "14575"
+    ],
+    "name": "Lansdowne"
+  },
+  "99946": {
+    "aliases": [],
+    "gtfsParents": [
+      "7906"
+    ],
+    "name": "Kipling"
+  },
+  "99947": {
+    "aliases": [],
+    "gtfsParents": [
+      "43295"
+    ],
+    "name": "Kennedy"
+  },
+  "99948": {
+    "aliases": [],
+    "gtfsParents": [
+      "43284"
+    ],
+    "name": "Keele"
+  },
+  "99949": {
+    "aliases": [],
+    "gtfsParents": [
+      "43281"
+    ],
+    "name": "Jane"
+  },
+  "99950": {
+    "aliases": [],
+    "gtfsParents": [
+      "43278"
+    ],
+    "name": "Islington"
+  },
+  "99951": {
+    "aliases": [],
+    "gtfsParents": [
+      "43283"
+    ],
+    "name": "High Park"
+  },
+  "99952": {
+    "aliases": [],
+    "gtfsParents": [
+      "3667"
+    ],
+    "name": "Greenwood"
+  },
+  "99953": {
+    "aliases": [],
+    "gtfsParents": [
+      "3529"
+    ],
+    "name": "Dundas West"
+  },
+  "99954": {
+    "aliases": [],
+    "gtfsParents": [
+      "14594"
+    ],
+    "name": "Dufferin"
+  },
+  "99955": {
+    "aliases": [],
+    "gtfsParents": [
+      "43290"
+    ],
+    "name": "Donlands"
+  },
+  "99956": {
+    "aliases": [],
+    "gtfsParents": [
+      "43291"
+    ],
+    "name": "Coxwell"
+  },
+  "99957": {
+    "aliases": [],
+    "gtfsParents": [
+      "14595"
+    ],
+    "name": "Christie"
+  },
+  "99958": {
+    "aliases": [],
+    "gtfsParents": [
+      "14573"
+    ],
+    "name": "Chester"
+  },
+  "99959": {
+    "aliases": [],
+    "gtfsParents": [
+      "43287"
+    ],
+    "name": "Castle Frank"
+  },
+  "99960": {
+    "aliases": [],
+    "gtfsParents": [
+      "43288"
+    ],
+    "name": "Broadview"
+  },
+  "99961": {
+    "aliases": [],
+    "gtfsParents": [
+      "14579"
+    ],
+    "name": "Bay"
+  },
+  "99962": {
+    "aliases": [],
+    "gtfsParents": [
+      "43286"
+    ],
+    "name": "Bathurst"
+  },
+  "99963": {
+    "aliases": [],
+    "gtfsParents": [
+      "14580"
+    ],
+    "name": "Yorkdale"
+  },
+  "99964": {
+    "aliases": [],
+    "gtfsParents": [
+      "15206"
+    ],
+    "name": "York University"
+  },
+  "99965": {
+    "aliases": [],
+    "gtfsParents": [
+      "43276"
+    ],
+    "name": "York Mills"
+  },
+  "99966": {
+    "aliases": [],
+    "gtfsParents": [
+      "43265"
+    ],
+    "name": "Wilson"
+  },
+  "99967": {
+    "aliases": [],
+    "gtfsParents": [
+      "43270"
+    ],
+    "name": "Wellesley"
+  },
+  "99968": {
+    "aliases": [],
+    "gtfsParents": [
+      "15209"
+    ],
+    "name": "Vaughan Metropolitan Centre"
+  },
+  "99969": {
+    "aliases": [],
+    "gtfsParents": [
+      "15772"
+    ],
+    "name": "Union"
+  },
+  "99970": {
+    "aliases": [],
+    "gtfsParents": [
+      "14590"
+    ],
+    "name": "Summerhill"
+  },
+  "99971": {
+    "aliases": [],
+    "gtfsParents": [
+      "14571"
+    ],
+    "name": "St Patrick"
+  },
+  "99972": {
+    "aliases": [],
+    "gtfsParents": [
+      "43269"
+    ],
+    "name": "St George"
+  },
+  "99973": {
+    "aliases": [],
+    "gtfsParents": [
+      "43267"
+    ],
+    "name": "St Clair West"
+  },
+  "99974": {
+    "aliases": [],
+    "gtfsParents": [
+      "43272"
+    ],
+    "name": "St Clair"
+  },
+  "99975": {
+    "aliases": [],
+    "gtfsParents": [
+      "14585"
+    ],
+    "name": "St Andrew"
+  },
+  "99977": {
+    "aliases": [],
+    "gtfsParents": [
+      "7129"
+    ],
+    "name": "Sheppard-Yonge"
+  },
+  "99978": {
+    "aliases": [],
+    "gtfsParents": [
+      "11860"
+    ],
+    "name": "Sheppard West"
+  },
+  "99979": {
+    "aliases": [],
+    "gtfsParents": [
+      "43271"
+    ],
+    "name": "Rosedale"
+  },
+  "99980": {
+    "aliases": [],
+    "gtfsParents": [
+      "14583"
+    ],
+    "name": "Queen's Park"
+  },
+  "99981": {
+    "aliases": [],
+    "gtfsParents": [
+      "14587"
+    ],
+    "name": "Queen"
+  },
+  "99982": {
+    "aliases": [],
+    "gtfsParents": [
+      "15207"
+    ],
+    "name": "Pioneer Village"
+  },
+  "99983": {
+    "aliases": [],
+    "gtfsParents": [
+      "14584"
+    ],
+    "name": "Osgoode"
+  },
+  "99984": {
+    "aliases": [],
+    "gtfsParents": [
+      "14591"
+    ],
+    "name": "North York Centre"
+  },
+  "99985": {
+    "aliases": [],
+    "gtfsParents": [
+      "14582"
+    ],
+    "name": "Museum"
+  },
+  "99986": {
+    "aliases": [],
+    "gtfsParents": [
+      "43266"
+    ],
+    "name": "Lawrence West"
+  },
+  "99987": {
+    "aliases": [],
+    "gtfsParents": [
+      "43275"
+    ],
+    "name": "Lawrence"
+  },
+  "99988": {
+    "aliases": [],
+    "gtfsParents": [
+      "14586"
+    ],
+    "name": "King"
+  },
+  "99989": {
+    "aliases": [],
+    "gtfsParents": [
+      "15208"
+    ],
+    "name": "Highway 407"
+  },
+  "99990": {
+    "aliases": [],
+    "gtfsParents": [
+      "14593"
+    ],
+    "name": "Glencairn"
+  },
+  "99991": {
+    "aliases": [],
+    "gtfsParents": [
+      "15205"
+    ],
+    "name": "Finch West"
+  },
+  "99992": {
+    "aliases": [],
+    "gtfsParents": [
+      "43277"
+    ],
+    "name": "Finch"
+  },
+  "99993": {
+    "aliases": [],
+    "gtfsParents": [
+      "43274"
+    ],
+    "name": "Eglinton"
+  },
+  "99994": {
+    "aliases": [],
+    "gtfsParents": [
+      "14581"
+    ],
+    "name": "Dupont"
+  },
+  "99995": {
+    "aliases": [],
+    "gtfsParents": [
+      "14588"
+    ],
+    "name": "TMU"
+  },
+  "99996": {
+    "aliases": [],
+    "gtfsParents": [
+      "15204"
+    ],
+    "name": "Downsview Park"
+  },
+  "99997": {
+    "aliases": [],
+    "gtfsParents": [
+      "43273"
+    ],
+    "name": "Davisville"
+  },
+  "99998": {
+    "aliases": [],
+    "gtfsParents": [
+      "14589"
+    ],
+    "name": "College"
+  },
+  "99999": {
+    "aliases": [],
+    "gtfsParents": [
+      "14572"
+    ],
+    "name": "Bloor-Yonge"
+  },
+  "spadina": {
+    "aliases": [],
+    "gtfsParents": [
+      "43268"
+    ],
+    "name": "Spadina"
+  },
+  "station-aga-khan-park-museum": {
+    "aliases": [],
+    "gtfsParents": [
+      "16781"
+    ],
+    "name": "Aga Khan Park & Museum"
+  },
+  "station-albion": {
+    "aliases": [],
+    "gtfsParents": [
+      "16814"
+    ],
+    "name": "Albion"
+  },
+  "station-avenue": {
+    "aliases": [],
+    "gtfsParents": [
+      "16776"
+    ],
+    "name": "Avenue"
+  },
+  "station-birchmount": {
+    "aliases": [],
+    "gtfsParents": [
+      "16788"
+    ],
+    "name": "Birchmount"
+  },
+  "station-caledonia": {
+    "aliases": [],
+    "gtfsParents": [
+      "16764"
+    ],
+    "name": "Caledonia"
+  },
+  "station-chaplin": {
+    "aliases": [],
+    "gtfsParents": [
+      "16775"
+    ],
+    "name": "Chaplin"
+  },
+  "station-don-valley": {
+    "aliases": [],
+    "gtfsParents": [
+      "16763"
+    ],
+    "name": "Don Valley"
+  },
+  "station-driftwood": {
+    "aliases": [],
+    "gtfsParents": [
+      "16825"
+    ],
+    "name": "Driftwood"
+  },
+  "station-duncanwoods": {
+    "aliases": [],
+    "gtfsParents": [
+      "16819"
+    ],
+    "name": "Duncanwoods"
+  },
+  "station-emery": {
+    "aliases": [],
+    "gtfsParents": [
+      "16821"
+    ],
+    "name": "Emery"
+  },
+  "station-fairbank": {
+    "aliases": [],
+    "gtfsParents": [
+      "16772"
+    ],
+    "name": "Fairbank"
+  },
+  "station-forest-hill": {
+    "aliases": [],
+    "gtfsParents": [
+      "16774"
+    ],
+    "name": "Forest Hill"
+  },
+  "station-golden-mile": {
+    "aliases": [],
+    "gtfsParents": [
+      "16787"
+    ],
+    "name": "Golden Mile"
+  },
+  "station-hakimi-lebovic": {
+    "aliases": [],
+    "gtfsParents": [
+      "16786"
+    ],
+    "name": "Hakimi Lebovic"
+  },
+  "station-humber-college": {
+    "aliases": [],
+    "gtfsParents": [
+      "16811"
+    ],
+    "name": "Humber College"
+  },
+  "station-ionview": {
+    "aliases": [],
+    "gtfsParents": [
+      "16789"
+    ],
+    "name": "Ionview"
+  },
+  "station-jane-and-finch": {
+    "aliases": [],
+    "gtfsParents": [
+      "16824"
+    ],
+    "name": "Jane and Finch"
+  },
+  "station-keelesdale": {
+    "aliases": [],
+    "gtfsParents": [
+      "16762"
+    ],
+    "name": "Keelesdale"
+  },
+  "station-laird": {
+    "aliases": [],
+    "gtfsParents": [
+      "16779"
+    ],
+    "name": "Laird"
+  },
+  "station-leaside": {
+    "aliases": [],
+    "gtfsParents": [
+      "16778"
+    ],
+    "name": "Leaside"
+  },
+  "station-martin-grove": {
+    "aliases": [],
+    "gtfsParents": [
+      "16813"
+    ],
+    "name": "Martin Grove"
+  },
+  "station-milvan-rumike": {
+    "aliases": [],
+    "gtfsParents": [
+      "16820"
+    ],
+    "name": "Milvan Rumike"
+  },
+  "station-mount-dennis": {
+    "aliases": [],
+    "gtfsParents": [
+      "16761"
+    ],
+    "name": "Mount Dennis"
+  },
+  "station-mount-olive": {
+    "aliases": [],
+    "gtfsParents": [
+      "16816"
+    ],
+    "name": "Mount Olive"
+  },
+  "station-mount-pleasant": {
+    "aliases": [],
+    "gtfsParents": [
+      "16777"
+    ],
+    "name": "Mount Pleasant"
+  },
+  "station-norfinch-oakdale": {
+    "aliases": [],
+    "gtfsParents": [
+      "16823"
+    ],
+    "name": "Norfinch Oakdale"
+  },
+  "station-o-connor": {
+    "aliases": [],
+    "gtfsParents": [
+      "16784"
+    ],
+    "name": "O'Connor"
+  },
+  "station-oakwood": {
+    "aliases": [],
+    "gtfsParents": [
+      "16773"
+    ],
+    "name": "Oakwood"
+  },
+  "station-pearldale": {
+    "aliases": [],
+    "gtfsParents": [
+      "16818"
+    ],
+    "name": "Pearldale"
+  },
+  "station-pharmacy": {
+    "aliases": [],
+    "gtfsParents": [
+      "16785"
+    ],
+    "name": "Pharmacy"
+  },
+  "station-rowntree-mills": {
+    "aliases": [],
+    "gtfsParents": [
+      "16817"
+    ],
+    "name": "Rowntree Mills"
+  },
+  "station-sentinel": {
+    "aliases": [],
+    "gtfsParents": [
+      "16827"
+    ],
+    "name": "Sentinel"
+  },
+  "station-signet-arrow": {
+    "aliases": [],
+    "gtfsParents": [
+      "16822"
+    ],
+    "name": "Signet Arrow"
+  },
+  "station-sloane": {
+    "aliases": [],
+    "gtfsParents": [
+      "16783"
+    ],
+    "name": "Sloane"
+  },
+  "station-stevenson": {
+    "aliases": [],
+    "gtfsParents": [
+      "16815"
+    ],
+    "name": "Stevenson"
+  },
+  "station-sunnybrook-park": {
+    "aliases": [],
+    "gtfsParents": [
+      "16780"
+    ],
+    "name": "Sunnybrook Park"
+  },
+  "station-tobermory": {
+    "aliases": [],
+    "gtfsParents": [
+      "16826"
+    ],
+    "name": "Tobermory"
+  },
+  "station-westmore": {
+    "aliases": [],
+    "gtfsParents": [
+      "16812"
+    ],
+    "name": "Westmore"
+  },
+  "station-wynford": {
+    "aliases": [],
+    "gtfsParents": [
+      "16782"
+    ],
+    "name": "Wynford"
+  }
+}

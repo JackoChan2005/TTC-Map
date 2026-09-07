@@ -4,10 +4,12 @@ New in the Python port — the JS renderer had no tests, and this is the contrac
 the PCB is designed against, so it is the one that must not drift.
 """
 
+import json
+
 import pytest
 
+from ttcmap.config import REPO_ROOT
 from ttcmap.map.state import MapState
-from ttcmap.map.topology import load_topology
 from ttcmap.renderers.led import load_led_map, pack_bits, render_led_state
 
 
@@ -66,7 +68,7 @@ def test_unknown_led_map_returns_none():
 def test_every_led_maps_to_a_real_station():
     """A silkscreen referencing a station the topology does not have would
     silently never light up."""
-    topology = load_topology()
+    topology = json.loads((REPO_ROOT / "shared/network.json").read_text())
     led_map = load_led_map("rev-a")
 
     unknown = [led for led in led_map["leds"] if led["station"] not in topology["stations"]]

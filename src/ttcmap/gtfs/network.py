@@ -1,12 +1,4 @@
-"""Generate the canonical subway topology from the GTFS feed.
-
-Ported from API/src/build_network.py. Writes shared/network.json (lines with
-stations in direction_id 0 travel order, plus a platform stop_id -> station map
-that both realtime and schedule sources use) and shared/layouts/geographic.json.
-
-Unlike the original this runs as part of every GTFS refresh, so network.json can
-no longer silently go stale after the feed changes.
-"""
+"""Build deterministic five-line topology using reviewed application station IDs."""
 
 import json
 import logging
@@ -16,144 +8,133 @@ from pathlib import Path
 import pandas as pd
 
 from ttcmap.config import get_settings
+from ttcmap.gtfs.rail_routes import select_rail_routes
 
 log = logging.getLogger(__name__)
-
 PLATFORM_SUFFIXES = [
-    " - Northbound Platform",
-    " - Southbound Platform",
-    " - Eastbound Platform",
-    " - Westbound Platform",
+    f" - {d} Platform" for d in ("Northbound", "Southbound", "Eastbound", "Westbound", "Subway")
 ]
 LAYOUT_MARGIN = 30.0
 LAYOUT_WIDTH = 1000.0
-SUBWAY_ROUTE_TYPE = 1
 
 
-def _read_data(data_dir: Path) -> dict[str, pd.DataFrame]:
-    if not (data_dir / "routes.txt").exists():
-        raise FileNotFoundError(f"GTFS files not found in {data_dir}. Run a GTFS refresh first.")
-    return {
-        "routes": pd.read_csv(data_dir / "routes.txt"),
-        "trips": pd.read_csv(data_dir / "trips.txt", dtype={"trip_id": str}),
-        "stop_times": pd.read_csv(
-            data_dir / "stop_times.txt",
-            dtype={"trip_id": str, "stop_headsign": str},
-            usecols=["trip_id", "stop_id", "stop_sequence"],
-        ),
-        "stops": pd.read_csv(data_dir / "stops.txt"),
-    }
-
-
-def station_name(platform_name: str) -> str:
+def station_name(name: str) -> str:
     for suffix in PLATFORM_SUFFIXES:
-        platform_name = platform_name.removesuffix(suffix)
-    # parent stations are named "Spadina", platforms "Spadina Station";
-    # normalize so both map to the same station
-    return platform_name.removesuffix(" Station")
+        name = name.removesuffix(suffix)
+    return name.removesuffix(" Station").strip()
 
 
-def _longest_trip(
-    trips: pd.DataFrame, stop_times: pd.DataFrame, route_id, direction_id: int
-) -> pd.DataFrame:
-    candidates = trips[(trips["route_id"] == route_id) & (trips["direction_id"] == direction_id)]
-    stops = stop_times[stop_times["trip_id"].isin(set(candidates["trip_id"]))]
-    if stops.empty:
-        return stops
-    best_trip = stops.groupby("trip_id")["stop_sequence"].count().idxmax()
-    return stops[stops["trip_id"] == best_trip].sort_values("stop_sequence")
+def build_network(data_dir: Path | None = None, *, frames: dict | None = None) -> dict:
+    from ttcmap.gtfs.build import read_gtfs
 
-
-def build_network(data_dir: Path | None = None) -> dict:
-    data_dir = data_dir or (get_settings().data_path / "gtfs")
-    frames = _read_data(data_dir)
-    routes = frames["routes"]
+    frames = (
+        frames if frames is not None else read_gtfs(data_dir or get_settings().data_path / "gtfs")
+    )
+    registry = json.loads((get_settings().shared_path / "stations.json").read_text())
+    names, parents = {}, {}
+    for sid, entry in registry.items():
+        for table, values in (
+            (names, [entry["name"], *entry.get("aliases", [])]),
+            (parents, entry.get("gtfsParents", [])),
+        ):
+            for value in values:
+                if value in table and table[value] != sid:
+                    raise ValueError(f"Ambiguous station registry entry: {value}")
+                table[value] = sid
     stops = frames["stops"].set_index("stop_id")
+    if not stops.index.is_unique:
+        raise ValueError("Duplicate GTFS stop ID")
+    routes = select_rail_routes(frames["routes"])
+    trips = frames["trips"].merge(routes[["route_id", "line_id"]], on="route_id")
+    rows = frames["stop_times"].merge(
+        trips[["trip_id", "line_id", "direction_id"]], on="trip_id", validate="many_to_one"
+    )
+    rows["stop_sequence"] = pd.to_numeric(rows["stop_sequence"], errors="raise")
+    rows = rows.sort_values(["line_id", "direction_id", "trip_id", "stop_sequence"])
+    stations, platforms = {}, {}
 
-    subway_routes = routes[routes["route_type"] == SUBWAY_ROUTE_TYPE].sort_values("route_id")
-
-    lines: list[dict] = []
-    stations: dict[str, dict] = {}
-    platforms: dict[str, dict] = {}
-    station_id_by_name: dict[str, str] = {}
-
-    def register_station(stop_id) -> str:
+    def register(stop_id: str) -> str:
         platform = stops.loc[stop_id]
         parent_id = platform["parent_station"]
-
-        if pd.notna(parent_id):
-            station_id = str(int(parent_id))
-            parent = stops.loc[int(parent_id)]
-            name = station_name(str(parent["stop_name"]))
-            lat, lon = parent["stop_lat"], parent["stop_lon"]
-        else:
-            name = station_name(str(platform["stop_name"]))
-            station_id = name.lower().replace(" ", "-")
-            lat, lon = platform["stop_lat"], platform["stop_lon"]
-
-        # some platforms lack a parent_station (e.g. Spadina on Line 1);
-        # merge by name so interchanges stay one station
-        station_id = station_id_by_name.setdefault(name, station_id)
-
-        if station_id not in stations:
-            stations[station_id] = {
-                "name": name,
-                "lat": round(float(lat), 6),
-                "lon": round(float(lon), 6),
+        parent = stops.loc[parent_id] if parent_id else platform
+        name = station_name(parent["stop_name"])
+        by_name, by_parent = names.get(name), parents.get(parent_id)
+        if by_name and by_parent and by_name != by_parent:
+            raise ValueError(f"Conflicting parent/name identity: {stop_id}")
+        sid = by_name or by_parent
+        if not sid:
+            raise ValueError(f"Register unknown station {name!r} (parent {parent_id})")
+        lat, lon = float(parent["stop_lat"]), float(parent["stop_lon"])
+        if not math.isfinite(lat) or not math.isfinite(lon):
+            raise ValueError(f"Invalid station coordinates: {sid}")
+        stations.setdefault(
+            sid,
+            {
+                "name": registry[sid]["name"],
+                "lat": round(lat, 6),
+                "lon": round(lon, 6),
                 "lines": [],
-            }
-        return station_id
-
-    for _, route in subway_routes.iterrows():
-        trip_stops = _longest_trip(
-            frames["trips"], frames["stop_times"], route["route_id"], direction_id=0
+            },
         )
-        if trip_stops.empty:
-            log.warning("No trips found for route %s, skipping", route["route_id"])
-            continue
+        return sid
 
-        line_id = f"line-{route['route_id']}"
-        station_ids = []
-
-        for stop_id in trip_stops["stop_id"]:
-            station_id = register_station(stop_id)
-            if line_id not in stations[station_id]["lines"]:
-                stations[station_id]["lines"].append(line_id)
-            station_ids.append(station_id)
-
-        # platform stop_ids for both directions, so realtime and schedule
-        # sources can map NTAS/stop_times rows back to stations
-        for direction_id in (0, 1):
-            direction_stops = _longest_trip(
-                frames["trips"], frames["stop_times"], route["route_id"], direction_id
-            )
-            for stop_id in direction_stops["stop_id"]:
-                platforms[str(stop_id)] = {
-                    "station": register_station(stop_id),
-                    "line": line_id,
-                    "direction": direction_id,
-                }
-
+    patterns = {}
+    for (line, direction, trip), group in rows.groupby(
+        ["line_id", "direction_id", "trip_id"], sort=True
+    ):
+        pattern = []
+        for stop_id in group["stop_id"]:
+            sid = register(stop_id)
+            mapping = {
+                "station": sid,
+                "line": line,
+                "direction": int(direction),
+                "stopCode": stops.loc[stop_id]["stop_code"] or stop_id,
+            }
+            if stop_id in platforms and platforms[stop_id] != mapping:
+                raise ValueError(f"Conflicting platform assignment: {stop_id}")
+            platforms[stop_id] = mapping
+            if line not in stations[sid]["lines"]:
+                stations[sid]["lines"].append(line)
+            pattern.append(sid)
+        patterns.setdefault((line, int(direction)), []).append((str(trip), pattern))
+    lines = []
+    for route in routes.itertuples():
+        orders = []
+        for direction in (0, 1):
+            candidates = patterns.get((route.line_id, direction), [])
+            if not candidates:
+                raise ValueError(f"Missing trips for {route.line_id} direction {direction}")
+            canonical = sorted(candidates, key=lambda item: (-len(item[1]), item[0]))[0][1]
+            if len(canonical) < 2 or len(set(canonical)) != len(canonical):
+                raise ValueError(f"Invalid canonical pattern for {route.line_id}")
+            for trip, pattern in candidates:
+                start = canonical.index(pattern[0]) if pattern[0] in canonical else -1
+                if start < 0 or canonical[start : start + len(pattern)] != pattern:
+                    raise ValueError(f"Unsupported rail pattern: {route.line_id} trip {trip}")
+            orders.append(canonical)
+        if orders[0] != list(reversed(orders[1])):
+            raise ValueError(f"Directions disagree for {route.line_id}")
         lines.append(
             {
-                "id": line_id,
-                "routeId": int(route["route_id"]),
-                "name": str(route["route_long_name"]),
-                "color": f"#{route['route_color']}",
-                "textColor": f"#{route['route_text_color']}",
-                "stations": station_ids,
+                "id": route.line_id,
+                "routeId": str(route.route_id),
+                "number": route.route_short_name,
+                "name": route.route_long_name,
+                "color": "#" + route.route_color,
+                "textColor": "#" + route.route_text_color,
+                "stations": orders[0],
             }
         )
-
-    for station in stations.values():
-        station["interchange"] = len(station["lines"]) > 1
-
+    for s in stations.values():
+        s["lines"].sort()
+        s["interchange"] = len(s["lines"]) > 1
     return {
         "source": "TTC merged GTFS (Toronto Open Data)",
         "stationOrder": "direction_id 0 travel order",
         "lines": lines,
-        "stations": stations,
-        "platforms": platforms,
+        "stations": dict(sorted(stations.items())),
+        "platforms": dict(sorted(platforms.items())),
     }
 
 

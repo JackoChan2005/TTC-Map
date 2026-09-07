@@ -15,13 +15,13 @@ GET /api/v1/led-state.bin?map=rev-a
 | `ETag` | Content hash of the frame. Send back as `If-None-Match` to get `304` |
 | `X-Led-Count` | Number of LEDs the board revision declares |
 | `X-Generated-At` | ISO 8601 timestamp of the frame |
-| `X-Source` | `ntas` (realtime) or `schedule` (simulation) |
+| `X-Source` | `ntas`, `schedule`, or `mixed` (sources selected per line) |
 
 `?map=` selects a board revision; it must match `^[a-z][a-z0-9-]*$` and name a file in
-`hardware/led-maps/`. Unknown names return `404`. `rev-a` is the default.
+`Hardware/led-maps/`. Unknown names return `404`. `rev-a` is the default.
 
 `?source=schedule` forces the schedule simulation — useful for bench testing when you want
-deterministic, always-populated output regardless of whether NTAS is up.
+deterministic output within the published service calendar regardless of whether NTAS is up.
 
 ## Bit layout
 
@@ -68,7 +68,7 @@ yourself — do not pass the buffer straight through.
 
 ## Adding a board revision
 
-Add `hardware/led-maps/<rev>.json`. No server code changes.
+Add `Hardware/led-maps/<rev>.json`. No server code changes.
 
 ```json
 {
@@ -84,3 +84,20 @@ Add `hardware/led-maps/<rev>.json`. No server code changes.
 `station` must be a station id from `shared/network.json` — `tests/test_led.py` asserts every
 LED maps to a real station, so a typo fails the test suite rather than silently never lighting
 up. `GET /api/v1/network` lists the ids alongside their names.
+
+
+## Five-line coverage
+
+The server includes Lines 5 and 6 in scheduled state. Line 5 can use NTAS after
+coverage validation; Line 6 is scheduled only. A mixed frame has `X-Source: mixed`.
+The firmware copies this header as text, so no new source enum or wire format is
+required. JSON `map-state.lineSources` explains each line's source.
+
+The existing `rev-a` byte count and LED indices do not change. Stable application
+station IDs preserve the physical mapping. New-line trains at an existing mapped
+interchange (for example Kennedy) can light its LED. Additional station LEDs
+require a separately verified board revision; no physical assignments are guessed.
+
+Unavailable required schedule data (including an incomplete importer migration)
+returns 503 rather than a partial successful frame. On a failed browser update,
+train markers are cleared; the firmware retains its existing bounded grace period.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TTC Live Search</title>
+  <title>TTC Scheduled Departures</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,13 +13,13 @@
 <body>
   <main class="layout">
     <section class="panel">
-      <p class="eyebrow">TTC Live Search</p>
-      <h1>Find where a route is right now</h1>
-      <p class="subtitle">Search by route number and compare records against the current time. Or go back to the <a href="/">live map</a>.</p>
+      <p class="eyebrow">TTC Scheduled Departures</p>
+      <h1>Find scheduled departures</h1>
+      <p class="subtitle">Search the published timetable by rail line number. Or go back to the <a href="/">live map</a>.</p>
 
       <form id="search-form" class="search-form">
         <label for="route">Route number</label>
-        <input id="route" name="route" type="text" placeholder="e.g. 1 or 2" required>
+        <input id="route" name="route" type="text" placeholder="1, 2, 4, 5 or 6" required>
 
         <label for="at-time">Time</label>
         <input id="at-time" name="at-time" type="datetime-local">

@@ -1,31 +1,34 @@
-"""Polls NTAS on a fixed cadence and keeps the latest snapshot in memory.
-
-Ported from node-api/src/map/rtRecorder.js. The snapshot used to be a single row
-in a SQLite table purely because `npm run sync` ran as a separate process; with
-one process it is just module state.
-
-A single failed poll marks the snapshot 'error' so serving falls back to the
-schedule simulation immediately — stale realtime positions are never shown.
-"""
+"""One bounded, fair poll produces independent per-line snapshots."""
 
 import asyncio
 import logging
-from dataclasses import dataclass, field
+import math
+from collections.abc import Mapping
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
+from types import MappingProxyType
 
 from ttcmap.config import get_settings
+from ttcmap.db import read_dataset
 from ttcmap.map import interpolate
-from ttcmap.map.sources import ntas
-from ttcmap.map.state import TrainPosition
+from ttcmap.map.segments import segment_spans
+from ttcmap.map.sources.ntas import LinePoll, poll_lines
 
 log = logging.getLogger(__name__)
 
 
-@dataclass
+@dataclass(frozen=True)
 class Snapshot:
     polled_at: datetime
-    status: str  # ok | error
-    positions: list[TrainPosition] = field(default_factory=list)
+    lines: Mapping[str, LinePoll] = field(default_factory=dict)
+    status: str = "ok"
+
+    def __post_init__(self):
+        object.__setattr__(self, "lines", MappingProxyType(dict(self.lines)))
+
+    @property
+    def positions(self):
+        return [p for line in self.lines.values() for p in line.positions]
 
 
 _snapshot: Snapshot | None = None
@@ -36,58 +39,52 @@ def get_snapshot() -> Snapshot | None:
 
 
 def set_snapshot(snapshot: Snapshot | None) -> None:
-    """Exposed for tests."""
     global _snapshot
     _snapshot = snapshot
 
 
-async def poll_once() -> Snapshot:
-    """Poll NTAS once, bounded so a hanging feed cannot stall the loop.
+def _poll_context():
+    with read_dataset() as dataset:
+        return dataset.network, dataset.generation, segment_spans(dataset)
 
-    Without the deadline, 148 platforms at concurrency 10 against an
-    unresponsive host take (148/concurrency) x request-timeout to fail — well
-    past the poll interval, leaving the recorder blocked and the board holding a
-    frame it believes is current.
-    """
+
+async def poll_once() -> Snapshot:
     global _snapshot
-    settings = get_settings()
     previous = _snapshot
     try:
-        positions = await asyncio.wait_for(
-            ntas.get_train_positions(), timeout=settings.ntas_poll_timeout_s
+        topology, generation, spans = await asyncio.to_thread(_poll_context)
+        cutoff = max(
+            get_settings().ntas_arriving_min, math.ceil(max(spans.values(), default=300) / 60) + 1
         )
-        polled_at = datetime.now(UTC)
-        if previous is not None and previous.status == "ok":
-            positions = interpolate.carry_floor(
-                positions, previous.positions, (polled_at - previous.polled_at).total_seconds()
-            )
-        _snapshot = Snapshot(polled_at=polled_at, status="ok", positions=positions)
-    except TimeoutError:
-        log.warning(
-            "NTAS poll exceeded %ss; map falls back to schedule", settings.ntas_poll_timeout_s
-        )
-        _snapshot = Snapshot(polled_at=datetime.now(UTC), status="error", positions=[])
+        lines = await poll_lines(topology, generation, cutoff)
+        for key, line in list(lines.items()):
+            old = previous.lines.get(key) if previous else None
+            elapsed = (line.polled_at - old.polled_at).total_seconds() if old else 0
+            if (
+                old
+                and old.status == line.status == "ok"
+                and old.generation == line.generation
+                and 0 <= elapsed <= get_settings().snapshot_max_age_s
+            ):
+                lines[key] = replace(
+                    line,
+                    positions=tuple(
+                        interpolate.carry_floor(
+                            list(line.positions), list(old.positions), elapsed, spans
+                        )
+                    ),
+                )
+        status = "ok" if all(line.status == "ok" for line in lines.values()) else "partial"
+        _snapshot = Snapshot(datetime.now(UTC), lines, status)
     except Exception as error:
-        log.warning("NTAS poll failed (%s); map falls back to schedule", error)
-        _snapshot = Snapshot(polled_at=datetime.now(UTC), status="error", positions=[])
+        log.warning("NTAS poll unavailable: %s", error)
+        _snapshot = Snapshot(datetime.now(UTC), status="error")
     return _snapshot
 
 
 async def poll_loop() -> None:
-    interval = get_settings().ntas_poll_s
-    snapshot = await poll_once()
-    if snapshot.status == "ok":
-        log.info(
-            "NTAS recorder started (%d trains, polling every %ds)",
-            len(snapshot.positions),
-            interval,
-        )
-
+    loop = asyncio.get_running_loop()
     while True:
-        await asyncio.sleep(interval)
-        try:
-            await poll_once()
-        except asyncio.CancelledError:
-            raise
-        except Exception:
-            log.exception("NTAS recorder loop error")
+        started = loop.time()
+        await poll_once()
+        await asyncio.sleep(max(0, get_settings().ntas_poll_s - (loop.time() - started)))
