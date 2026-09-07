@@ -18,7 +18,9 @@ Nothing else — no separate setup step, no virtualenv to activate.
 uv run ttcmap serve
 ```
 
-Or double-click `start.command` (macOS/Linux) / `start.bat` (Windows).
+Or double-click `start.command` (macOS/Linux) / `start.bat` (Windows). The Windows
+launcher keeps its virtual environment in `%LOCALAPPDATA%\TTC-Map\venv` so that
+OneDrive cannot make installed packages read-only.
 
 Then open <http://localhost:8000> for the map and <http://localhost:8000/docs> for the
 interactive API reference.
