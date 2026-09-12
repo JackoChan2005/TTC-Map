@@ -40,7 +40,10 @@ def test_nosniff_and_referrer_policy_are_pinned():
     headers = make_client().get("/probe").headers
 
     assert headers["X-Content-Type-Options"] == "nosniff"
-    assert headers["Referrer-Policy"] == "no-referrer"
+    assert headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
+    csp = headers["Content-Security-Policy"]
+    assert "img-src 'self' data: https://tile.openstreetmap.org" in csp
+    assert "connect-src 'self'" in headers["Content-Security-Policy"]
 
 
 def test_old_map_url_redirects_to_schematic_homepage():

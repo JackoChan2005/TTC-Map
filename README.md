@@ -76,7 +76,7 @@ data endpoints return 503 until publication succeeds. See
 | Path | Contents |
 |---|---|
 | `src/ttcmap/` | The API — GTFS pipeline, map state engine, sources, renderers, routes |
-| `web/` | Static frontend (schematic SVG map + route search) |
+| `web/` | Static frontend (geographic/schematic SVG explorer, route timelines and timetable search) |
 | `scripts/` | Dependency-free schematic layout generator |
 | `firmware/` | ESP32 firmware (PlatformIO, ESP-IDF, `esp32doit-devkit-v1`) |
 | `Hardware/` | KiCad project and `led-maps/` board revisions |
@@ -86,6 +86,10 @@ data endpoints return 503 until publication succeeds. See
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit together and
 [docs/FIRMWARE_API.md](docs/FIRMWARE_API.md) for the ESP32 contract.
+
+The redesigned frontend follows the root UI design references. Its supported
+features and API limitations are mapped in [docs/UI_API_AUDIT.md](docs/UI_API_AUDIT.md),
+with local browser/test results in [docs/UI_VALIDATION.md](docs/UI_VALIDATION.md).
 
 ## Configuration
 
