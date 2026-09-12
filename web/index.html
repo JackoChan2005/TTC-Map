@@ -1,36 +1,50 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TTC Map</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14232c">
+  <title>TTC Map · Explore Toronto by rail</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/site.css">
+  <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
-  <header class="banner">
-    <div class="banner-text">
-      <h1>TTC Map</h1>
-      <p class="banner-tagline">Toronto's subway, live</p>
-    </div>
-    <a class="banner-button" href="/search/">TTC LIVE SEARCH</a>
-  </header>
-
-  <main class="map-stage">
-    <svg id="map" xmlns="http://www.w3.org/2000/svg" role="img"
-         aria-label="Schematic TTC subway map with live train positions"></svg>
-
-    <footer class="map-footer">
-      <span id="source-pill" class="source-pill">loading…</span>
-      <span id="train-count" class="map-meta-text"></span>
-      <span id="legend" class="legend"></span>
-      <span id="status" class="map-meta-text" role="status" aria-live="polite"></span>
-    </footer>
+  <a class="skip-link" href="#panel-content">Skip to route information</a>
+  <main class="workspace">
+    <section class="map-stage" aria-label="Toronto rail map">
+      <div class="map-heading"><span class="eyebrow">TORONTO, ON</span><h1>Your city. Connected.</h1><span id="map-caption">Geographic rail network</span></div>
+      <svg id="map" tabindex="0" role="group" aria-label="Rail network. Use arrow keys to pan, plus and minus to zoom."></svg>
+      <div id="map-empty" class="map-empty"><span class="empty-symbol">⌁</span><h2>Connecting the city</h2><p>Loading the published rail network…</p></div>
+      <div class="north" aria-hidden="true">N<span>↑</span></div>
+      <div class="map-controls" aria-label="Map controls">
+        <button id="fit-map" title="Fit network" aria-label="Fit network">⌖</button>
+        <div class="zoom-group"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button></div>
+      </div>
+      <div id="basemap-status" class="basemap-status" role="status" hidden></div>
+      <div class="map-bottom"><div id="map-key"><span class="train-key"></span> Live direction <span class="train-key scheduled"></span> Scheduled direction</div><button id="map-type">Map: geographic</button></div>
+      <p class="attribution"><span id="basemap-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors · </span><span id="geometry-note">TTC / Toronto Open Data</span></p>
+    </section>
+    <aside class="context-panel" aria-label="Explore rail routes">
+      <header class="brand"><a href="/" class="brand-link"><img src="/favicon.svg" alt="" width="35" height="35"><span>TTC <b>Map</b><small>TORONTO RAIL EXPLORER</small></span></a><button id="collapse-panel" class="icon-button" aria-label="Collapse panel" aria-expanded="true">−</button></header>
+      <div id="panel-content" tabindex="-1">
+        <div class="search-wrap"><label class="sr-only" for="network-search">Search stations or lines</label><span aria-hidden="true">⌕</span><input id="network-search" type="search" placeholder="Search stations or lines" autocomplete="off" aria-controls="search-results"><kbd>/</kbd></div>
+        <div id="search-results" class="search-results" aria-label="Search results" hidden></div>
+        <nav class="tabs" aria-label="Main navigation"><a href="/" id="explore-tab">Explore map</a><a href="/search/" id="departures-tab">Departures</a></nav>
+        <div id="status-banner" class="status-banner" role="status"><span class="status-dot"></span><div><strong id="source-status">Connecting to transit data</strong><small id="update-status">Checking the published network</small></div><button id="refresh" aria-label="Refresh transit data" title="Refresh transit data">↻</button></div>
+        <section id="overview"><div class="section-heading"><h2>Explore the network</h2><span id="line-count"></span></div><p class="section-intro">Pick a line. See the city in motion.</p><div id="route-list"><p class="empty-copy">Routes will appear when the network is available.</p></div><p class="disclosure">Train positions are estimates. Source availability does not indicate service disruptions.</p></section>
+        <section id="route-detail" hidden></section>
+        <section id="departure-view" hidden>
+          <div class="section-heading"><h2>Scheduled departures</h2><span class="tag">TIMETABLE</span></div>
+          <p class="section-intro">Find trains departing across a line in a two-minute window.</p>
+          <form id="search-form"><label for="route">Rail line</label><select id="route" required><option value="">Waiting for network…</option></select><label for="at-time">Departure time <span id="time-zone"></span></label><input id="at-time" type="datetime-local"><div class="form-actions"><button type="button" id="now-btn" class="secondary">Use current time</button><button type="submit" id="search-btn" class="primary" disabled>Find departures →</button></div></form>
+          <p id="departure-status" role="status" class="empty-copy">Published schedules, not live arrival predictions.</p><div id="departure-results"></div>
+        </section>
+      </div>
+      <footer class="panel-footer"><button data-dialog="about">ⓘ <span>About</span></button><button data-dialog="alerts">△ <span>Service info</span></button><button data-dialog="settings">⚙ <span>Settings</span></button></footer>
+    </aside>
+    <div id="map-message" role="status" class="toast" hidden></div>
+    <dialog id="info-dialog" aria-labelledby="dialog-title"><div class="dialog-heading"><h2 id="dialog-title"></h2><button id="close-dialog" aria-label="Close dialog">×</button></div><div id="dialog-content"></div></dialog>
   </main>
-
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="/main.js"></script>
 </body>
 </html>

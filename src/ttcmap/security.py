@@ -11,7 +11,7 @@ SECURITY_HEADERS = {
             "script-src 'self'",
             "style-src 'self' https://fonts.googleapis.com",
             "font-src https://fonts.gstatic.com",
-            "img-src 'self' data:",
+            "img-src 'self' data: https://tile.openstreetmap.org",
             "connect-src 'self'",
             "object-src 'none'",
             "base-uri 'self'",
@@ -21,7 +21,8 @@ SECURITY_HEADERS = {
     ),
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "SAMEORIGIN",
-    "Referrer-Policy": "no-referrer",
+    # Public map tiles require an identifying origin referrer; no path/query leaks.
+    "Referrer-Policy": "strict-origin-when-cross-origin",
 }
 
 

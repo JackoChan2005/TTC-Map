@@ -18,7 +18,7 @@ const asFiniteNumber = (value, fallback = 0) => {
 };
 
 export const validateNetwork = (raw) => {
-  if (!raw || typeof raw !== 'object' || !Array.isArray(raw.lines) || typeof raw.stations !== 'object') {
+  if (!raw || typeof raw !== 'object' || !Array.isArray(raw.lines) || !raw.stations || typeof raw.stations !== 'object') {
     throw new Error('Invalid network payload');
   }
 
@@ -29,6 +29,8 @@ export const validateNetwork = (raw) => {
     }
     stations[id] = {
       name: asString(station.name) || 'Unknown',
+      lat: typeof station.lat === 'number' && Number.isFinite(station.lat) && Math.abs(station.lat) <= 85.05112878 ? station.lat : null,
+      lon: typeof station.lon === 'number' && Number.isFinite(station.lon) && Math.abs(station.lon) <= 180 ? station.lon : null,
       interchange: station.interchange === true,
       lines: Array.isArray(station.lines) ? station.lines.map(asString) : []
     };
@@ -38,16 +40,19 @@ export const validateNetwork = (raw) => {
     .filter((line) => line && typeof line === 'object' && Array.isArray(line.stations))
     .map((line) => ({
       id: asString(line.id),
+      number: asString(line.number) || asString(line.id).replace('line-', ''),
+      routeId: asString(line.routeId),
+      textColor: asColor(line.textColor),
       name: asString(line.name) || 'Line',
       color: asColor(line.color),
       stations: line.stations.map(asString).filter((s) => stations[s])
     }));
 
-  return { lines, stations };
+  return { lines, stations, platforms: raw.platforms || {} };
 };
 
 export const validateLayout = (raw) => {
-  if (!raw || typeof raw !== 'object' || typeof raw.stations !== 'object') {
+  if (!raw || typeof raw !== 'object' || !raw.stations || typeof raw.stations !== 'object') {
     throw new Error('Invalid layout payload');
   }
 
@@ -75,6 +80,7 @@ export const validateMapState = (raw) => {
     .filter((train) => train && typeof train === 'object')
     .map((train) => ({
       line: asString(train.line),
+      direction: train.direction === 0 || train.direction === 1 ? train.direction : null,
       at: train.at === null || train.at === undefined ? null : asString(train.at),
       between: Array.isArray(train.between) && train.between.length === 2
         ? [asString(train.between[0]), asString(train.between[1])]
