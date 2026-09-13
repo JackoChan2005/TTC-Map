@@ -1,3 +1,5 @@
+"""Ported from node-api/test/stateEngine.test.js."""
+
 from ttcmap.map.state import TrainPosition, compute_map_state
 
 TOPOLOGY = {

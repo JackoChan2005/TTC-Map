@@ -11,6 +11,7 @@ SPAN = 120.0
 
 @pytest.fixture(autouse=True)
 def fixed_span(monkeypatch):
+    """Pin every segment to a known traversal time so the maths is checkable."""
     monkeypatch.setattr(interpolate, "span_for", lambda *_: SPAN)
 
 
@@ -32,18 +33,21 @@ def test_progress_is_the_fraction_of_the_segment_already_run():
 
 
 def test_a_train_further_out_than_one_segment_has_not_left_the_origin():
+    # 5 minutes from B down a 2-minute segment means it is still behind A
     assert progress_from_eta(300, 120) == 0.0
     assert not is_on_segment(300, 120)
     assert is_on_segment(119, 120)
 
 
 def test_sightings_from_further_back_are_dropped_not_stacked_at_the_origin():
-    # Ignore duplicate sightings from stations farther ahead.
+    # every platform reports every train heading its way, so the same train is
+    # seen from several stations ahead; only the segment it is on may keep it
     assert advance([train(eta_s=300)], elapsed_s=0) == []
 
 
 def test_a_train_already_on_the_segment_is_not_yanked_off_by_a_revised_eta():
-    # An ETA revision must not remove a sighting already on this segment.
+    # it has a floor, so a reading that puts it back behind the origin keeps it
+    # in place rather than making it vanish and reappear
     [position] = advance([train(eta_s=300, floor=0.4)], elapsed_s=0)
     assert position.progress == pytest.approx(0.4)
 
@@ -59,7 +63,8 @@ def test_an_arrived_train_is_held_across_the_dwell():
 
 
 def test_an_arrived_train_is_released_once_the_next_segment_has_it():
-    # Expired arrivals must not overlap the next segment.
+    # holding it any longer would draw the same train twice: once at the
+    # platform and once just out of it
     assert advance([train(eta_s=0)], elapsed_s=interpolate.ARRIVED_GRACE_S) == []
 
 
@@ -94,23 +99,29 @@ def test_progress_never_falls_below_the_floor():
 
 
 def test_floor_carries_a_held_train_forward_instead_of_backwards():
-    # A repeated ETA must preserve the previously projected progress.
-    previous = [train(eta_s=120)]
+    # feed says 2 minutes, then 30s later says 2 minutes again because the train
+    # is held. By then it had been projected a quarter of the way along, and the
+    # floor keeps it there instead of sliding it back to the origin.
+    previous = [train(eta_s=120)]  # as the recorder stored it
     seeded = carry_floor([train(eta_s=120)], previous, elapsed_s=30)
 
     assert advance(seeded, elapsed_s=0)[0].progress == pytest.approx(0.25)
+    # ...and without the floor the same reading reads as "not on this segment"
     assert advance([train(eta_s=120)], elapsed_s=0) == []
 
 
 def test_floor_is_not_carried_when_the_queue_shifts():
-    # After the queue shifts, the replacement train must not inherit the old floor.
-    previous = [train(eta_s=30)]
+    # the nearest train arrives and everything behind it moves down an index;
+    # slot 0 now holds a train that has only just left A and must not be pinned
+    # to where the departed train was
+    previous = [train(eta_s=30)]  # as the recorder stored it
     seeded = carry_floor([train(eta_s=120)], previous, elapsed_s=30)
     assert seeded[0].progress_floor == 0.0
 
 
 def test_floor_survives_minute_rounding():
-    previous = [train(eta_s=120)]
+    # a reading that slips within the rounding slack is the same train
+    previous = [train(eta_s=120)]  # as the recorder stored it
     seeded = carry_floor([train(eta_s=150)], previous, elapsed_s=30)
     assert seeded[0].progress_floor == pytest.approx(0.25)
 
@@ -122,5 +133,6 @@ def test_unmatched_keys_get_no_floor():
 
 
 def test_a_train_that_leaves_the_feed_does_not_coast():
-    previous = [train(eta_s=30)]
+    # only the floor is carried, never the position itself
+    previous = [train(eta_s=30)]  # as the recorder stored it
     assert carry_floor([], previous, elapsed_s=30) == []

@@ -1,4 +1,8 @@
-"""LED mapping and the LSB-first firmware contract."""
+"""LED renderer: the bit packing the ESP32 firmware depends on.
+
+New in the Python port — the JS renderer had no tests, and this is the contract
+the PCB is designed against, so it is the one that must not drift.
+"""
 
 import json
 
@@ -52,6 +56,7 @@ def test_empty_state_lights_nothing():
 
 
 def test_invalid_led_map_name_is_rejected():
+    # the name reaches this from a query parameter, so path traversal must fail
     with pytest.raises(ValueError):
         load_led_map("../../etc/passwd")
 
@@ -62,8 +67,7 @@ def test_unknown_led_map_returns_none():
 
 def test_every_led_maps_to_a_real_station():
     """A silkscreen referencing a station the topology does not have would
-    silently never light up.
-    """
+    silently never light up."""
     topology = json.loads((REPO_ROOT / "shared/network.json").read_text())
     led_map = load_led_map("rev-a")
 

@@ -1,3 +1,5 @@
+"""Ported from node-api/test/ntasSource.test.js."""
+
 from ttcmap.map.sources.ntas import positions_from_responses
 
 TOPOLOGY = {
@@ -24,7 +26,8 @@ def test_train_arriving_is_placed_approaching_the_station():
 
 
 def test_every_arrival_in_the_list_becomes_a_train():
-    # Keep every arrival in the platform queue.
+    # "1, 4" is two trains queued for the same platform; keeping only the first
+    # is what left most of the map dark
     positions = parse([("p1", [{"line": "2", "direction": "0", "nextTrains": "1, 4, 7"}])])
     assert [p.eta_s for p in positions] == [60.0, 240.0]
 
@@ -35,7 +38,8 @@ def test_arrivals_beyond_the_window_are_ignored():
 
 
 def test_eta_is_carried_rather_than_a_position():
-    # Position interpolation happens after the observation age is known.
+    # the parser must not guess a position; interpolate does that once the age
+    # of the observation is known
     positions = parse([("p1", [{"line": "2", "direction": "0", "nextTrains": "3"}])])
     assert positions[0].eta_s == 180.0
     assert positions[0].progress == 0.0
@@ -68,7 +72,9 @@ def test_missing_direction_is_skipped_rather_than_raising():
 
 
 def test_repeat_sightings_of_a_queue_slot_are_deduped():
-    # Deduplicate repeated platform responses by queue slot.
+    # NTAS carries no train ids, so two responses covering the same
+    # line/direction/station must collapse per queue position rather than
+    # double-counting the same trains
     positions = parse(
         [
             ("p1", [{"line": "2", "direction": "0", "nextTrains": "1, 4"}]),

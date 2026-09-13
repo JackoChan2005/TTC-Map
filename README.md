@@ -1,147 +1,112 @@
 # TTC Map
 
-A Toronto rail explorer and ESP32 LED display built around one transit-state API.
-The web map shows Lines 1, 2, 4, 5 and 6 over OpenStreetMap, with route search,
-station details, directional markers and a schematic view.
+TTC rail state for Lines 1, 2, 4, 5 Eglinton and 6 Finch West, served to two displays: a web map and an ESP32-driven
+LED board on a custom PCB.
 
-The project implements GTFS import and validation, bounded NTAS polling, estimated
-train positions, a shared web/LED state model, the browser interface and firmware
-for an eight-LED board revision. Contributor history is available in Git; individual
-ownership and asset permissions are documented in [docs/ASSETS.md](docs/ASSETS.md).
-
-![TTC Map geographic explorer](docs/images/map-demo.png)
-
-The image records a real-data session on September 12, 2026; it is not a live feed.
-
-```text
-Toronto Open Data GTFS -> validated SQLite schedules/topology --+
-TTC NTAS countdowns -> per-line snapshots and interpolation ----+-> map state
-                                                               |-> web explorer
-                                                               +-> ESP32 LED frame
+```
+Toronto Open Data (GTFS)  ─┐
+                           ├─► ttcmap API ─┬─► web frontend (SVG map + route search)
+TTC NTAS (realtime)       ─┘               └─► ESP32 / LED board (packed bitmask)
 ```
 
-Python/FastAPI serves the vanilla JavaScript/SVG frontend. SQLite, pandas and
-HTTPX handle data; ESP-IDF/PlatformIO builds the firmware. There is no frontend
-build step and no Node server.
+## Quick start
 
-## What the map means
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.12+.
+Nothing else — no separate setup step, no virtualenv to activate.
 
-- Filled arrows are NTAS-backed estimates; outlined arrows are scheduled estimates.
-  Neither is GPS. Routes connect station coordinates approximately, not surveyed tracks.
-- Lines 1/2/4 use NTAS when healthy. Line 5 is scheduled unless explicitly enabled
-  after [coverage validation](docs/LINE_5_6.md); Line 6 is schedule-only.
-- Direction follows API travel order. Unknown direction uses a neutral marker.
-- Departures are scheduled, within a two-minute line-wide window capped at 200 rows.
-  Service alerts, live station arrival boards and journey planning are unavailable.
-- Data health does not imply normal TTC operations. Failed state requests clear
-  train markers; a missing street background leaves the transit overlay usable.
-
-## Run on Windows
-
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/), clone this
-repository, then double-click `start.bat` or run it from PowerShell:
-
-```powershell
-.\start.bat
+```bash
+uv run ttcmap serve
 ```
 
-The launcher installs the locked dependencies and starts the server. It keeps
-Python packages in `%LOCALAPPDATA%\TTC-Map\venv`, outside OneDrive. Python 3.13 is
-selected by `.python-version`; uv can download it if needed. Do not repair or
-reuse an old OneDrive-managed `.venv` to run this launcher.
+Or double-click `start.command` (macOS/Linux) / `start.bat` (Windows).
 
-Open <http://localhost:8000> for the map, `/search/` for timetable search, and
-`/docs` or `/redoc` for the local interactive API reference. Stop with Ctrl+C.
-For another port: `.\start.bat serve --port 8001`.
+Then open <http://localhost:8000> for the map and <http://localhost:8000/docs> for the
+interactive API reference.
 
-[Windows setup and clean-checkout verification](docs/SETUP.md) includes manual
-commands, separate-checkout environments and offline rehearsal.
-
-## macOS / Linux
-
-```sh
-uv sync --locked
-uv run --no-sync ttcmap serve
-```
-
-Python 3.12+ is supported by the package; the repository pins 3.13 for development.
-Use one worker and a local SQLite database. The current validation machine is
-Windows; Linux/macOS launch and physical hardware validation are separate checks.
-
-## Prepare the demo
-
-The first refresh downloads the GTFS archive and builds the database. Network
-access and several minutes may be needed; the server displays an unavailable
-state until publication completes. A fresh offline checkout has no transit data.
-
-Before presenting, run a refresh while online and check `/api/v1/health`. A valid
-published schedule can support estimates when NTAS fails. For a deliberate
-schedule-only demo, set `MAP_SOURCE=schedule`. Expired/missing schedules cannot
-provide that fallback. Street tiles still need internet; the schematic does not.
-See the [offline rehearsal](docs/SETUP.md#offline-rehearsal).
+The first run downloads the ~84 MB GTFS feed and builds the database, which takes a few
+minutes. The server answers requests while that happens; the map falls back to whatever data
+it has. Later runs check whether the feed changed and start in seconds when it has not.
 
 ## Commands
 
-Run these after the platform-specific setup. On Windows, set
-`$env:UV_PROJECT_ENVIRONMENT = "$env:LOCALAPPDATA\TTC-Map\venv"` first, or use
-`.\start.bat refresh` for a feed check.
-
-| Command | Purpose |
+| Command | What it does |
 |---|---|
-| `uv run --no-sync ttcmap refresh` | Check/rebuild the feed; add `--force` for a forced rebuild |
-| `uv run --no-sync ttcmap build-network` | Regenerate exports from the verified cache |
-| `uv run --no-sync pytest` | Backend tests |
-| `uv run --no-sync ruff check src tests` | Python lint |
-| `node --test tests/web/*.test.mjs` | Frontend unit tests, optional Node.js |
-| `node scripts/build-schematic.mjs` | Regenerate schematic after network export |
+| `uv run ttcmap serve` | Run the API and web frontend |
+| `uv run ttcmap refresh` | Check the GTFS feed, rebuild if it changed (`--force` to rebuild anyway) |
+| `uv run ttcmap build-network` | Regenerate shared exports from the verified cache (`--data-dir` for an explicit extract) |
+| `uv run pytest` | Run the test suite |
+| `uv run ruff check src tests` | Lint |
+| `node --test tests/web/*.test.mjs` | Run frontend tests (optional Node.js) |
+| `node scripts/build-schematic.mjs` | Regenerate the schematic layout (optional Node.js) |
 
-Browser tests use a pinned optional Playwright install; see [SETUP.md](docs/SETUP.md).
-There is no separate JavaScript build, type-checker or linter configured.
+## API
 
-## API and structure
+All endpoints are under `/api/v1`. Full schemas at `/docs`.
 
-The local API reference reads `/openapi.json` and can send GET requests without
-external scripts. All transit routes are below `/api/v1`:
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/health` | Service, GTFS and realtime status |
+| GET | `/api/v1/map-config` | Matching topology, schematic layout and generation |
+| GET | `/api/v1/network` | Canonical topology — lines, stations, platforms |
+| GET | `/api/v1/layout/{name}` | Station x/y for a visual design (`schematic`, `geographic`) |
+| GET | `/api/v1/map-state` | Train positions. `?source=auto\|schedule\|ntas`, `?at=<ISO8601>` |
+| GET | `/api/v1/led-state` | LED frame as JSON. `?map=rev-a` |
+| GET | `/api/v1/led-state.bin` | LED frame as a raw bitmask — see [docs/FIRMWARE_API.md](docs/FIRMWARE_API.md) |
+| GET | `/api/v1/departures` | Next departures. `?route=1&at=<ISO8601>` |
+| GET | `/api/v1/gtfs/status` | Feed version and last refresh result |
+| POST | `/api/v1/gtfs/refresh` | Trigger a check. `?force=true` to rebuild regardless |
 
-| GET endpoint | Data |
+`map-state` selects data per line: NTAS for healthy enabled lines and labelled
+scheduled estimates for the others. Lines 1/2/4 use NTAS by default. Line 5 is
+opt-in after coverage validation; Line 6 is schedule-only. Mixed responses carry
+`source: "mixed"` and `lineSources`; a configured live line falling back sets
+`fallback: true`. Failed/stale observations are never retained as live positions.
+`source=ntas` reuses fresh recorder snapshots, excludes disabled lines and returns
+503 when an enabled line is unavailable. An explicit `at` uses schedules;
+combining it with `source=ntas` is invalid.
+
+The browser uses `/api/v1/map-config` to load a matching network, layout and
+generation. Schedules, date exceptions and runtime topology publish in one SQLite
+transaction. If an old installation has not completed its first upgraded build,
+data endpoints return 503 until publication succeeds. See
+[upgrade and rollback instructions](docs/ARCHITECTURE.md#refresh-and-upgrade-operations).
+
+## Layout
+
+| Path | Contents |
 |---|---|
-| `/health`, `/gtfs/status` | Dataset and per-line source diagnostics |
-| `/map-config` | Matching generation, network and schematic |
-| `/network`, `/layout/{name}` | Topology or an individual layout |
-| `/map-state` | Estimated positions; source and optional time selection |
-| `/departures?route=1` | Scheduled departure window |
-| `/led-state`, `/led-state.bin` | Board frame as JSON or packed bits |
+| `src/ttcmap/` | The API — GTFS pipeline, map state engine, sources, renderers, routes |
+| `web/` | Static frontend (geographic/schematic SVG explorer, route timelines and timetable search) |
+| `scripts/` | Dependency-free schematic layout generator |
+| `firmware/` | ESP32 firmware (PlatformIO, ESP-IDF, `esp32doit-devkit-v1`) |
+| `Hardware/` | KiCad project and `led-maps/` board revisions |
+| `shared/` | Station registry and generated network/layout exports |
+| `tests/` | pytest suite |
+| `data/` | Gitignored: GTFS extract and `ttc.db` |
 
-Refresh is CLI-only. The former `POST /api/v1/gtfs/refresh` is removed so a viewer
-cannot trigger an expensive rebuild. The web refresh button reloads read endpoints.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit together and
+[docs/FIRMWARE_API.md](docs/FIRMWARE_API.md) for the ESP32 contract.
 
-| Directory | Purpose |
-|---|---|
-| `src/ttcmap/` | API, GTFS pipeline, source selection and LED renderer |
-| `web/` | Explorer, timetable and local API reference |
-| `shared/` | Reviewed station identities and generated network/layout exports |
-| `firmware/` | ESP-IDF firmware; local Wi-Fi settings are gitignored |
-| `hardware/` | Integrated KiCad design and eight-LED board map |
-| `tests/`, `scripts/` | Validation and schematic generation |
-| `data/` | Ignored feeds, database, local validation and private asset archive |
+The redesigned frontend follows the root UI design references. Its supported
+features and API limitations are mapped in [docs/UI_API_AUDIT.md](docs/UI_API_AUDIT.md),
+with local browser/test results in [docs/UI_VALIDATION.md](docs/UI_VALIDATION.md).
 
-Run from an editable repository checkout. A standalone wheel does not include the
-web/shared/hardware resources and is not a supported deployment package.
+## Configuration
 
-## Configuration and troubleshooting
+Everything has a working default; the app runs with no config at all. To override, copy
+`.env.example` to `.env` and uncomment what you need. The full list of settings is
+`src/ttcmap/config.py`.
 
-Copy `.env.example` to `.env` for optional overrides; all fields are in
-`src/ttcmap/config.py`. Local paths resolve against the checkout. For OneDrive
-installations that also need database isolation, configure `DATA_DIR` and `DB_PATH`
-to local storage. Cloud synchronization is not multi-host database coordination.
+## Troubleshooting
 
-- **Port occupied:** use another port with the launcher/CLI.
-- **Transit data unavailable:** check `/api/v1/health` and refresh logs. First import,
-  expired schedules or a failed upgrade can cause 503 responses.
-- **Scheduled labels:** live observations may be unavailable or disabled for that line.
-- **Street map unavailable:** use the schematic; OSM tiles are an external service.
-- **Firmware connection:** follow [ESP32_SMOKE_TEST.md](docs/ESP32_SMOKE_TEST.md).
-  The eight-LED revision does not represent a fully wired station network.
+**Port already in use** — `uv run ttcmap serve --port 8001`, or set `PORT` in `.env`.
 
-See [ARCHITECTURE.md](docs/ARCHITECTURE.md), [UI_API_AUDIT.md](docs/UI_API_AUDIT.md),
-[validation results](docs/UI_VALIDATION.md) and [asset/publication status](docs/ASSETS.md).
+**`Topology not found` / `503` from `/api/v1/network`** — the first GTFS refresh has not
+finished. Check progress in the server log, or run `uv run ttcmap refresh` directly.
+
+**Map shows "schedule simulation (realtime unavailable)"** — TTC's NTAS feed is unreachable or
+returned too few platforms. This is expected behaviour, not a failure; the map keeps working
+from the schedule. `/api/v1/health` shows the last poll result.
+
+**Rebuild seems stuck** — the pandas merge over `stop_times.txt` (~280 MB extracted) takes
+several minutes. It runs off the event loop, so the API stays responsive.

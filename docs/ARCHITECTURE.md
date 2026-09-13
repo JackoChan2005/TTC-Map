@@ -73,9 +73,6 @@ claimed. Adding GTFS-Realtime is a separate change.
 
 ## Refresh and upgrade operations
 
-Refresh is CLI-only. The former HTTP refresh route is removed. Browser viewers
-can read state and diagnostics but cannot trigger publication.
-
 Use `uv run ttcmap refresh` to check metadata and rebuild when the feed, importer
 revision or local registry/layout inputs change. `--force` rebuilds even if the
 version is unchanged. The recorded metadata comes from the package used for the

@@ -18,7 +18,7 @@ GET /api/v1/led-state.bin?map=rev-a
 | `X-Source` | `ntas`, `schedule`, or `mixed` (sources selected per line) |
 
 `?map=` selects a board revision; it must match `^[a-z][a-z0-9-]*$` and name a file in
-`hardware/led-maps/`. Unknown names return `404`. `rev-a` is the default.
+`Hardware/led-maps/`. Unknown names return `404`. `rev-a` is the default.
 
 `?source=schedule` forces the schedule simulation — useful for bench testing when you want
 deterministic output within the published service calendar regardless of whether NTAS is up.
@@ -68,7 +68,7 @@ yourself — do not pass the buffer straight through.
 
 ## Adding a board revision
 
-Add `hardware/led-maps/<rev>.json`. No server code changes.
+Add `Hardware/led-maps/<rev>.json`. No server code changes.
 
 ```json
 {

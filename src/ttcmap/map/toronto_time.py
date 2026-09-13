@@ -1,4 +1,9 @@
-"""Toronto service dates, including GTFS trips after midnight."""
+"""Toronto service-day helpers.
+
+Ported from node-api/src/map/torontoTime.js. This logic previously existed three
+times (also in API/src/main.py and node-api/src/routes.js, each subtly
+different); this is now the only copy.
+"""
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta

@@ -180,7 +180,8 @@ export function createExplorerMap(svg, onStation, onBasemap = () => {}) {
       if (!p) continue;
       const x = (p.x - box.x) / unit, y = (p.y - box.y) / unit;
       if (x < 0 || y < 0 || x > s.w || y > s.h) continue;
-      // Group nearby observations with the same line, direction and source.
+      // Co-located observations on the same line/direction share a marker.
+      // Positions are not moved or invented to manufacture visual separation.
       const key = [train.line, train.direction, live, Math.round(x / (trainSize * 1.7)), Math.round(y / (trainSize * 1.7))].join(':');
       if (trainGroups.has(key)) { trainGroups.get(key).count++; continue; }
       trainGroups.set(key, { p, train, live, count: 1 });

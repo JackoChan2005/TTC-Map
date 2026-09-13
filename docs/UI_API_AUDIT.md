@@ -1,8 +1,8 @@
 # Frontend redesign: API capability audit
 
-Design source: root `desktop_ui_design.md`. Original reference images are kept
-locally pending provenance confirmation; they supplied visual direction, not
-transit data. See `ASSETS.md`.
+Design sources: root `desktop_ui_design.md`, `desktop_landing_view.jpg`, and
+`route_details_view.jpg`. The images establish layout and visual hierarchy;
+their illustrative station names, routes, status text and countdowns are not data.
 
 ## Architecture and reuse
 
@@ -68,7 +68,7 @@ the legacy directories.
 | `GET /layout/schematic` | Matching schematic already included in `/map-config`. Other valid layout names are not assumed to exist. |
 | `GET /led-state`, `GET /led-state.bin` | Hardware renderer contracts, not browser map data. |
 | `GET /gtfs/status` | Subset of `/health`; no duplicate diagnostic request needed. |
-| CLI `ttcmap refresh` | Publication is CLI-only; the former HTTP write route was removed. Browser refresh only reloads reads. |
+| `POST /gtfs/refresh` | Administrative data publication, not a rider control. Refresh button only reloads browser reads. |
 | `map-state?source=ntas/schedule&at=...` variants | The main map follows backend automatic source policy. Historical time selection remains in timetable search. |
 
 ## Missing capabilities and intentional limitations

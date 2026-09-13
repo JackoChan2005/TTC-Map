@@ -14,19 +14,9 @@
    It returns packed bytes with `ETag`, `X-Led-Count`, `X-Generated-At`, and
    `X-Source` headers. Repeating the request with `If-None-Match` should return
    `304` when the frame is unchanged.
-4. Build with `pio run --project-dir firmware`, then flash the `firmware`
-   PlatformIO project and open the monitor at 115200 baud. The
+4. Flash the `firmware` PlatformIO project and open the monitor at 115200 baud. The
    expected sequence is Wi-Fi association, an `RX frame` line, decoded LED
    indices, a 74HC595 latch line, then periodic `HTTP 304` lines.
 
 Never commit `firmware/include/secrets.h`; it contains local credentials and the
 LAN address.
-
-The project uses a 2 MB flash layout to match the checked-in SDK configuration;
-this does not measure the chip's physical capacity. Keep that setting aligned when
-regenerating sdkconfig. The current rev-a consumer drives eight LEDs through two
-four-bit register groups. Compilation verifies neither wiring nor Wi-Fi operation.
-
-On Windows, PlatformIO may be installed by its editor extension without being on
-PATH. Its usual command is `%USERPROFILE%\.platformio\penv\Scripts\platformio.exe`;
-use the PlatformIO terminal if it is installed elsewhere.

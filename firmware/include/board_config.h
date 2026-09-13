@@ -1,6 +1,8 @@
 #pragma once
 
-// Limit remote LED counts to the physical board capacity.
+// rev-a is the currently wired PCB. Keep physical capacity separate from the
+// X-Led-Count value received from the server: a remote header must never make
+// the firmware write beyond the board's actual output buffer.
 #define TTC_BOARD_LED_CAPACITY 8U
 
 #define TTC_U2_SER GPIO_NUM_23
