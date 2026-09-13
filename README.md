@@ -68,18 +68,6 @@ Python 3.12+ is supported by the package; the repository pins 3.13 for developme
 Use one worker and a local SQLite database. The current validation machine is
 Windows; Linux/macOS launch and physical hardware validation are separate checks.
 
-## Prepare the demo
-
-The first refresh downloads the GTFS archive and builds the database. Network
-access and several minutes may be needed; the server displays an unavailable
-state until publication completes. A fresh offline checkout has no transit data.
-
-Before presenting, run a refresh while online and check `/api/v1/health`. A valid
-published schedule can support estimates when NTAS fails. For a deliberate
-schedule-only demo, set `MAP_SOURCE=schedule`. Expired/missing schedules cannot
-provide that fallback. Street tiles still need internet; the schematic does not.
-See the [offline rehearsal](docs/SETUP.md#offline-rehearsal).
-
 ## Commands
 
 Run these after the platform-specific setup. On Windows, set
