@@ -1,4 +1,4 @@
-// All transit requests belong here. No static transit fallback or invented feed.
+// Centralized transit API access.
 export class ApiError extends Error {
   constructor(message, status) { super(message); this.status = status; }
 }
@@ -18,6 +18,6 @@ export const api = {
   state: () => request('map-state'),
   health: () => request('health'),
   departures: (route, at) => request('departures', { route, at }),
-  // Station coordinates and schematic now come from the same atomic response.
+  // Coordinates and schematic layout share one dataset generation.
   config: () => request('map-config')
 };

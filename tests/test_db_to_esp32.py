@@ -1,8 +1,6 @@
-"""Integration tests for the database-to-ESP32 LED-frame pipeline.
+"""Test the database-to-ESP32 API contract through the returned frame bytes.
 
-These tests stop at the hardware boundary: the exact bytes returned by the
-firmware endpoint.  The ESP32 firmware does not have an HTTP/74HC595 consumer
-yet, so exercising physical GPIO requires that production code to exist first.
+Physical GPIO and firmware behavior require separate hardware testing.
 """
 
 import json
@@ -20,7 +18,6 @@ from ttcmap.map import recorder
 from ttcmap.map.recorder import Snapshot as RecorderSnapshot
 from ttcmap.map.sources.ntas import LinePoll
 from ttcmap.map.state import TrainPosition
-from ttcmap.map.topology import clear_cache
 from ttcmap.routes import map as map_routes
 
 NOW = datetime(2026, 8, 5, 16, 0, tzinfo=UTC)  # Wednesday, noon in Toronto
@@ -41,7 +38,6 @@ def Snapshot(polled_at, status="ok", positions=()):
 
 @pytest.fixture()
 def pipeline(tmp_path, monkeypatch):
-    """Build the smallest real GTFS DB/topology/board needed by the API."""
     settings = get_settings()
     data_dir = tmp_path / "data"
     shared_dir = tmp_path / "shared"
@@ -144,7 +140,6 @@ def pipeline(tmp_path, monkeypatch):
             ),
         )
 
-    clear_cache()
     recorder.set_snapshot(None)
     app = FastAPI()
     app.include_router(map_routes.router, prefix="/api/v1")
@@ -153,11 +148,9 @@ def pipeline(tmp_path, monkeypatch):
         yield client
 
     recorder.set_snapshot(None)
-    clear_cache()
 
 
 def test_schedule_database_becomes_exact_esp32_frame(pipeline):
-    """SQLite -> schedule source -> map state -> renderer -> HTTP bytes."""
     response = pipeline.get("/api/v1/led-state.bin?map=rev-a&source=schedule")
 
     assert response.status_code == 200

@@ -15,8 +15,6 @@ from ttcmap.gtfs import build, ckan
 from ttcmap.gtfs.refresh_lock import refresh_lock
 
 log = logging.getLogger(__name__)
-GTFS_VERSION_META_KEY = "gtfs_last_modified"
-STOP_TIMES_TABLE = "SUBWAY_STOP_TIMES"
 _lock = asyncio.Lock()
 _last_result = None
 
@@ -47,10 +45,6 @@ def active_metadata() -> tuple[dict, str | None, str | None]:
     return (
         (json.loads(row["payload"]), row["version"], row["revision"]) if row else ({}, None, None)
     )
-
-
-def database_is_missing() -> bool:
-    return active_metadata()[2] != build.IMPORTER_REVISION
 
 
 def _refresh_sync(force: bool) -> RefreshResult:

@@ -1,12 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { launchBrowser } from './browser.js';
 
-// Optional runner only. Install Playwright in an ignored/temp directory;
-// no browser-test dependency is needed to serve the frontend.
-const { chromium } = await import(pathToFileURL(path.resolve(process.env.PLAYWRIGHT_MODULE || 'data/ui-validation/node_modules/playwright/index.mjs')));
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
+// Optional browser tooling is locked in tests/web/package-lock.json.
+const browser = await launchBrowser();
 const base = process.env.TTCMAP_URL || 'http://127.0.0.1:8000';
 const output = 'data/ui-validation';
 await fs.mkdir(output, { recursive: true });
@@ -27,7 +24,7 @@ const noOverflow = async () => assert.equal(await page.evaluate(() => document.d
 const routes = ['/', '/index.html', '/search', '/search/', '/search/index.html', '/map', '/map/'];
 const report = { realRoutes: [], fixtureRoutes: [], checks: [] };
 try {
-  // Real backend first: no response interception and no synthetic transit data.
+  // Use real transit responses first; only map tiles are intercepted.
   for (const route of routes) {
     const response = await page.goto(base + route);
     assert.equal(response.status(), 200, route);

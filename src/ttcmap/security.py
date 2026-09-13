@@ -30,7 +30,6 @@ async def security_headers(
     request: Request,
     call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
-    """Add the common browser hardening headers to every response."""
     response = await call_next(request)
     response.headers.update(SECURITY_HEADERS)
     return response

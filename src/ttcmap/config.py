@@ -1,10 +1,4 @@
-"""Single source of configuration.
-
-Replaces node-api/env.config plus the gitignored .env.local override that only
-existed so the Node server could locate a Python interpreter to spawn. With one
-process there is nothing to spawn, so PYTHON_BIN, PYTHON_SYNC_*, RT_DATABASE_PATH,
-JSON_SOURCE and CKAN_FETCH_RESOURCE are all gone.
-"""
+"""Application settings, loaded from the environment and .env."""
 
 from functools import lru_cache
 from pathlib import Path
@@ -12,7 +6,6 @@ from pathlib import Path
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# repo root: src/ttcmap/config.py -> src/ttcmap -> src -> repo
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
@@ -26,35 +19,25 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
 
-    # Data locations. Relative paths resolve against the repo root.
+    # Relative data paths resolve against the repository root.
     data_dir: Path = Path("data")
     db_path: Path = Path("data/ttc.db")
     shared_dir: Path = Path("shared")
-    led_maps_dir: Path = Path("Hardware/led-maps")
+    led_maps_dir: Path = Path("hardware/led-maps")
     web_dir: Path = Path("web")
 
-    # Toronto Open Data (CKAN) — one package id for both the version check and
-    # the download; the Node and Python halves used to disagree on this.
     ckan_base_url: str = "https://ckan0.cf.opendata.inter.prod-toronto.ca"
     gtfs_package_id: str = "merged-gtfs-ttc-routes-and-schedules"
-    # The GTFS feed changes every few weeks, so this is how often we *check*
-    # CKAN's metadata_modified, not how often we rebuild.
+    # Check metadata at this interval; rebuild only when needed.
     gtfs_check_interval_s: int = 6 * 60 * 60
 
-    # NTAS realtime feed
     ntas_base_url: str = "https://ntas.ttc.ca/api/ntas/get-next-train-time/"
     ntas_poll_s: int = 30
-    # How far ahead to accept arrivals. At 1 a train only existed for its final
-    # minute and most of the map stayed dark. It only has to clear the slowest
-    # segment (276s measured from the schedule) for every train to be seen on
-    # the segment it is actually on; interpolate drops anything further out as a
-    # duplicate of the platform behind, so 6, 8 and 10 minutes all render
-    # identically to 5.
+    # Minimum arrival window; the recorder extends it for longer segments.
     ntas_arriving_min: int = 5
     ntas_concurrency: int = 10
     ntas_timeout_s: float = 5.0
-    # deadline for a whole poll across every platform, so an unresponsive feed
-    # cannot block the recorder for longer than one cycle
+    # Bound the whole poll so feed timeouts cannot stall the recorder.
     ntas_poll_timeout_s: float = 25.0
     snapshot_max_age_s: float = 90.0
 

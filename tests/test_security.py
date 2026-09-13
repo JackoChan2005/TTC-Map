@@ -46,7 +46,7 @@ def test_nosniff_and_referrer_policy_are_pinned():
     assert "connect-src 'self'" in headers["Content-Security-Policy"]
 
 
-def test_old_map_url_redirects_to_schematic_homepage():
+def test_old_map_url_redirects_to_homepage():
     response = TestClient(create_app()).get("/map/", follow_redirects=False)
 
     assert response.status_code in {302, 307}
@@ -54,3 +54,22 @@ def test_old_map_url_redirects_to_schematic_homepage():
     assert response.headers["Content-Security-Policy"] == SECURITY_HEADERS[
         "Content-Security-Policy"
     ]
+
+
+def test_local_docs_work_with_the_frontend_security_policy():
+    client = TestClient(create_app())
+    for route in ("/docs", "/redoc"):
+        response = client.get(route)
+        assert response.status_code == 200
+        assert 'src="/api/reference.js"' in response.text
+        assert "cdn.jsdelivr.net" not in response.text
+        assert response.headers["Content-Security-Policy"] == SECURITY_HEADERS[
+            "Content-Security-Policy"
+        ]
+    assert client.get("/api/reference.js").status_code == 200
+
+
+def test_refresh_cannot_be_triggered_over_http():
+    client = TestClient(create_app())
+    assert "/api/v1/gtfs/refresh" not in client.get("/openapi.json").json()["paths"]
+    assert client.post("/api/v1/gtfs/refresh?force=true").status_code == 405

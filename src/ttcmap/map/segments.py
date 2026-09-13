@@ -1,17 +1,7 @@
-"""How long a train takes to travel each segment, measured from the GTFS feed.
+"""Median scheduled travel times for each directed station pair.
 
-NTAS answers "next train in N minutes", which is a countdown to a *destination*,
-not a position. Converting one into the other needs the segment's traversal
-time: a train 3 minutes from B is halfway along A->B if that run takes 6
-minutes, and has not left A yet if it takes 2.
-
-Times are the median over every scheduled trip rather than the mean, because a
-handful of rows carry absurd spans (a trip straddling the service-day rollover,
-or a short-turn reusing a stop pair) and one of those drags a mean badly.
-
-Departure-to-departure, matching how sources/schedule.py measures progress, so
-both sources place a train the same way. That folds the dwell at the far end
-into the span; it is a few seconds against a two-minute run.
+Use departure-to-departure spans, as the schedule source does. Filter outliers
+before taking the median; spans include station dwell time.
 """
 
 import logging
@@ -20,13 +10,11 @@ from ttcmap.db import Dataset, read_dataset
 
 log = logging.getLogger(__name__)
 
-# Spans outside this range are not real runs — they are service-day rollovers,
-# short-turns or data errors. Excluded before the median is taken.
+# Exclude implausible travel times before taking the median.
 MIN_SPAN_S = 20
 MAX_SPAN_S = 900
 
-# Used when a segment has no scheduled trips at all, which happens for pairs
-# that only exist in the realtime feed (diversions, non-revenue moves).
+# Estimate travel time when no scheduled span is available.
 DEFAULT_SPAN_S = 120.0
 
 _SQL = """
@@ -80,7 +68,6 @@ def segment_spans(dataset: Dataset | None = None) -> dict[tuple[str, str], float
 
 
 def clear_cache() -> None:
-    """Called after a GTFS refresh, alongside topology.clear_cache()."""
     _cache.clear()
 
 

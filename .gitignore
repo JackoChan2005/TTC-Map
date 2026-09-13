@@ -22,3 +22,23 @@ data/
 
 hardware/TTC-map-backups
 .DS_Store
+
+# Local credentials, dependencies and retired workspaces
+.env.*
+!.env.example
+**/secrets.h
+node_modules/
+.pio/
+/TTC/
+/node-api/
+*.kicad_prl
+fp-info-cache
+/dist/
+# Optional third-party CAD downloads stay local.
+hardware/My-Custom-Footprints.pretty/**
+!hardware/My-Custom-Footprints.pretty/**/License.txt
+!hardware/My-Custom-Footprints.pretty/License.txt
+
+# Original UI references pending provenance review
+/desktop_landing_view.jpg
+/route_details_view.jpg

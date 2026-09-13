@@ -1,12 +1,10 @@
-// Pure octolinear layout generator: places stations on a unit grid where
-// every edge points in one of 8 compass directions. Interchanges anchor
-// later lines to positions fixed by earlier ones.
+// Use eight-direction grid edges, anchoring later lines at interchanges.
 
 export const DIRECTIONS = [
   [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]
 ];
 
-// nearest of the 8 compass directions for a screen-space delta (y grows down)
+// Screen-space y increases downward.
 export const quantizeDirection = (dx, dy) => {
   const angle = Math.atan2(dy, dx);
   const index = ((Math.round(angle / (Math.PI / 4)) % 8) + 8) % 8;
@@ -15,9 +13,7 @@ export const quantizeDirection = (dx, dy) => {
 
 const key = (x, y) => `${x},${y}`;
 
-// walks a line's station list from an anchored index, stepping one grid cell
-// per edge in the quantized geographic direction; occupied cells push the
-// step outward so stations never collide
+// Step along quantized directions; skip occupied cells to avoid station collisions.
 const walk = (stations, startIndex, step, geo, positions, occupied) => {
   for (let i = startIndex + step; i >= 0 && i < stations.length; i += step) {
     const current = stations[i];

@@ -6,7 +6,7 @@ from fastapi import APIRouter
 
 from ttcmap.config import get_settings
 from ttcmap.db import DatasetUnavailable, read_dataset
-from ttcmap.gtfs.refresh import get_last_result, refresh
+from ttcmap.gtfs.refresh import get_last_result
 from ttcmap.gtfs.service_calendar import require_schedule
 from ttcmap.map.recorder import get_snapshot
 from ttcmap.map.sources.schedule import operating_lines
@@ -92,8 +92,3 @@ def health() -> dict:
 @router.get("/gtfs/status")
 def gtfs_status() -> dict:
     return health()["gtfs"]
-
-
-@router.post("/gtfs/refresh")
-async def gtfs_refresh(force: bool = False) -> dict:
-    return (await refresh(force=force)).as_dict()

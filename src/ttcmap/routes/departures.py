@@ -1,9 +1,4 @@
-"""Departure search for the web frontend.
-
-Replaces node-api's /api/route-search and the Python /departing/{time_str}, which
-answered the same question with two different implementations of Toronto service
-time. Both now go through ttcmap.map.toronto_time.
-"""
+"""Scheduled departures using Toronto service dates."""
 
 from datetime import UTC, datetime, timedelta
 

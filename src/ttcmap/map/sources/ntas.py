@@ -1,26 +1,7 @@
-"""Realtime train positions from TTC's NTAS (Next Train Arrival System).
+"""Poll NTAS platform arrival queues with bounded concurrency.
 
-Ported from node-api/src/map/sources/ntasSource.js. One request per platform
-returns the next arrival times in minutes:
-
-    [{"line": "2", "direction": "0", "nextTrains": "1, 3, 6", ...}]
-
-Every arrival in that list is a train, so all of them are kept — "3" and "6"
-above are the two trains queued behind the one arriving in a minute. Each is
-placed approaching that platform's station from the previous station on the
-line, and carries its ETA rather than a position: NTAS measures time-to-arrival,
-and ttcmap.map.interpolate turns that into a position using the segment's
-traversal time. Every train on the network is approaching *some* platform, so
-keeping the full list covers the whole map rather than just the last minute of
-each approach.
-
-NTAS carries no train ids, so positions are deduped per
-(line, direction, station, nth-arrival) — the nth entry of a platform's queue is
-the same train from one poll to the next, which is enough to keep a train moving
-forwards but is not a real vehicle identity.
-
-The hand-rolled concurrency lanes of the original become an asyncio.Semaphore
-over a shared keep-alive client.
+Each queue entry carries an ETA for interpolation. Queue slots can shift between
+polls and are not vehicle IDs.
 """
 
 import asyncio
@@ -56,11 +37,7 @@ def _arrival_minutes(entry: dict) -> list[int]:
 def positions_from_responses(
     topology: dict, responses: list[tuple[str, list]], arriving_min: int | None = None
 ) -> list[TrainPosition]:
-    """Pure: map (platform_id, entries) pairs onto deduped TrainPositions.
-
-    `arriving_min` is how far ahead to look, in minutes; it defaults to the
-    configured window and is a parameter so tests do not depend on settings.
-    """
+    """Convert platform queues to deduplicated sightings within arriving_min."""
     if arriving_min is None:
         arriving_min = get_settings().ntas_arriving_min
     by_key: dict[str, TrainPosition] = {}

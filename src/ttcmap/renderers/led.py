@@ -1,12 +1,6 @@
-"""Renders a MapState frame into the packed LED bitmask the ESP32 polls.
+"""Pack map state using the selected board mapping.
 
-Ported from node-api/src/map/renderers/ledRenderer.js. Each board revision is
-just a mapping file in hardware/led-maps/ — adding a display means adding a file,
-not changing code.
-
-Bit packing (unchanged from the JS, and the contract the firmware depends on):
-LED index i lives in byte i // 8 at bit i % 8, i.e. LSB-first within each byte.
-See docs/FIRMWARE_API.md.
+LED i uses byte i // 8, bit i % 8 (LSB-first). See docs/FIRMWARE_API.md.
 """
 
 import hashlib
