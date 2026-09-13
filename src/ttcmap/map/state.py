@@ -1,15 +1,4 @@
-"""The map state engine — pure, no database or HTTP.
-
-Ported from node-api/src/map/stateEngine.js. Sources are injected by the caller,
-which is what lets the schedule simulation, the NTAS feed and a recorded snapshot
-be swapped without the engine or any renderer knowing.
-
-  TrainPosition: line, direction, from, to, progress, trip_id
-                 from/to are station ids; to=None means the train is at `from`.
-  MapState:      generatedAt, source, trainCount, trains[], stationsWithTrains
-
-JSON keys stay camelCase because the web frontend reads them directly.
-"""
+"""Convert source positions into the shared web and LED map state."""
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -27,17 +16,11 @@ class TrainPosition:
     progress: float = 0.0
     trip_id: str | None = None
 
-    # NTAS reports a countdown to the destination, not a position, so realtime
-    # positions carry the ETA and have `progress` filled in later by
-    # ttcmap.map.interpolate once the age of the observation is known.
-    # Schedule positions compute `progress` directly and leave this None.
+    # NTAS countdown, aged by interpolate; schedule positions leave this unset.
     eta_s: float | None = None
-    # Lower bound carried across polls so a revised ETA cannot run a train
-    # backwards down the line. See interpolate.carry_floor.
+    # Prevent backward jumps after ETA revisions.
     progress_floor: float = 0.0
-    # Stable identity for one sighting: line|direction|station|nth-arrival.
-    # NTAS has no train ids, so this is only good for matching consecutive
-    # polls of the same queue position, which is all the floor needs.
+    # Queue key: line|direction|station|nth-arrival, not a vehicle ID.
     key: str | None = None
 
 
@@ -51,7 +34,6 @@ class MapState:
     fallback: bool = False
     generation: str | None = None
     lineSources: dict = field(default_factory=dict)
-    _extra: dict = field(default_factory=dict, repr=False)
 
     def as_dict(self) -> dict:
         payload = {

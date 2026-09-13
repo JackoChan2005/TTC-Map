@@ -1,9 +1,3 @@
-"""Ported from node-api/test/snapshotSource.test.js.
-
-The JS version also asserted that an unparseable polled_at is rejected; here
-polled_at is a datetime, so that case cannot occur and has no test.
-"""
-
 from datetime import UTC, datetime, timedelta
 
 from ttcmap.map.sources.ntas import LinePoll as Snapshot

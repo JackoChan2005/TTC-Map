@@ -7,7 +7,6 @@ FORMAT = "%(asctime)s %(levelname)s %(name)s: %(message)s"
 
 def configure(level: int = logging.INFO) -> None:
     logging.basicConfig(level=level, format=FORMAT)
-    # the NTAS recorder issues 148 requests every 30s; at INFO httpx logs a line
-    # for each and buries everything else
+    # Suppress per-platform HTTP logs so recorder diagnostics remain readable.
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)

@@ -1,9 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import path from 'node:path';
-import { pathToFileURL } from 'node:url';
-const { chromium } = await import(pathToFileURL(path.resolve(process.env.PLAYWRIGHT_MODULE || 'data/ui-validation/node_modules/playwright/index.mjs')));
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
+import { launchBrowser } from './browser.js';
+const browser = await launchBrowser();
 const network = JSON.parse(await fs.readFile('shared/network.json', 'utf8'));
 const layout = JSON.parse(await fs.readFile('shared/layouts/schematic.json', 'utf8'));
 const line = network.lines[0];

@@ -6,7 +6,8 @@ This document outlines the design concepts, justifications, and trade-offs for a
 
 The landing experience is designed to immediately orient the user geographically while keeping high-level system information accessible.
 
-![Desktop Landing View](./desktop_landing_view.jpg)
+The original reference image is retained locally pending provenance confirmation.
+See the current implementation in [README.md](README.md).
 
 ### Design Justifications
 - **Map-First Geography:** Using a full-screen, dark-themed geographic base map (rather than a schematic) allows users to instantly understand where stations and live trains are located relative to actual city streets and landmarks.
@@ -23,11 +24,11 @@ The landing experience is designed to immediately orient the user geographically
 
 When a user selects a specific route (e.g., Line 1 Yonge-University), the UI shifts to a focused, progressive disclosure mode.
 
-![Route Details View](./route_details_view.jpg)
+The original route reference is retained locally pending provenance confirmation.
 
 ### Design Justifications
 - **Progressive Map Highlighting:** When a route is selected, the map zooms to fit the route's bounding box. Other subway lines are visually de-emphasized (grayed out or lowered in opacity), drawing full attention to the active route and its trains.
-- **Vertical Station Timeline:** The side panel transitions from a system overview to a vertical timeline of the selected route. This makes it easy to scan the order of stations, see where trains currently are relative to the stops, and check next-arrival countdowns.
+- **Vertical Station Timeline:** The side panel transitions from a system overview to a vertical timeline of the selected route. This makes it easy to scan the order of stations, see where trains currently are relative to the stops, and check scheduled departures when available.
 - **Clear Route Branding:** The panel header takes on the official color of the selected route (Yellow for Line 1), reinforcing to the user exactly which context they are currently viewing.
 
 ### Trade-offs

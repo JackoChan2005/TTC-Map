@@ -1,4 +1,4 @@
-"""Map, layout and renderer endpoints. Ported from node-api/src/mapRoutes.js."""
+"""Map configuration, state and LED endpoints."""
 
 from datetime import datetime
 
@@ -63,11 +63,7 @@ def get_layout(name: str) -> dict:
 
 
 async def _state_or_503(source: str | None, at: str | None = None):
-    """A forced source that cannot answer is a 503, not an unhandled 500.
-
-    Only ?source=ntas and ?source=schedule can reach this — `auto` falls back to
-    the schedule internally and always answers.
-    """
+    """Return 503 when the requested source or its fallback is unavailable."""
     try:
         return await get_map_state(now=_parse_at(at), source=_validate_source(source))
     except (FileNotFoundError, RuntimeError) as error:

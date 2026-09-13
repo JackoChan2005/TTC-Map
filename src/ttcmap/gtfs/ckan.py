@@ -27,10 +27,6 @@ def get_package_metadata() -> dict:
     return payload["result"]
 
 
-def get_feed_version() -> str | None:
-    return get_package_metadata().get("metadata_modified")
-
-
 def _pick_zip_resource(package: dict) -> dict:
     candidates = [
         r

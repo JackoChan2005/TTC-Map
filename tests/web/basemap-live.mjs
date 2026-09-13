@@ -1,11 +1,9 @@
 // One fixed-viewport integration check. No automated panning/zooming or tile
 // collection: the public OSM service is not used for the regression suite.
 import assert from 'node:assert/strict';
-import path from 'node:path';
 import fs from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
-const { chromium } = await import(pathToFileURL(path.resolve(process.env.PLAYWRIGHT_MODULE || 'data/ui-validation/node_modules/playwright/index.mjs')));
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
+import { launchBrowser } from './browser.js';
+const browser = await launchBrowser();
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   const errors = [], tiles = [], referers = [];

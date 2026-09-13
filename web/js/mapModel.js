@@ -1,9 +1,4 @@
-// View models for the schematic map, plus validation of API responses.
-// Everything from the network is treated as untrusted input: fields are
-// type-checked, numbers coerced and clamped, and bad entries dropped
-// before any of it reaches the DOM. Pure functions, no DOM.
-
-import { octolinearPoints, pointAlongPath } from './geometry.js';
+// Validate transit API responses.
 
 const FALLBACK_COLOR = '#1f2937';
 const COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
@@ -104,78 +99,3 @@ export const validateMapState = (raw) => {
     trains
   };
 };
-
-const positionOf = (layout, stationId) => layout.stations[stationId] || null;
-
-// One polyline per line, edges expanded to octolinear segments.
-export const buildLinePaths = (network, layout) => network.lines.map((line) => {
-  const points = [];
-  for (let i = 1; i < line.stations.length; i += 1) {
-    const a = positionOf(layout, line.stations[i - 1]);
-    const b = positionOf(layout, line.stations[i]);
-    if (!a || !b) {
-      continue;
-    }
-    const segment = octolinearPoints(a, b);
-    for (const point of points.length === 0 ? segment : segment.slice(1)) {
-      points.push(point);
-    }
-  }
-  return { id: line.id, color: line.color, name: line.name, points };
-});
-
-const KIND_INTERCHANGE = 'interchange';
-const KIND_TERMINAL = 'terminal';
-const KIND_REGULAR = 'regular';
-
-export const stationKind = (network, stationId) => {
-  if (network.stations[stationId]?.interchange) {
-    return KIND_INTERCHANGE;
-  }
-  for (const line of network.lines) {
-    if (line.stations[0] === stationId || line.stations[line.stations.length - 1] === stationId) {
-      return KIND_TERMINAL;
-    }
-  }
-  return KIND_REGULAR;
-};
-
-export const buildStationMarkers = (network, layout) => Object.entries(network.stations)
-  .map(([id, station]) => {
-    const position = positionOf(layout, id);
-    if (!position) {
-      return null;
-    }
-    const line = network.lines.find((l) => l.id === station.lines[0]);
-    return {
-      id,
-      name: station.name,
-      x: position.x,
-      y: position.y,
-      kind: stationKind(network, id),
-      color: line ? line.color : FALLBACK_COLOR
-    };
-  })
-  .filter(Boolean);
-
-export const buildTrainMarkers = (state, network, layout) => state.trains
-  .map((train) => {
-    const line = network.lines.find((l) => l.id === train.line);
-    const color = line ? line.color : FALLBACK_COLOR;
-
-    if (train.at) {
-      const position = positionOf(layout, train.at);
-      return position
-        ? { x: position.x, y: position.y, angle: 0, color, label: train.stationName }
-        : null;
-    }
-
-    const a = positionOf(layout, train.between[0]);
-    const b = positionOf(layout, train.between[1]);
-    if (!a || !b) {
-      return null;
-    }
-    const point = pointAlongPath(octolinearPoints(a, b), train.progress);
-    return { x: point.x, y: point.y, angle: point.angle, color, label: train.stationName };
-  })
-  .filter(Boolean);
