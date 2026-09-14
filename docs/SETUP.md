@@ -46,14 +46,48 @@ successful refresh is published atomically and does not require a server restart
 
 ## macOS / Linux
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and open a
+terminal in the checkout. Initial setup needs internet; uv downloads the pinned
+Python 3.13 interpreter if necessary.
+
+```sh
+./start.command
+```
+
+On macOS, double-clicking `start.command` also launches it in Terminal. The
+launcher checks PATH and then `~/.local/bin/uv`, runs `uv sync --locked`, and
+starts the server. It stops on installation failure and passes CLI arguments
+through, for example `./start.command serve --port 8001` or
+`./start.command refresh`. Use `bash start.command` if an archive extraction
+did not preserve executable permissions. Stop the server with Ctrl+C.
+
+Equivalent manual commands, run from the repository root:
+
 ```sh
 uv sync --locked
 uv run --no-sync ttcmap serve
 ```
 
+Dependencies live in `.venv` by default. Do not reuse a Windows environment on
+Linux/macOS. Set `UV_PROJECT_ENVIRONMENT` to a separate local path if the checkout
+is shared across operating systems or stored in a cloud-synchronized directory;
+keep it set for subsequent commands. Open <http://localhost:8000> for the map.
+
 The default LED directory uses the tracked lowercase `hardware/led-maps` path.
-The current validation was performed on Windows; this path fix is not a claim
-of an executed Linux or macOS test.
+Linux validation uses a fresh checkout on Ubuntu 24.04 under WSL2, on its
+case-sensitive filesystem, with Python 3.13.15. macOS runtime validation has not
+been performed; the launcher uses Bash syntax compatible with macOS's bundled
+Bash. Neither check validates physical hardware.
+
+Startup verification on September 13, 2026 passed locked dependency installation,
+113 backend tests and Ruff. The checkout path contained spaces, and the launcher
+was also invoked from another directory. HTTP checks returned 200 for `/`,
+`/search/`, `/docs`, `/redoc`, `/openapi.json` and `/api/v1/health`. With an empty
+database and intentionally unreachable feed service, health reported degraded
+and `/api/v1/map-state` returned 503 as expected. Ctrl+C completed application
+shutdown. Launcher regression tests cover default startup, argument quoting,
+custom ports, installation failure and command exit-code propagation. This did
+not validate a live GTFS download or NTAS service availability.
 
 ## Offline rehearsal
 

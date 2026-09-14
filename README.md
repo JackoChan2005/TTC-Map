@@ -59,14 +59,31 @@ commands, separate-checkout environments and offline rehearsal.
 
 ## macOS / Linux
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then open a
+terminal in this repository and run:
+
+```sh
+./start.command
+```
+
+On macOS you can also double-click `start.command`. The launcher installs the
+locked dependencies into `.venv` and starts the server. Open
+<http://localhost:8000> and stop with Ctrl+C. Use
+`./start.command serve --port 8001` for another port or `./start.command refresh`
+for a feed check. If an extracted archive loses executable permissions, run
+`bash start.command`.
+
+Equivalent manual commands:
+
 ```sh
 uv sync --locked
 uv run --no-sync ttcmap serve
 ```
 
 Python 3.12+ is supported by the package; the repository pins 3.13 for development.
-Use one worker and a local SQLite database. The current validation machine is
-Windows; Linux/macOS launch and physical hardware validation are separate checks.
+Use one worker and a local SQLite database. Linux startup has been checked under
+Ubuntu 24.04 (WSL2); macOS runtime and physical hardware validation remain separate
+checks. See [setup verification](docs/SETUP.md#macos--linux).
 
 ## Commands
 
