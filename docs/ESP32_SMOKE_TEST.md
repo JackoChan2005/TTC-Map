@@ -1,5 +1,9 @@
 # ESP32 smoke test
 
+For the 24-channel TLC5947 test PCB, use the separate
+[TLC5947 acceptance test](../firmware/tlc5947-test/README.md).
+The steps below apply to the original 8-LED 74HC595 firmware.
+
 1. Copy `firmware/include/secrets.h.example` to `firmware/include/secrets.h` and set the
    Wi-Fi profiles plus the laptop's LAN URL. The local file is ignored by Git.
 2. From the repository root, start the API on the laptop with
