@@ -67,6 +67,6 @@ LED index i in bit i%8 of byte i/8, matching the existing binary API contract.
 These are synthetic positions: test slot 0 maps to OUT0/D1, slot 1 to OUT1/D2,
 and so on. This verifies output order and moving occupancy patterns. It does
 not verify TTC feed accuracy or real station assignments. Before live use,
-create a verified 24-channel station map and adapt the production firmware
-(currently an 8-LED 74HC595 driver). For a 24-channel API map, its six-digit
+create a verified 24-channel station map for the production firmware in
+`firmware/`, which drives the same pins. For a 24-channel API map, its six-digit
 `bits` value can be pasted into this monitor to compare the physical display.
