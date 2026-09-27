@@ -41,7 +41,7 @@ live **departures board** overhead.
           web map in a browser   packed LED bitmask
                                       |
                                       v
-                              ESP32 and 74HC595s
+                              ESP32 and TLC5947
 ```
 
 Everything runs in one Python service started with `uv run ttcmap serve`.

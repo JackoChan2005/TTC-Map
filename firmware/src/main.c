@@ -42,6 +42,10 @@
 #define TTC_ENABLE_SHIFT_OUTPUT 1
 #endif
 
+#ifndef TTC_SELF_TEST_MS
+#define TTC_SELF_TEST_MS 1000U
+#endif
+
 #ifndef TTC_WIFI_CONNECT_TIMEOUT_MS
 #define TTC_WIFI_CONNECT_TIMEOUT_MS 12000U
 #endif
@@ -271,47 +275,76 @@ static void print_frame_diagnostics(const led_frame_t *frame)
 #endif
 }
 
-static void shift_register_write(gpio_num_t data_pin, gpio_num_t clock_pin, gpio_num_t latch_pin,
-                                 uint8_t value)
+#if TTC_ENABLE_SHIFT_OUTPUT
+// TLC5947 datasheet (SBVS114B): SIN is sampled on the SCLK rising edge and
+// shifts toward the MSB, so the first bit sent ends up in bit 287 (OUT23 bit
+// 11). Send OUT23..OUT0, 12 bits each, MSB first, then pulse XLAT to latch.
+static void tlc5947_write(const uint16_t grayscale[TTC_BOARD_LED_CAPACITY])
 {
-    gpio_set_level(latch_pin, 0);
-    for (int bit = 7; bit >= 0; --bit) {
-        gpio_set_level(clock_pin, 0);
-        gpio_set_level(data_pin, (value >> bit) & 1U);
-        gpio_set_level(clock_pin, 1);
+    gpio_set_level(TTC_TLC_XLAT, 0);
+    for (int channel = (int)TTC_BOARD_LED_CAPACITY - 1; channel >= 0; --channel) {
+        for (int bit = 11; bit >= 0; --bit) {
+            gpio_set_level(TTC_TLC_SCLK, 0);
+            gpio_set_level(TTC_TLC_SIN, (grayscale[channel] >> bit) & 1U);
+            gpio_set_level(TTC_TLC_SCLK, 1);
+        }
     }
-    gpio_set_level(clock_pin, 0);
-    gpio_set_level(latch_pin, 1);
-    gpio_set_level(latch_pin, 0);
+    gpio_set_level(TTC_TLC_SCLK, 0);
+    gpio_set_level(TTC_TLC_XLAT, 1);
+    gpio_set_level(TTC_TLC_XLAT, 0);
 }
+#endif
 
-static void shift_output_init(void)
+static void led_output_init(void)
 {
 #if TTC_ENABLE_SHIFT_OUTPUT
+    // Grayscale data is undefined at power-up, so keep BLANK high (R2 already
+    // holds it there) until a known frame is latched. Set the level before
+    // enabling the output so the pin never glitches low.
+    gpio_set_level(TTC_TLC_BLANK, 1);
     const gpio_config_t output_config = {
-        .pin_bit_mask = (1ULL << TTC_U2_SER) | (1ULL << TTC_U2_SRCLK) | (1ULL << TTC_U2_RCLK) |
-                        (1ULL << TTC_U3_SER) | (1ULL << TTC_U3_SRCLK) | (1ULL << TTC_U3_RCLK),
+        .pin_bit_mask = (1ULL << TTC_TLC_SIN) | (1ULL << TTC_TLC_SCLK) |
+                        (1ULL << TTC_TLC_XLAT) | (1ULL << TTC_TLC_BLANK),
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,
     };
     ESP_ERROR_CHECK(gpio_config(&output_config));
-    shift_register_write(TTC_U2_SER, TTC_U2_SRCLK, TTC_U2_RCLK, 0);
-    shift_register_write(TTC_U3_SER, TTC_U3_SRCLK, TTC_U3_RCLK, 0);
+    gpio_set_level(TTC_TLC_BLANK, 1);
+
+    uint16_t grayscale[TTC_BOARD_LED_CAPACITY] = {0};
+    tlc5947_write(grayscale);
+    gpio_set_level(TTC_TLC_BLANK, 0);
+
+#if TTC_SELF_TEST_MS > 0
+    // Wiring check that needs no Wi-Fi or server: every LED lights briefly.
+    for (size_t channel = 0; channel < TTC_BOARD_LED_CAPACITY; ++channel) {
+        grayscale[channel] = TTC_TLC_ON_LEVEL;
+    }
+    tlc5947_write(grayscale);
+    ESP_LOGI(TAG, "TLC5947 self-test: all %u LEDs lit for %u ms",
+             (unsigned)TTC_BOARD_LED_CAPACITY, (unsigned)TTC_SELF_TEST_MS);
+    vTaskDelay(pdMS_TO_TICKS(TTC_SELF_TEST_MS));
+    memset(grayscale, 0, sizeof(grayscale));
+    tlc5947_write(grayscale);
+#endif
 #else
-    ESP_LOGI(TAG, "74HC595 output disabled by TTC_ENABLE_SHIFT_OUTPUT");
+    ESP_LOGI(TAG, "TLC5947 output disabled by TTC_ENABLE_SHIFT_OUTPUT");
 #endif
 }
 
-static void shift_frame_to_board(const led_frame_t *frame)
+static void led_frame_to_board(const led_frame_t *frame)
 {
 #if TTC_ENABLE_SHIFT_OUTPUT
-    uint8_t u2 = frame->byte_len > 0 ? frame->bytes[0] & 0x0FU : 0;
-    uint8_t u3 = frame->byte_len > 0 ? (frame->bytes[0] >> 4) & 0x0FU : 0;
-    shift_register_write(TTC_U2_SER, TTC_U2_SRCLK, TTC_U2_RCLK, u2);
-    shift_register_write(TTC_U3_SER, TTC_U3_SRCLK, TTC_U3_RCLK, u3);
-    ESP_LOGI(TAG, "74HC595 latch complete: U2=0x%02x U3=0x%02x", u2, u3);
+    uint16_t grayscale[TTC_BOARD_LED_CAPACITY] = {0};
+    for (uint16_t index = 0; index < frame->led_count && index < TTC_BOARD_LED_CAPACITY; ++index) {
+        if (led_is_on(frame->bytes, frame->byte_len, index)) {
+            grayscale[index] = TTC_TLC_ON_LEVEL;
+        }
+    }
+    tlc5947_write(grayscale);
+    ESP_LOGI(TAG, "TLC5947 latch complete: %u channels", (unsigned)frame->led_count);
 #else
     (void)frame;
 #endif
@@ -398,7 +431,7 @@ static void frame_mark_stale_if_needed(void)
     ESP_LOGW(TAG, "Frame is stale after %" PRIu32 " ms; blanking outputs", TTC_STALE_AFTER_MS);
     led_frame_t blank_frame = s_frame;
     memset(blank_frame.bytes, 0, sizeof(blank_frame.bytes));
-    shift_frame_to_board(&blank_frame);
+    led_frame_to_board(&blank_frame);
 }
 
 typedef enum {
@@ -447,7 +480,7 @@ static poll_result_t poll_frame(void)
         s_frame.stale = false;
         ESP_LOGI(TAG, "HTTP 304: frame unchanged; state remains valid");
         if (was_stale) {
-            shift_frame_to_board(&s_frame);
+            led_frame_to_board(&s_frame);
         }
         esp_http_client_cleanup(client);
         return POLL_UNCHANGED;
@@ -486,7 +519,7 @@ static poll_result_t poll_frame(void)
     s_frame.stale = false;
 
     print_frame_diagnostics(&s_frame);
-    shift_frame_to_board(&s_frame);
+    led_frame_to_board(&s_frame);
     esp_http_client_cleanup(client);
     return POLL_OK;
 }
@@ -500,7 +533,7 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(nvs_result);
 
-    shift_output_init();
+    led_output_init();
     wifi_init();
 
     uint32_t reconnect_delay_ms = TTC_WIFI_RETRY_BASE_MS;

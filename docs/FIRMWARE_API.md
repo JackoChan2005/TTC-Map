@@ -45,15 +45,15 @@ bool led_is_on(const uint8_t *frame, int index) {
 }
 ```
 
-Note this is LSB-first, while the 74HC595 shifts out MSB-first. Reverse the bits per byte
-before shifting, or walk the indices with `led_is_on()` and build the shift register word
-yourself — do not pass the buffer straight through.
+Note this is one bit per LED, LSB-first, while the TLC5947 takes 12 grayscale bits per
+channel, OUT23 first and MSB first. Walk the indices with `led_is_on()` and build the
+grayscale data yourself — do not pass the buffer straight through.
 
 ## Suggested poll loop
 
 1. `GET /api/v1/led-state.bin?map=rev-a` with `If-None-Match: <last etag>`.
 2. `304` → nothing changed, keep the current display and skip the shift-out.
-3. `200` → store the new `ETag`, latch the bytes out to the 74HC595 chain.
+3. `200` → store the new `ETag`, shift the frame out to the TLC5947 and pulse XLAT.
 4. Sleep ~5s. The server refreshes realtime data every 30s, so polling faster than that only
    costs power; slower than ~30s and the board visibly lags the trains.
 
